@@ -2,7 +2,7 @@
 import pytest
 import linktype
 import util
-import pcapng.core
+import core
 
 def test_section_header_block():
     blk_str     = core.section_header_block_create()

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import pcapng.linktype
 import pcapng.util
 import pcapng.core

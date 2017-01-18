@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 #todo copy all
 # http://www.tcpdump.org/linktypes.html

@@ -1,8 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import struct
+import sys
 import time
 import math
 
+
+def assert_python27():
+    (major, minor, micro, release_level, serial) = sys.version_info
+    assert major == 2
+    assert minor == 7
+
+assert_python27()
 
 #todo used anywhere?
 def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):

@@ -35,7 +35,7 @@ else
   echo ""
   echo ">>> to install, perform:"
   echo ""
-  echo ">>>    sudo pip install 'pcapng==1.2.3'   # *** use new version number ***  "
+  echo ">>>    sudo pip install --upgrade  pcapng"
   echo ""
 fi
 

@@ -1,9 +1,17 @@
 #!/usr/bin/python
 import struct
+import sys
 import pcapng.linktype
 import pcapng.util
 
 #todo options (for all)
+
+def assert_python27():
+    (major, minor, micro, release_level, serial) = sys.version_info
+    assert major == 2
+    assert minor == 7
+
+assert_python27()
 
 def section_header_block_create():    #todo data_len, options
     block_type = 0x0A0D0D0A

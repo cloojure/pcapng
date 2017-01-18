@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import struct
-import linktype
-import util
+import pcapng.linktype
+import pcapng.util
 
 #todo options (for all)
 
@@ -12,7 +12,7 @@ def section_header_block_create():    #todo data_len, options
     minor_version = 0
     section_len = -1        #todo set to actual (incl padding)
     options_bytes=[]        #todo none at present
-    options_str = util.byte_list_to_str(options_bytes)
+    options_str = pcapng.util.byte_list_to_str(options_bytes)
     block_total_len =    ( 4 +      # block type
                            4 +      # block total length
                            4 +      # byte order magic
@@ -28,13 +28,13 @@ def section_header_block_create():    #todo data_len, options
 
 def section_header_block_decode(block):
     assert type( block ) == str
-    block_type          = util.first( struct.unpack( '=l', block[0:4]   ))
-    block_total_len     = util.first( struct.unpack( '=l', block[4:8]   ))
-    byte_order_magic    = util.first( struct.unpack( '=L', block[8:12]  ))
-    major_version       = util.first( struct.unpack( '=h', block[12:14] ))
-    minor_version       = util.first( struct.unpack( '=h', block[14:16] ))
-    section_len         = util.first( struct.unpack( '=q', block[16:24] ))
-    block_total_len_end = util.first( struct.unpack( '=l', block[24:28] ))
+    block_type          = pcapng.util.first( struct.unpack( '=l', block[0:4]   ))
+    block_total_len     = pcapng.util.first( struct.unpack( '=l', block[4:8]   ))
+    byte_order_magic    = pcapng.util.first( struct.unpack( '=L', block[8:12]  ))
+    major_version       = pcapng.util.first( struct.unpack( '=h', block[12:14] ))
+    minor_version       = pcapng.util.first( struct.unpack( '=h', block[14:16] ))
+    section_len         = pcapng.util.first( struct.unpack( '=q', block[16:24] ))
+    block_total_len_end = pcapng.util.first( struct.unpack( '=l', block[24:28] ))
 
     block_data = {  'block_type'          : block_type ,
                     'block_total_len'     : block_total_len ,
@@ -47,12 +47,12 @@ def section_header_block_decode(block):
 
 def interface_desc_block_create():
     block_type = 0x00000001
-    link_type = linktype.LINKTYPE_ETHERNET   # todo how determine?
+    link_type = pcapng.linktype.LINKTYPE_ETHERNET   # todo how determine?
     reserved = 0
     snaplen = 0                     # 0 => no limit
     options_bytes=[]                #todo none at present
-    options_str = util.byte_list_to_str(options_bytes)
-    util.assert_block32_size( options_bytes )
+    options_str = pcapng.util.byte_list_to_str(options_bytes)
+    pcapng.util.assert_block32_size( options_bytes )
     block_total_len =   (  4 +         # block type
                            4 +         # block total length
                            2 + 2 +     # linktype + reserved
@@ -86,8 +86,8 @@ def interface_desc_block_decode(block):
 def simple_pkt_block_create(pkt_data):
     assert type(pkt_data) == str       #todo is list & tuple & str ok?
     pkt_data            = list(map(ord, pkt_data))
-    pkt_data_pad        = util.pad_to_block32(pkt_data)
-    pkt_data_pad_str    = util.byte_list_to_str( pkt_data_pad )
+    pkt_data_pad        = pcapng.util.pad_to_block32(pkt_data)
+    pkt_data_pad_str    = pcapng.util.byte_list_to_str( pkt_data_pad )
     block_type = 0x00000003
     original_pkt_len = len(pkt_data)
     pkt_data_pad_len = len(pkt_data_pad)
@@ -103,12 +103,12 @@ def simple_pkt_block_create(pkt_data):
 
 def simple_pkt_block_decode(block):
     assert type( block ) == str
-    block_type          = util.first( struct.unpack( '=L', block[0:4]  ))
-    block_tot_len       = util.first( struct.unpack( '=L', block[4:8]  ))
-    original_pkt_len    = util.first( struct.unpack( '=L', block[8:12] ))
-    pkt_data_pad_len    = util.block32_pad_len( original_pkt_len )
+    block_type          = pcapng.util.first( struct.unpack( '=L', block[0:4]  ))
+    block_tot_len       = pcapng.util.first( struct.unpack( '=L', block[4:8]  ))
+    original_pkt_len    = pcapng.util.first( struct.unpack( '=L', block[8:12] ))
+    pkt_data_pad_len    = pcapng.util.block32_pad_len( original_pkt_len )
     pkt_data            = block[ 12 : (12+original_pkt_len)  ]
-    block_tot_len_end   = util.first( struct.unpack( '=L', block[ -4:block_tot_len] ))
+    block_tot_len_end   = pcapng.util.first( struct.unpack( '=L', block[ -4:block_tot_len] ))
     block_data =    { 'block_type'          : block_type ,
                       'block_tot_len'         : block_tot_len ,
                       'original_pkt_len'    : original_pkt_len ,

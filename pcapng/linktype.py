@@ -1,8 +1,4 @@
 #!/usr/bin/python
-import struct;
-import time;
-import math;
-import util;
 
 #todo copy all
 # http://www.tcpdump.org/linktypes.html

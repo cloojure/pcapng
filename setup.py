@@ -23,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.0',
+    version='0.1.2',
 
     description='Tool for reading/writing PCAPNG network packet capture files.',
     long_description=long_description,
@@ -86,6 +86,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
+            'pcapng' : 'README.adoc'
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
@@ -98,5 +99,5 @@ setup(
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
-    },
+    }
 )

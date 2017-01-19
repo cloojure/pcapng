@@ -75,3 +75,49 @@ def test_xxx():
     time.sleep(0.1)
     delta = pcapng.util.timetup_subtract( ts1, pcapng.util.curr_utc_time_tuple() )
     assert ((0.09 < delta) and (delta < 0.11))
+
+def test_types():
+    pcapng.util.assert_type_str('a')
+    pcapng.util.assert_type_str('abc')
+    pcapng.util.assert_type_str('')
+
+    pcapng.util.assert_type_list( [] )
+    pcapng.util.assert_type_list( [1] )
+    pcapng.util.assert_type_list( [1,2,3,] )
+
+    pcapng.util.assert_type_dict( {} )
+    pcapng.util.assert_type_dict( {'a':1} )
+    pcapng.util.assert_type_dict( {'a':1, 'b':2} )
+
+    with pytest.raises(AssertionError): pcapng.util.assert_type_str( None )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_str( [1] )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_str( {'a':1} )
+
+    with pytest.raises(AssertionError): pcapng.util.assert_type_list( None )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_list( 'a' )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_list( {'a':1} )
+
+    with pytest.raises(AssertionError): pcapng.util.assert_type_dict( None )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_dict( 'a' )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_dict( [1] )
+
+
+def test_uint8():
+    for ub in range(256):
+        pcapng.util.assert_uint8(ub)
+    with pytest.raises(AssertionError): pcapng.util.assert_uint8(-1)
+    with pytest.raises(AssertionError): pcapng.util.assert_uint8(256)
+
+def test_int8():
+    for sb in range(-128,127):
+        pcapng.util.assert_int8(sb)
+    with pytest.raises(AssertionError): pcapng.util.assert_int8(-129)
+    with pytest.raises(AssertionError): pcapng.util.assert_int8(128)
+
+def test_ByteList():
+    pcapng.util.assert_type_ByteList( [] )
+    pcapng.util.assert_type_ByteList( [0] )
+    pcapng.util.assert_type_ByteList( [1,2,3] )
+    pcapng.util.assert_type_ByteList( [1,2,255] )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,-2,25] )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,2,256] )

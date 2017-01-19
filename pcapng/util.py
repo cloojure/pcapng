@@ -12,6 +12,7 @@ def assert_python27():
 
 assert_python27()
 
+
 def assert_type_str( arg ):
     assert type( arg ) == str
 
@@ -20,6 +21,17 @@ def assert_type_list( arg ):
 
 def assert_type_dict( arg ):
     assert type( arg ) == dict
+
+def assert_uint8(arg):        # unsigned byte
+    assert (0 <= arg <= 255)
+
+def assert_int8(arg):          # signed byte
+    assert (-128 <= arg <= 127)
+
+def assert_type_ByteList( lst ):    #todo UByteList ?
+    assert_type_list( lst )
+    for elem in lst:
+        assert_uint8(elem)
 
 #todo used anywhere?
 def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):

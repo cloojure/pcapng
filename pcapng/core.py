@@ -7,7 +7,8 @@ pcapng.util.assert_python27()
 
 
 # #todo options (for all)
-# def option_encode( opt_code, opt_val ):
+def option_encode( opt_code, opt_ByteList ):
+    pcapng.util.assert_type_list( block )
 
 
 #todo: "create" -> "encode" ?

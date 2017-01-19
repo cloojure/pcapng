@@ -2,6 +2,7 @@ import struct
 import time
 import pytest
 import pcapng.util
+from pcapng.util import to_bytes
 
 def test_block32_pad_len():
     assert 0 == pcapng.util.block32_pad_len(  0 )
@@ -125,3 +126,7 @@ def test_bytearray():
     pcapng.util.assert_type_bytearray( bytearray( [1,2,255] ))
     with pytest.raises(AssertionError): pcapng.util.assert_type_bytearray( list( [1,2,255] ) )
     with pytest.raises(AssertionError): pcapng.util.assert_type_bytearray( 'abc' )
+
+def test_to_bytes():
+    assert 'abc' == to_bytes( 'abc' )
+    assert 'abc' == to_bytes( [97,98,99] )

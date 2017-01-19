@@ -4,8 +4,6 @@ import pcapng.linktype
 import pcapng.option
 import pcapng.util
 
-#todo convert most datatypes to 'bytes'. Works on both 2.7 (as 'str') & 3.3 (as class 'bytes')
-
 #todo think about how to handle a block of packets
 #todo look at "docopt" usage -> cmdopts processing
 

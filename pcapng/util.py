@@ -4,16 +4,24 @@ import time
 import math
 
 
-def assert_python27():
+def is_python2():
     (major, minor, micro, release_level, serial) = sys.version_info
-    assert major == 2
-    assert minor == 7
+    return ((major == 2) and (minor == 7))
+
+def is_python3():
+    (major, minor, micro, release_level, serial) = sys.version_info
+    return ((major == 3) and (minor >= 5))
+
+def assert_python27():
+    assert is_python2()
 
 assert_python27()
 
-
 def assert_type_bytearray( arg ):
     assert type( arg ) == bytearray
+
+def assert_type_bytes( arg ):
+    assert type( arg ) == bytes
 
 def assert_type_str( arg ):
     assert type( arg ) == str
@@ -30,10 +38,15 @@ def assert_uint8(arg):        # unsigned byte
 def assert_int8(arg):          # signed byte
     assert (-128 <= arg <= 127)
 
+
+
 def assert_type_ByteList( lst ):    #todo UByteList ?
     assert_type_list( lst )
     for elem in lst:
         assert_uint8(elem)
+
+def to_bytes( arg ):
+    return bytes( bytearray( arg ))    # if python2, 'bytes' is synonym for 'str'
 
 #todo used anywhere?
 def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):

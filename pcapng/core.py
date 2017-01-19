@@ -1,15 +1,31 @@
 #!/usr/bin/env python
 import struct
 import pcapng.linktype
+import pcapng.option
 import pcapng.util
 
 pcapng.util.assert_python27()
 
 
-# #todo options (for all)
-def option_encode( opt_code, opt_ByteList ):
-    pcapng.util.assert_type_list( block )
+def option_endofopt():
+    result = struct.pack( '=HH', pcapng.option.OPT_END_OF_OPT, 0 )
+    return result
 
+# #todo add all options ability
+
+def option_encode( opt_code, opt_ByteList ):
+    pcapng.util.assert_type_ByteList( opt_ByteList )
+    data_len_orig   = len( opt_ByteList )
+    data_pad        = pcapng.util.pad_to_block32(opt_ByteList)
+    data_pad_str    = pcapng.util.ByteList_to_str(data_pad)
+    result_hdr      = struct.pack( '=HH', opt_code, data_len_orig )
+    result          = result_hdr + data_pad_str
+    return result
+
+def option_str( comment_str ):  #todo ensure unicode => utf-8 string
+    pcapng.util.assert_type_str( comment_str )
+    result = option_encode( pcapng.option.OPT_COMMENT, pcapng.util.str_to_ByteList(comment_str) )
+    return result
 
 #todo: "create" -> "encode" ?
 def section_header_block_encode():    #todo data_len, options

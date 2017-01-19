@@ -121,3 +121,6 @@ def test_ByteList():
     pcapng.util.assert_type_ByteList( [1,2,255] )
     with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,-2,25] )
     with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,2,256] )
+
+def test_option_endofopt():
+    assert (0,0) == struct.unpack( '=HH', pcapng.core.option_endofopt())

@@ -121,6 +121,7 @@ def test_ByteList():
     with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,-2,25] )
     with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,2,256] )
 
-def test_bytes():
-    pcapng.util.assert_type_bytes( bytes( [1,2,255] ))
-    with pytest.raises(AssertionError): pcapng.util.assert_type_bytes( [1,2,255] )
+def test_bytearray():
+    pcapng.util.assert_type_bytearray( bytearray( [1,2,255] ))
+    with pytest.raises(AssertionError): pcapng.util.assert_type_bytearray( list( [1,2,255] ) )
+    with pytest.raises(AssertionError): pcapng.util.assert_type_bytearray( 'abc' )

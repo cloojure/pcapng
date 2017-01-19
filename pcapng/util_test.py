@@ -134,4 +134,9 @@ def assert_option_codec( opt_code, opt_ByteList ):
     assert res_data == opt_ByteList_orig
 
 def test_option_codec():
-    assert_option_codec( 1, [1, 2, 3] )
+    assert_option_codec( 0, [] )
+    assert_option_codec( 1, [1,] )
+    assert_option_codec( 2, [1,2, ] )
+    assert_option_codec( 3, [1,2,3,] )
+    assert_option_codec( 4, [1,2,3,4,] )
+    assert_option_codec( 5, [1,2,3,4,5] )

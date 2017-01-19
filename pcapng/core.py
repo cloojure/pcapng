@@ -11,7 +11,7 @@ pcapng.util.assert_python27()
 
 
 #todo: "create" -> "encode" ?
-def section_header_block_create():    #todo data_len, options
+def section_header_block_encode():    #todo data_len, options
     block_type = 0x0A0D0D0A
     byte_order_magic = 0x1A2B3C4D
     major_version = 1
@@ -51,7 +51,7 @@ def section_header_block_decode(block):
                     'block_total_len_end' : block_total_len_end }
     return block_data
 
-def interface_desc_block_create():
+def interface_desc_block_encode():
     block_type = 0x00000001
     link_type = pcapng.linktype.LINKTYPE_ETHERNET   # todo how determine?
     reserved = 0
@@ -89,7 +89,7 @@ def interface_desc_block_decode(block):
     return block_data
 
 
-def simple_pkt_block_create(pkt_data):
+def simple_pkt_block_encode(pkt_data):
     assert type(pkt_data) == str       #todo is list & tuple & str ok?
     pkt_data            = list(map(ord, pkt_data))
     pkt_data_pad        = pcapng.util.pad_to_block32(pkt_data)

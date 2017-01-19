@@ -4,7 +4,7 @@ import pcapng.util
 import pcapng.core
 
 def test_section_header_block():
-    blk_str     = pcapng.core.section_header_block_create()
+    blk_str     = pcapng.core.section_header_block_encode()
     blk_data    = pcapng.core.section_header_block_decode(blk_str)
     assert type( blk_str  )  == str
     assert type( blk_data )  == dict
@@ -18,7 +18,7 @@ def test_section_header_block():
     assert blk_data['section_len']          == -1
 
 def test_interface_desc_block():
-    blk_str    = pcapng.core.interface_desc_block_create()
+    blk_str    = pcapng.core.interface_desc_block_encode()
     blk_data   = pcapng.core.interface_desc_block_decode(blk_str)
     assert type( blk_str )     == str
     assert type( blk_data )    == dict
@@ -31,7 +31,7 @@ def test_interface_desc_block():
     assert blk_data['snaplen']             == 0
 
 def test_simple_pkt_block():
-    blk_str   = pcapng.core.simple_pkt_block_create( 'abc')
+    blk_str   = pcapng.core.simple_pkt_block_encode('abc')
     blk_data  = pcapng.core.simple_pkt_block_decode(blk_str)
     assert type( blk_str )                  == str
     assert type( blk_data )                 == dict

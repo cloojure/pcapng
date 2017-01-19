@@ -47,14 +47,14 @@ def bytearray_to_ChrList(arg):
     return charArray
 
 #todo rename char_list_to_str
-def chr_list_to_str(arg):
+def ChrList_to_str(arg):
     #todo verify input type & values [0..255]
     strval = ''.join( arg )
     return strval
 
 def ByteList_to_str(arg):
     #todo verify input type & values [0..255]
-    strval = chr_list_to_str(bytearray_to_ChrList(arg))
+    strval = ChrList_to_str(bytearray_to_ChrList(arg))
     return strval
 
 def first( lst ):

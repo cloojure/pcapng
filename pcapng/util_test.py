@@ -75,7 +75,7 @@ def test_xxx():
     assert [97, 98, 99]      == pcapng.util.str_to_bytearray(       'abc'           )
     assert ['a', 'b', 'c']   == pcapng.util.bytearray_to_ChrList([97, 98, 99])
     assert 'abc'             == pcapng.util.ByteList_to_str([97, 98, 99])
-    assert 'abc'             == pcapng.util.chr_list_to_str(['a', 'b', 'c'])
+    assert 'abc'             == pcapng.util.ChrList_to_str(['a', 'b', 'c'])
 
     ts1 = pcapng.util.curr_utc_time_tuple()
     time.sleep(0.1)

@@ -12,6 +12,12 @@ def assert_python27():
 
 assert_python27()
 
+def assert_type_str( arg ):
+    assert type( arg ) == str
+
+def assert_type_dict( arg ):
+    assert type( arg ) == dict
+
 #todo used anywhere?
 def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):
     packed = struct.pack( '>LLLL', ts_sec, ts_usec, incl_len, orig_len)

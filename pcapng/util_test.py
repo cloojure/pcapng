@@ -4,12 +4,6 @@ import time
 import pytest
 import pcapng.util
 
-def func(x):
-    return x + 1
-
-def test_answer():
-    assert func(3) == 4
-
 def test_block32_pad_len():
     assert 0 == pcapng.util.block32_pad_len(  0 )
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #todo add brocade copyright / license
 import struct
 import pcapng.linktype

@@ -77,9 +77,9 @@ def test_xxx():
     assert ((0.09 < delta) and (delta < 0.11))
 
 def test_types():
+    pcapng.util.assert_type_str('')
     pcapng.util.assert_type_str('a')
     pcapng.util.assert_type_str('abc')
-    pcapng.util.assert_type_str('')
 
     pcapng.util.assert_type_list( [] )
     pcapng.util.assert_type_list( [1] )

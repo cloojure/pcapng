@@ -90,7 +90,7 @@ def interface_desc_block_decode(block):
 
 
 def simple_pkt_block_encode(pkt_data):
-    assert type(pkt_data) == str       #todo is list & tuple & str ok?
+    pcapng.util.assert_type_str(pkt_data)        #todo is list & tuple & str ok?
     pkt_data            = list(map(ord, pkt_data))
     pkt_data_pad        = pcapng.util.pad_to_block32(pkt_data)
     pkt_data_pad_str    = pcapng.util.ByteList_to_str(pkt_data_pad)
@@ -108,7 +108,7 @@ def simple_pkt_block_encode(pkt_data):
     return block
 
 def simple_pkt_block_decode(block):
-    assert type( block ) == str
+    pcapng.util.assert_type_str( block )
     block_type          = pcapng.util.first( struct.unpack( '=L', block[0:4]  ))
     block_tot_len       = pcapng.util.first( struct.unpack( '=L', block[4:8]  ))
     original_pkt_len    = pcapng.util.first( struct.unpack( '=L', block[8:12] ))

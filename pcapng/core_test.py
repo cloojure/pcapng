@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import struct
 import pcapng.linktype
 import pcapng.util
 import pcapng.core
@@ -43,3 +44,21 @@ def test_simple_pkt_block():
     assert blk_data['original_pkt_len']     == 3
     assert blk_data['pkt_data']             == 'abc'
 
+def test_option_endofopt():
+    assert (0,0) == struct.unpack( '=HH', pcapng.core.option_endofopt())
+
+def assert_option_codec( opt_code, opt_ByteList ):
+    opt_ByteList_orig = opt_ByteList[:]  # copy data
+    (res_code, res_len, res_data) = pcapng.core.option_decode(
+                                    pcapng.core.option_encode( opt_code, opt_ByteList ))
+    assert res_code     == opt_code
+    assert res_len      == len( opt_ByteList )
+    assert res_data     == opt_ByteList_orig
+
+def test_option_codec():
+    assert_option_codec( 0, [] )
+    assert_option_codec( 1, [1,] )
+    assert_option_codec( 2, [1,2, ] )
+    assert_option_codec( 3, [1,2,3,] )
+    assert_option_codec( 4, [1,2,3,4,] )
+    assert_option_codec( 5, [1,2,3,4,5] )

@@ -31,10 +31,16 @@ def option_decode( block ):
     return ( opt_code, data_len_orig, data_ByteList[ :data_len_orig ] )
 
 
-def option_str( comment_str ):  #todo ensure unicode => utf-8 string
+def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support
     pcapng.util.assert_type_str( comment_str )
     result = option_encode( pcapng.option.OPT_COMMENT, pcapng.util.str_to_ByteList(comment_str) )
     return result
+
+def option_comment_decode( block ):  #todo add unicode => utf-8 support
+    pcapng.util.assert_type_str( comment_str )
+    ( opt_code, data_len_orig, data_ByteList ) - option_decode( block )
+    assert opt_code == pcapng.option.OPT_COMMENT
+    return pcapng.util.ByteList_to_str( data_ByteList )
 
 #todo: "create" -> "encode" ?
 def section_header_block_encode():    #todo data_len, options

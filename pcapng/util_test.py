@@ -122,21 +122,3 @@ def test_ByteList():
     with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,-2,25] )
     with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,2,256] )
 
-def test_option_endofopt():
-    assert (0,0) == struct.unpack( '=HH', pcapng.core.option_endofopt())
-
-def assert_option_codec( opt_code, opt_ByteList ):
-    opt_ByteList_orig = opt_ByteList[:]  # copy data
-    (res_code, res_len, res_data) = pcapng.core.option_decode(
-        pcapng.core.option_encode( opt_code, opt_ByteList ))
-    assert res_code == opt_code
-    assert res_len == len( opt_ByteList )
-    assert res_data == opt_ByteList_orig
-
-def test_option_codec():
-    assert_option_codec( 0, [] )
-    assert_option_codec( 1, [1,] )
-    assert_option_codec( 2, [1,2, ] )
-    assert_option_codec( 3, [1,2,3,] )
-    assert_option_codec( 4, [1,2,3,4,] )
-    assert_option_codec( 5, [1,2,3,4,5] )

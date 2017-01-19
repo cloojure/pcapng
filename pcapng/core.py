@@ -3,10 +3,14 @@ import struct
 import pcapng.linktype
 import pcapng.util
 
-#todo options (for all)
-
 pcapng.util.assert_python27()
 
+
+# #todo options (for all)
+# def option_encode( opt_code, opt_val ):
+
+
+#todo: "create" -> "encode" ?
 def section_header_block_create():    #todo data_len, options
     block_type = 0x0A0D0D0A
     byte_order_magic = 0x1A2B3C4D
@@ -14,7 +18,7 @@ def section_header_block_create():    #todo data_len, options
     minor_version = 0
     section_len = -1        #todo set to actual (incl padding)
     options_bytes=[]        #todo none at present
-    options_str = pcapng.util.byte_list_to_str(options_bytes)
+    options_str = pcapng.util.ByteList_to_str(options_bytes)
     block_total_len =    ( 4 +      # block type
                            4 +      # block total length
                            4 +      # byte order magic
@@ -53,7 +57,7 @@ def interface_desc_block_create():
     reserved = 0
     snaplen = 0                     # 0 => no limit
     options_bytes=[]                #todo none at present
-    options_str = pcapng.util.byte_list_to_str(options_bytes)
+    options_str = pcapng.util.ByteList_to_str(options_bytes)
     pcapng.util.assert_block32_size( options_bytes )
     block_total_len =   (  4 +         # block type
                            4 +         # block total length
@@ -89,7 +93,7 @@ def simple_pkt_block_create(pkt_data):
     assert type(pkt_data) == str       #todo is list & tuple & str ok?
     pkt_data            = list(map(ord, pkt_data))
     pkt_data_pad        = pcapng.util.pad_to_block32(pkt_data)
-    pkt_data_pad_str    = pcapng.util.byte_list_to_str( pkt_data_pad )
+    pkt_data_pad_str    = pcapng.util.ByteList_to_str(pkt_data_pad)
     block_type = 0x00000003
     original_pkt_len = len(pkt_data)
     pkt_data_pad_len = len(pkt_data_pad)

@@ -73,8 +73,8 @@ def test_xxx():
     assert (3, 141593) == pcapng.util.split_float(3.141592654)
 
     assert [97, 98, 99]      == pcapng.util.str_to_bytearray(       'abc'           )
-    assert ['a', 'b', 'c']   == pcapng.util.bytearray_to_chrarray(  [97, 98, 99]    )
-    assert 'abc'             == pcapng.util.byte_list_to_str([97, 98, 99])
+    assert ['a', 'b', 'c']   == pcapng.util.bytearray_to_ChrList([97, 98, 99])
+    assert 'abc'             == pcapng.util.ByteList_to_str([97, 98, 99])
     assert 'abc'             == pcapng.util.chr_list_to_str(['a', 'b', 'c'])
 
     ts1 = pcapng.util.curr_utc_time_tuple()

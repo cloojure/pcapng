@@ -130,3 +130,7 @@ def test_bytearray():
 def test_to_bytes():
     assert 'abc' == to_bytes( 'abc' )
     assert 'abc' == to_bytes( [97,98,99] )
+    if pcapng.util.is_python2():
+        assert str( 'abc' ) == to_bytes( 'abc' )
+    if pcapng.util.is_python3():
+        assert bytes( [97,98,99] ) == to_bytes( [97,98,99] )

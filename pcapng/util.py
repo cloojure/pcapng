@@ -39,11 +39,13 @@ def timetup_subtract( ts1, ts2 ):
     return delta
 
 def str_to_ByteList(arg):
-    bytearr = map( int, bytearray(arg) )
+    #todo verify input type & values [0..255]
+    bytearr = list( map( int, bytearray(arg) ))
     return bytearr
 
 def bytearray_to_ChrList(arg):
-    charArray = map( chr, arg )
+    #todo verify input type & values [0..255]
+    charArray = list( map( chr, arg ))
     return charArray
 
 #todo rename char_list_to_str

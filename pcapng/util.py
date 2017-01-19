@@ -12,10 +12,10 @@ def is_python3():
     (major, minor, micro, release_level, serial) = sys.version_info
     return ((major == 3) and (minor >= 5))
 
-def assert_python27():
+def assert_python2():
     assert is_python2()
 
-assert_python27()
+assert_python2()
 
 def assert_type_bytearray( arg ):
     assert type( arg ) == bytearray
@@ -75,13 +75,11 @@ def timetup_subtract( ts1, ts2 ):
     return delta
 
 def str_to_ByteList(arg):
-    #todo verify input type & values [0..255]
     bytearr = list( map( int, bytearray(arg) ))
     return bytearr
 
 def ByteList_to_ChrList(arg):
-    #todo verify input type & values [0..255]
-    charArray = list( map( chr, arg ))
+    charArray = list( map( chr, bytearray(arg) ))
     return charArray
 
 #todo rename char_list_to_str
@@ -91,34 +89,34 @@ def ChrList_to_str(arg):
     return strval
 
 def ByteList_to_str(arg):
-    #todo verify input type & values [0..255]
     strval = ChrList_to_str(ByteList_to_ChrList(arg))
     return strval
 
 def first( lst ):
     return lst[0]
 
-def pad_to_len(data, tolen, padval=0):
-    assert_type_list(data)
-    elem_needed = tolen - len(data)
-    assert (elem_needed >= 0), "padding cannot be negative"
-    result = data + [padval]*elem_needed
-    return result
-
+#todo move to pcapng.bytes
 def block32_pad_len(curr_len):
     curr_blks = float(curr_len) / 4.0
     pad_blks = int( math.ceil( curr_blks ))
     pad_len = pad_blks * 4
     return pad_len
 
+#todo move to pcapng.bytes
+def pad_to_len(data, tolen, padval=0):
+    elem_needed = tolen - len(data)
+    assert (elem_needed >= 0), "padding cannot be negative"
+    result = to_bytes(data) + to_bytes( [padval] )*elem_needed
+    return result
+
+#todo move to pcapng.bytes
 def pad_to_block32(data):
-    assert_type_list(data)
     pad_len = block32_pad_len( len(data) )
     result = pad_to_len(data, pad_len)
     return result
 
+#todo move to pcapng.bytes
 def assert_block32_size(data):
-    assert_type_list(data)
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True
 

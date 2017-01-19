@@ -43,7 +43,7 @@ def str_to_ByteList(arg):
     bytearr = list( map( int, bytearray(arg) ))
     return bytearr
 
-def bytearray_to_ChrList(arg):
+def ByteList_to_ChrList(arg):
     #todo verify input type & values [0..255]
     charArray = list( map( chr, arg ))
     return charArray
@@ -56,7 +56,7 @@ def ChrList_to_str(arg):
 
 def ByteList_to_str(arg):
     #todo verify input type & values [0..255]
-    strval = ChrList_to_str(bytearray_to_ChrList(arg))
+    strval = ChrList_to_str(ByteList_to_ChrList(arg))
     return strval
 
 def first( lst ):

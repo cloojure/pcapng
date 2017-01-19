@@ -38,7 +38,7 @@ def timetup_subtract( ts1, ts2 ):
     delta = t2 - t1
     return delta
 
-def str_to_bytearray( arg ):
+def str_to_ByteList(arg):
     bytearr = map( int, bytearray(arg) )
     return bytearr
 

@@ -72,7 +72,7 @@ def test_xxx():
     assert (3, 140000) == pcapng.util.split_float(3.14)
     assert (3, 141593) == pcapng.util.split_float(3.141592654)
 
-    assert [97, 98, 99]      == pcapng.util.str_to_bytearray(       'abc'           )
+    assert [97, 98, 99]      == pcapng.util.str_to_ByteList('abc')
     assert ['a', 'b', 'c']   == pcapng.util.bytearray_to_ChrList([97, 98, 99])
     assert 'abc'             == pcapng.util.ByteList_to_str([97, 98, 99])
     assert 'abc'             == pcapng.util.ChrList_to_str(['a', 'b', 'c'])

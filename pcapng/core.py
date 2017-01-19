@@ -37,8 +37,8 @@ def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support
     return result
 
 def option_comment_decode( block ):  #todo add unicode => utf-8 support
-    pcapng.util.assert_type_str( comment_str )
-    ( opt_code, data_len_orig, data_ByteList ) - option_decode( block )
+    pcapng.util.assert_type_str( block )
+    ( opt_code, data_len_orig, data_ByteList ) = option_decode( block )
     assert opt_code == pcapng.option.OPT_COMMENT
     return pcapng.util.ByteList_to_str( data_ByteList )
 

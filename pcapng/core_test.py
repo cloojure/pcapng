@@ -47,18 +47,34 @@ def test_simple_pkt_block():
 def test_option_endofopt():
     assert (0,0) == struct.unpack( '=HH', pcapng.core.option_endofopt())
 
-def assert_option_codec( opt_code, opt_ByteList ):
-    opt_ByteList_orig = opt_ByteList[:]  # copy data
-    (res_code, res_len, res_data) = pcapng.core.option_decode(
-                                    pcapng.core.option_encode( opt_code, opt_ByteList ))
-    assert res_code     == opt_code
-    assert res_len      == len( opt_ByteList )
-    assert res_data     == opt_ByteList_orig
+
 
 def test_option_codec():
+    def assert_option_codec( opt_code, opt_ByteList ):
+        opt_ByteList_orig = opt_ByteList[:]  # copy data
+        (res_code, res_len, res_data) = pcapng.core.option_decode(
+            pcapng.core.option_encode( opt_code, opt_ByteList ))
+        assert res_code     == opt_code
+        assert res_len      == len( opt_ByteList )
+        assert res_data     == opt_ByteList_orig
+
     assert_option_codec( 0, [] )
     assert_option_codec( 1, [1,] )
     assert_option_codec( 2, [1,2, ] )
     assert_option_codec( 3, [1,2,3,] )
     assert_option_codec( 4, [1,2,3,4,] )
     assert_option_codec( 5, [1,2,3,4,5] )
+
+def test_option_comment():
+    def assert_comment_codec( str_val ):
+        result = pcapng.core.option_comment_decode(
+                 pcapng.core.option_comment_encode(str_val))
+        assert result == str_val
+
+    assert_comment_codec( '' )
+    assert_comment_codec( 'a' )
+    assert_comment_codec( 'go' )
+    assert_comment_codec( 'ray' )
+    assert_comment_codec( 'Doh!' )
+    assert_comment_codec( 'How do you like me now?' )
+

@@ -15,6 +15,9 @@ assert_python27()
 def assert_type_str( arg ):
     assert type( arg ) == str
 
+def assert_type_list( arg ):
+    assert type( arg ) == list
+
 def assert_type_dict( arg ):
     assert type( arg ) == dict
 
@@ -69,7 +72,7 @@ def first( lst ):
     return lst[0]
 
 def pad_to_len(data, tolen, padval=0):
-    assert type(data) == list
+    assert_type_list(data)
     elem_needed = tolen - len(data)
     assert (elem_needed >= 0), "padding cannot be negative"
     result = data + [padval]*elem_needed
@@ -82,13 +85,13 @@ def block32_pad_len(curr_len):
     return pad_len
 
 def pad_to_block32(data):
-    assert type(data) == list
+    assert_type_list(data)
     pad_len = block32_pad_len( len(data) )
     result = pad_to_len(data, pad_len)
     return result
 
 def assert_block32_size(data):
-    assert type(data) == list
+    assert_type_list(data)
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True
 

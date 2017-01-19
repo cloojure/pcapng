@@ -22,6 +22,15 @@ def option_encode( opt_code, opt_ByteList ):
     result          = result_hdr + data_pad_str
     return result
 
+def option_decode( block ):
+    pcapng.util.assert_type_str( block )
+    (opt_code, data_len_orig) = struct.unpack( '=HH', block[0:4] )
+    data_len_pad    = pcapng.util.block32_pad_len( data_len_orig )
+    assert (4 + data_len_pad) == len( block )
+    data_ByteList = pcapng.util.str_to_ByteList( block[4:] )
+    return ( opt_code, data_len_orig, data_ByteList[ :data_len_orig ] )
+
+
 def option_str( comment_str ):  #todo ensure unicode => utf-8 string
     pcapng.util.assert_type_str( comment_str )
     result = option_encode( pcapng.option.OPT_COMMENT, pcapng.util.str_to_ByteList(comment_str) )

@@ -124,3 +124,14 @@ def test_ByteList():
 
 def test_option_endofopt():
     assert (0,0) == struct.unpack( '=HH', pcapng.core.option_endofopt())
+
+def assert_option_codec( opt_code, opt_ByteList ):
+    opt_ByteList_orig = opt_ByteList[:]  # copy data
+    (res_code, res_len, res_data) = pcapng.core.option_decode(
+        pcapng.core.option_encode( opt_code, opt_ByteList ))
+    assert res_code == opt_code
+    assert res_len == len( opt_ByteList )
+    assert res_data == opt_ByteList_orig
+
+def test_option_codec():
+    assert_option_codec( 1, [1, 2, 3] )

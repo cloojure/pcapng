@@ -21,7 +21,7 @@ def test_pad_to_len():
     with pytest.raises(AssertionError): pcapng.util.pad_to_len( [1, 2, 3, 4], 3 )
     with pytest.raises(AssertionError): pcapng.util.pad_to_len( 'superlong', 3 )
 
-    pcapng.util.pad_to_len( 'superlong', 32 )
+    assert to_bytes( 'superlong' + chr(0)*23 ) == pcapng.util.pad_to_len( 'superlong', 32 )
     assert to_bytes([0, 0, 0, 0]) == pcapng.util.pad_to_len( [          ], 4 )
     assert to_bytes([1, 0, 0, 0]) == pcapng.util.pad_to_len( [1,        ], 4 )
     assert to_bytes([1, 2, 0, 0]) == pcapng.util.pad_to_len( [1, 2      ], 4 )

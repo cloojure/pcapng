@@ -50,7 +50,7 @@ def test_section_header_block():
     assert blk_data['major_version']        == 1
     assert blk_data['minor_version']        == 0
     assert blk_data['section_len']          == -1
-    assert blk_data['options_dict']         == {}
+    assert blk_data['options_dict']         == {} #   *** continue here ***
 
 
 def test_interface_desc_block():

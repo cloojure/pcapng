@@ -13,6 +13,9 @@ def assert_python27():
 assert_python27()
 
 
+def assert_type_bytes( arg ):
+    assert type( arg ) == bytes
+
 def assert_type_str( arg ):
     assert type( arg ) == str
 

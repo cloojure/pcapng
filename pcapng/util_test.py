@@ -127,3 +127,11 @@ def test_to_bytes():
 
 def test_str_to_bytes():
     assert to_bytes( [97,98,99] ) == str_to_bytes( 'abc' )
+
+def test_ipAddr_codec():
+    ip_bytes = pcapng.util.ipAddr_encode( [97,98,99,100] )
+    assert len( ip_bytes )  ==  4
+    assert ip_bytes[0]      == to_bytes( [97] )
+    assert ip_bytes[3]      == to_bytes( [100] )
+    assert pcapng.util.ipAddr_decode( ip_bytes ) == [97,98,99,100]
+

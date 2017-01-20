@@ -68,6 +68,11 @@ def curr_utc_time_tuple():
     secs, usecs = split_float( utc_secs )
     return secs, usecs
 
+def curr_utc_secs():
+    """Returns the current UTC time in integer seconds."""
+    secs, usecs = curr_utc_time_tuple()
+    return secs
+
 def timetup_to_float( secs, usecs ):
     """Converts a time tuple from (secs, usecs) to float."""
     return secs + (usecs / 1000000.0)
@@ -91,6 +96,18 @@ def ChrList_to_str(arg):
 def first( lst ):
     """Returns the first item in a sequence."""
     return lst[0]
+
+#todo move to pcapng.types ?
+#-----------------------------------------------------------------------------
+def ipAddr_encode( ip_vals ):
+    assert 4 == len( ip_vals )
+    ip_bytes = struct.pack( '!BBBB', *ip_vals )
+    return ip_bytes
+
+def ipAddr_decode( ip_bytes ):
+    assert 4 == len( ip_bytes )
+    ip_vals = list( struct.unpack( '!BBBB',  ip_bytes ))
+    return ip_vals
 
 #todo move to pcapng.bytes
 #-----------------------------------------------------------------------------

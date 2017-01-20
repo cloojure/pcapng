@@ -12,6 +12,12 @@ from pcapng.util import to_bytes
 pcapng.util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
+# Brocade Private Enterprise Number (PEN)
+#   see:  http://www.iana.org/assignments/enterprise-numbers/enterprise-numbers
+#   Brocade Communications Systems, Inc.
+#     Scott Kipp
+#     skipp@brocade.com
+BROCADE_PEN = 1588
 
 # IANA type codes; MRT types  ("_ET" suffix => Extended Timestamp field is present)
 NULL                        =   0       # deprecated
@@ -58,7 +64,6 @@ RIB_IPV6_MULTICAST          = 5
 RIB_GENERIC                 = 6
 
 # IANA BGP4MP and BGP4MP_ET Subtype Codes
-
 BGP4MP_STATE_CHANGE         =  0
 BGP4MP_MESSAGE              =  1
 BGP4MP_ENTRY                =  2       # deprecated
@@ -77,20 +82,14 @@ def section_header_block_encode(opts_dict={}):    #todo data_len
     minor_version = 0
     section_len = -1        #todo set to actual (incl padding)
 
-    for opt_code in opts_dict.keys():
-        pcapng.option.assert_shb_option(opt_code)
-    options_bytes = options_encode(opts_dict)
-
     block_total_len =    ( 4 +      # block type
                            4 +      # block total length
                            4 +      # byte order magic
                            2 + 2 +  # major version + minor version
                            8 +      # section length
-                           len(options_bytes) +
                            4 )      # block total length
     block = ( struct.pack( '=LlLhhq', block_type, block_total_len, byte_order_magic,
                                       major_version, minor_version, section_len )
-            + options_bytes
             + struct.pack( '=l', block_total_len ))
     return block
 

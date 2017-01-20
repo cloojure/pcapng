@@ -26,27 +26,6 @@ def option_encode(opt_code, opt_bytes):
     result          = result_hdr + data_pad
     return result
 
-def option_decode( block ):
-    pcapng.util.assert_type_bytes( block )
-    (opt_code, data_len_orig) = struct.unpack( '=HH', block[0:4] )
-    data_len_pad    = pcapng.util.block32_ceil_bytes(data_len_orig)
-    assert (4 + data_len_pad) == len( block )
-    data_bytes = block[4:]
-    return ( opt_code, data_len_orig, data_bytes[ :data_len_orig ] )
-
-#todo maybe merge these 2 fns?
-def option_decode_rolling(opts_bytes):
-    pcapng.util.assert_type_str(opts_bytes)
-    assert 4 <= len(opts_bytes)
-    (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[0:4])
-    data_len_pad = pcapng.util.block32_ceil_bytes( data_len_orig )
-    first_block_len_pad = 4+data_len_pad
-    assert first_block_len_pad <= len(opts_bytes)
-    curr_block = opts_bytes[:first_block_len_pad]
-    opts_bytes_remaining = opts_bytes[first_block_len_pad:]
-    data_str_orig = curr_block[ 4 : 4+data_len_orig ]
-    return ( opt_code, data_str_orig, opts_bytes_remaining )
-
 def options_encode( opts ):
     pcapng.util.assert_type_dict( opts )
     cum_result = ""
@@ -55,6 +34,18 @@ def options_encode( opts ):
         opt_str = option_encode( opt_code, opt_value )
         cum_result += opt_str
     return cum_result
+
+def option_decode_rolling(opts_bytes):
+    pcapng.util.assert_type_str(opts_bytes)
+    assert 4 <= len(opts_bytes)
+    (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[0:4])
+    data_len_pad = pcapng.util.block32_ceil_bytes( data_len_orig )
+    first_block_len_pad = 4+data_len_pad
+    assert first_block_len_pad <= len(opts_bytes)
+    first_opt_bytes = opts_bytes[:first_block_len_pad]
+    opts_bytes_remaining = opts_bytes[first_block_len_pad:]
+    first_opt_value = first_opt_bytes[ 4 : 4+data_len_orig ]
+    return ( opt_code, first_opt_value, opts_bytes_remaining )
 
 def options_decode(opts_bytes):
     pcapng.util.assert_type_bytes(opts_bytes)
@@ -65,6 +56,13 @@ def options_decode(opts_bytes):
         opts_bytes = opts_bytes_remaining
     return cum_result_dict
 
+def option_decode( block ):
+    opts_dict_result = options_decode( block )
+    assert 1 == len( opts_dict_result )
+    opt_code  = opts_dict_result.keys()[0]
+    opt_bytes = opts_dict_result[opt_code]
+    return (opt_code, opt_bytes)
+
 def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support
     pcapng.util.assert_type_str( comment_str )
     result = option_encode( pcapng.option.OPT_COMMENT, comment_str )
@@ -72,9 +70,9 @@ def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support
 
 def option_comment_decode( block ):  #todo add unicode => utf-8 support
     pcapng.util.assert_type_str( block )
-    ( opt_code, data_len_orig, data_bytes ) = option_decode( block )
+    ( opt_code, opt_bytes ) = option_decode( block )
     assert opt_code == pcapng.option.OPT_COMMENT
-    return data_bytes
+    return opt_bytes
 
 #todo: "create" -> "encode" ?
 def section_header_block_encode( options_dict={} ):    #todo data_len, options

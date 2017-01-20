@@ -10,12 +10,11 @@ def test_option_endofopt():
     assert (0,0) == struct.unpack( '=HH', pcapng.core.option_endofopt())
 
 def test_option_codec():
-    def assert_option_codec( opt_code, opt_bytes ):
-        (res_code, res_len, res_data) = pcapng.core.option_decode(
-            pcapng.core.option_encode( opt_code, opt_bytes ))
-        assert res_code     == opt_code
-        assert res_len      == len( opt_bytes )
-        assert res_data     == to_bytes( opt_bytes )
+    def assert_option_codec(opt_code, opt_value):
+        (res_code, res_bytes) = pcapng.core.option_decode(
+            pcapng.core.option_encode(opt_code, opt_value))
+        assert res_code   == opt_code
+        assert res_bytes  == to_bytes(opt_value)
 
     assert_option_codec( 0, [] )
     assert_option_codec( 1, [1,] )

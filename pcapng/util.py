@@ -68,6 +68,7 @@ def timetup_subtract( ts1, ts2 ):
     return delta
 
 def ChrList_to_str(arg):
+    """ Convert a list of characters to a string"""
     #todo verify input type & values [0..255]
     strval = ''.join( arg )
     return strval
@@ -78,24 +79,28 @@ def first( lst ):
 #todo move to pcapng.bytes
 #-----------------------------------------------------------------------------
 
-def block32_pad_len(curr_len):
+def block32_ceil_bytes(curr_len):
+    """Returns the number of bytes (n >= curr_len) at the next 32-bit boundary"""
     curr_blks = float(curr_len) / 4.0
     pad_blks = int( math.ceil( curr_blks ))
     pad_len = pad_blks * 4
     return pad_len
 
-def pad_to_len(data, tolen, padval=0):
-    elem_needed = tolen - len(data)
+def pad_bytes(data, tgt_length, padval=0):
+    """Add (n>=0) 'padval' bytes to extend data to tgt_length"""
+    elem_needed = tgt_length - len(data)
     assert (elem_needed >= 0), "padding cannot be negative"
     result = to_bytes(data) + to_bytes( [padval] )*elem_needed
     return result
 
-def pad_to_block32(data):
-    pad_len = block32_pad_len( len(data) )
-    result = pad_to_len(data, pad_len)
+def block32_pad_bytes(data):
+    """Pad data with (n>=0) 0x00 bytes to reach the next 32-bit boundary"""
+    pad_len = block32_ceil_bytes(len(data))
+    result = pad_bytes(data, pad_len)
     return result
 
 def assert_block32_size(data):
+    """Assert that data length is at a 32-bit boundary"""
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True
 

@@ -21,7 +21,7 @@ def option_endofopt():
 
 def option_encode(opt_code, opt_bytes):
     data_len_orig   = len(opt_bytes)
-    data_pad        = pcapng.util.pad_to_block32( to_bytes( opt_bytes ))
+    data_pad        = pcapng.util.block32_pad_bytes(to_bytes(opt_bytes))
     result_hdr      = struct.pack( '=HH', opt_code, data_len_orig )
     result          = result_hdr + data_pad
     return result
@@ -29,7 +29,7 @@ def option_encode(opt_code, opt_bytes):
 def option_decode( block ):
     pcapng.util.assert_type_bytes( block )
     (opt_code, data_len_orig) = struct.unpack( '=HH', block[0:4] )
-    data_len_pad    = pcapng.util.block32_pad_len( data_len_orig )
+    data_len_pad    = pcapng.util.block32_ceil_bytes(data_len_orig)
     assert (4 + data_len_pad) == len( block )
     data_bytes = block[4:]
     return ( opt_code, data_len_orig, data_bytes[ :data_len_orig ] )
@@ -39,7 +39,7 @@ def option_decode_rolling(blocks):
     pcapng.util.assert_type_str(blocks)
     assert 4 <= len(blocks)
     (opt_code, data_len_orig) = struct.unpack( '=HH', blocks[0:4])
-    data_len_pad = pcapng.util.block32_pad_len( data_len_orig )
+    data_len_pad = pcapng.util.block32_ceil_bytes(data_len_orig)
     first_block_len_pad = 4+data_len_pad
     assert first_block_len_pad <= len(blocks)
     curr_block = blocks[ :first_block_len_pad ]
@@ -167,7 +167,7 @@ def interface_desc_block_decode(block):
 def simple_pkt_block_encode(pkt_data):
     pcapng.util.assert_type_str(pkt_data)        #todo is list & tuple & str ok?
     pkt_data            = list(map(ord, pkt_data))
-    pkt_data_pad        = pcapng.util.pad_to_block32(pkt_data)
+    pkt_data_pad        = pcapng.util.block32_pad_bytes(pkt_data)
     block_type = 0x00000003
     original_pkt_len = len(pkt_data)
     pkt_data_pad_len = len(pkt_data_pad)
@@ -186,7 +186,7 @@ def simple_pkt_block_decode(block):
     block_type          = pcapng.util.first( struct.unpack( '=L', block[0:4]  ))
     block_tot_len       = pcapng.util.first( struct.unpack( '=L', block[4:8]  ))
     original_pkt_len    = pcapng.util.first( struct.unpack( '=L', block[8:12] ))
-    pkt_data_pad_len    = pcapng.util.block32_pad_len( original_pkt_len )
+    pkt_data_pad_len    = pcapng.util.block32_ceil_bytes(original_pkt_len)
     pkt_data            = block[ 12 : (12+original_pkt_len)  ]
     block_tot_len_end   = pcapng.util.first( struct.unpack( '=L', block[ -4:block_tot_len] ))
     block_data =    { 'block_type'          : block_type ,

@@ -45,12 +45,12 @@ def test_pad_to_block32():
     assert to_bytes( [1, 2, 3, 4, 5, 6, 7, 0] ) == pcapng.util.block32_pad_bytes([1, 2, 3, 4, 5, 6, 7])
     assert to_bytes( [1, 2, 3, 4, 5, 6, 7, 8] ) == pcapng.util.block32_pad_bytes([1, 2, 3, 4, 5, 6, 7, 8])
 
-    pcapng.util.assert_block32_size( [                      ] )
-    pcapng.util.assert_block32_size( [1, 2, 3, 4            ] )
-    pcapng.util.assert_block32_size( [1, 2, 3, 4, 5, 6, 7, 8] )
-    with pytest.raises(AssertionError): pcapng.util.assert_block32_size( [1        ] )
-    with pytest.raises(AssertionError): pcapng.util.assert_block32_size( [1, 2     ] )
-    with pytest.raises(AssertionError): pcapng.util.assert_block32_size( [1, 2, 3  ] )
+    pcapng.util.assert_block32_length([                      ])
+    pcapng.util.assert_block32_length([1, 2, 3, 4])
+    pcapng.util.assert_block32_length([1, 2, 3, 4, 5, 6, 7, 8])
+    with pytest.raises(AssertionError): pcapng.util.assert_block32_length([1])
+    with pytest.raises(AssertionError): pcapng.util.assert_block32_length([1, 2])
+    with pytest.raises(AssertionError): pcapng.util.assert_block32_length([1, 2, 3])
 
 
 def test_xxx():

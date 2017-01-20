@@ -104,7 +104,7 @@ def block32_pad_bytes(data):
     result = pad_bytes(data, pad_len)
     return result
 
-def assert_block32_size(data):
+def assert_block32_length(data):
     """Assert that data length is at a 32-bit boundary"""
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True

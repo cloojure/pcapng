@@ -31,12 +31,12 @@ def options_encode( opts ):
     cum_result = ""
     for opt_code in opts.keys():
         opt_value = opts[ opt_code ]
-        opt_str = option_encode( opt_code, opt_value )
-        cum_result += opt_str
+        opt_bytes = option_encode( opt_code, opt_value )
+        cum_result += opt_bytes
     return cum_result
 
 def option_decode_rolling(opts_bytes):
-    pcapng.util.assert_type_str(opts_bytes)
+    pcapng.util.assert_type_bytes(opts_bytes)
     assert 4 <= len(opts_bytes)
     (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[0:4])
     data_len_pad = pcapng.util.block32_ceil_bytes( data_len_orig )
@@ -49,6 +49,7 @@ def option_decode_rolling(opts_bytes):
 
 def options_decode(opts_bytes):
     pcapng.util.assert_type_bytes(opts_bytes)
+    pcapng.util.assert_block32_length(opts_bytes)
     cum_result_dict = {}
     while (0 < len(opts_bytes)):
         ( opt_code, opt_value, opts_bytes_remaining ) = option_decode_rolling(opts_bytes)
@@ -68,9 +69,9 @@ def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support
     result = option_encode( pcapng.option.OPT_COMMENT, comment_str )
     return result
 
-def option_comment_decode( block ):  #todo add unicode => utf-8 support
-    pcapng.util.assert_type_str( block )
-    ( opt_code, opt_bytes ) = option_decode( block )
+def option_comment_decode(opt_bytes):  #todo add unicode => utf-8 support
+    pcapng.util.assert_type_bytes(opt_bytes)
+    ( opt_code, opt_bytes ) = option_decode(opt_bytes)
     assert opt_code == pcapng.option.OPT_COMMENT
     return opt_bytes
 
@@ -84,18 +85,18 @@ def section_header_block_encode( options_dict={} ):    #todo data_len, options
 
     for opt_code in options_dict.keys():
         pcapng.option.assert_shb_option(opt_code)
-    options_str = options_encode( options_dict )
+    options_bytes = options_encode( options_dict )
 
     block_total_len =    ( 4 +      # block type
                            4 +      # block total length
                            4 +      # byte order magic
                            2 + 2 +  # major version + minor version
                            8 +      # section length
-                           len(options_str) +
+                           len(options_bytes) +
                            4 )      # block total length
     block = ( struct.pack( '=LlLhhq', block_type, block_total_len, byte_order_magic,
                                       major_version, minor_version, section_len )
-            + options_str
+            + options_bytes
             + struct.pack( '=l', block_total_len ))
     return block
 
@@ -108,8 +109,8 @@ def section_header_block_decode(block):
     minor_version       = pcapng.util.first( struct.unpack( '=h', block[14:16] ))
     section_len         = pcapng.util.first( struct.unpack( '=q', block[16:24] ))
 
-    options_str         = block[24:-4]
-    options_dict        = options_decode( options_str )
+    options_bytes       = block[24:-4]
+    options_dict        = options_decode( options_bytes )
 
     block_total_len_end = pcapng.util.first( struct.unpack( '=l', block[-4:] ))
 
@@ -129,7 +130,7 @@ def interface_desc_block_encode():
     reserved = 0
     snaplen = 0                     # 0 => no limit
     options_bytes=to_bytes( [] )                #todo none at present
-    pcapng.util.assert_block32_size( options_bytes )
+    pcapng.util.assert_block32_length(options_bytes)
     block_total_len =   (  4 +         # block type
                            4 +         # block total length
                            2 + 2 +     # linktype + reserved
@@ -148,20 +149,20 @@ def interface_desc_block_decode(block):
     link_type               = struct.unpack( '=H', block[8:10]  )[0]
     reserved                = struct.unpack( '=H', block[10:12] )[0]
     snaplen                 = struct.unpack( '=l', block[12:16] )[0]
-  # options_str  #todo
+  # options_bytes  #todo
     block_total_len_end     = struct.unpack( '=l', block[-4:]   )[0]
     block_data = { 'block_type'              : block_type ,
                    'block_total_len'         : block_total_len ,
                    'link_type'               : link_type ,
                    'reserved'                : reserved ,
                    'snaplen'                 : snaplen ,
-                   # options_str  #todo
+                   # options_bytes  #todo
                    'block_total_len_end'     : block_total_len_end }
     return block_data
 
 
 def simple_pkt_block_encode(pkt_data):
-    pcapng.util.assert_type_str(pkt_data)        #todo is list & tuple & str ok?
+    pcapng.util.assert_type_bytes(pkt_data)        #todo is list & tuple & str ok?
     pkt_data            = list(map(ord, pkt_data))
     pkt_data_pad        = pcapng.util.block32_pad_bytes(pkt_data)
     block_type = 0x00000003
@@ -178,7 +179,7 @@ def simple_pkt_block_encode(pkt_data):
     return block
 
 def simple_pkt_block_decode(block):
-    pcapng.util.assert_type_str( block )
+    pcapng.util.assert_type_bytes( block )
     block_type          = pcapng.util.first( struct.unpack( '=L', block[0:4]  ))
     block_tot_len       = pcapng.util.first( struct.unpack( '=L', block[4:8]  ))
     original_pkt_len    = pcapng.util.first( struct.unpack( '=L', block[8:12] ))

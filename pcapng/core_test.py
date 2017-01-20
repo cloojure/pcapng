@@ -1,6 +1,7 @@
 import struct
 import pcapng.linktype
 import pcapng.core
+import pcapng.option
 import pcapng.util
 from pcapng.util import to_bytes, str_to_bytes
 
@@ -39,7 +40,7 @@ def test_options_codec():
                              1:val1,
                              2:val2 } )
 
-def test_option_comment():
+def test_option_comment_codec():
     def assert_comment_codec( str_val ):
         result = pcapng.core.option_comment_decode(
                  pcapng.core.option_comment_encode(str_val))
@@ -54,11 +55,11 @@ def test_option_comment():
 
 
 def test_section_header_block():
-    opts = { pcapng.option.OPT_SHB_HARDWARE:"Dell",
-             pcapng.option.OPT_SHB_OS:"Ubuntu",
-             pcapng.option.OPT_SHB_USERAPPL:"IntelliJ Idea" }
+    opts = { pcapng.option.OPT_SHB_HARDWARE  : "Dell",
+             pcapng.option.OPT_SHB_OS        : "Ubuntu",
+             pcapng.option.OPT_SHB_USERAPPL  : "IntelliJ Idea" }
     blk_str     = pcapng.core.section_header_block_encode( opts )
-    blk_data    = pcapng.core.section_header_block_decode(blk_str)
+    blk_data    = pcapng.core.section_header_block_decode( blk_str )
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']           == 0x0A0D0D0A
@@ -68,9 +69,7 @@ def test_section_header_block():
     assert blk_data['major_version']        == 1
     assert blk_data['minor_version']        == 0
     assert blk_data['section_len']          == -1
-    assert blk_data['options_dict']         == { pcapng.option.OPT_SHB_HARDWARE:"Dell",
-                                                 pcapng.option.OPT_SHB_OS:"Ubuntu",
-                                                 pcapng.option.OPT_SHB_USERAPPL:"IntelliJ Idea" }
+    assert blk_data['options_dict']         == opts
 
     #   *** continue here ***
 

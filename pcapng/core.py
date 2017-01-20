@@ -47,18 +47,6 @@ def option_decode_rolling(blocks):
     data_str_orig = curr_block[ 4 : 4+data_len_orig ]
     return ( opt_code, data_str_orig, blocks_remaining )
 
-
-def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support
-    pcapng.util.assert_type_str( comment_str )
-    result = option_encode( pcapng.option.OPT_COMMENT, comment_str )
-    return result
-
-def option_comment_decode( block ):  #todo add unicode => utf-8 support
-    pcapng.util.assert_type_str( block )
-    ( opt_code, data_len_orig, data_bytes ) = option_decode( block )
-    assert opt_code == pcapng.option.OPT_COMMENT
-    return data_bytes
-
 def options_encode( opts ):
     pcapng.util.assert_type_dict( opts )
     cum_result = ""
@@ -76,6 +64,17 @@ def options_decode( opts_str ):
         cum_result_dict[ opt_code ] = data_str_orig
         opts_str = blocks_remaining
     return cum_result_dict
+
+def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support
+    pcapng.util.assert_type_str( comment_str )
+    result = option_encode( pcapng.option.OPT_COMMENT, comment_str )
+    return result
+
+def option_comment_decode( block ):  #todo add unicode => utf-8 support
+    pcapng.util.assert_type_str( block )
+    ( opt_code, data_len_orig, data_bytes ) = option_decode( block )
+    assert opt_code == pcapng.option.OPT_COMMENT
+    return data_bytes
 
 #todo: "create" -> "encode" ?
 def section_header_block_encode( options_dict={} ):    #todo data_len, options

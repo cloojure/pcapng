@@ -15,8 +15,6 @@ def is_python3():
 def assert_python2():
     assert is_python2()
 
-assert_python2()
-
 def assert_type_bytearray( arg ):
     assert type( arg ) == bytearray
 
@@ -43,7 +41,7 @@ def assert_int8(arg):          # signed byte
 def to_bytes( arg ):
     return bytes( bytearray( arg ))    # if python2, 'bytes' is synonym for 'str'
 
-#todo used anywhere?
+#todo move to pcap
 def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):
     packed = struct.pack( '>LLLL', ts_sec, ts_usec, incl_len, orig_len)
     return packed
@@ -78,26 +76,25 @@ def first( lst ):
     return lst[0]
 
 #todo move to pcapng.bytes
+#-----------------------------------------------------------------------------
+
 def block32_pad_len(curr_len):
     curr_blks = float(curr_len) / 4.0
     pad_blks = int( math.ceil( curr_blks ))
     pad_len = pad_blks * 4
     return pad_len
 
-#todo move to pcapng.bytes
 def pad_to_len(data, tolen, padval=0):
     elem_needed = tolen - len(data)
     assert (elem_needed >= 0), "padding cannot be negative"
     result = to_bytes(data) + to_bytes( [padval] )*elem_needed
     return result
 
-#todo move to pcapng.bytes
 def pad_to_block32(data):
     pad_len = block32_pad_len( len(data) )
     result = pad_to_len(data, pad_len)
     return result
 
-#todo move to pcapng.bytes
 def assert_block32_size(data):
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True

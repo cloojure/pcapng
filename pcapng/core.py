@@ -8,8 +8,9 @@ from pcapng.util import to_bytes
 #todo think about how to handle a block of packets
 #todo look at "docopt" usage -> cmdopts processing
 
-#todo make work for python 2.7 or 3.3 ?
-pcapng.util.assert_python2()
+#-----------------------------------------------------------------------------
+pcapng.util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
+#-----------------------------------------------------------------------------
 
 
 def option_endofopt():
@@ -19,15 +20,14 @@ def option_endofopt():
 # #todo add all options ability
 
 def option_encode(opt_code, opt_bytes):
-    opt_bytes = to_bytes(opt_bytes)
     data_len_orig   = len(opt_bytes)
-    data_pad        = pcapng.util.pad_to_block32(opt_bytes)
+    data_pad        = pcapng.util.pad_to_block32( to_bytes( opt_bytes ))
     result_hdr      = struct.pack( '=HH', opt_code, data_len_orig )
     result          = result_hdr + data_pad
     return result
 
 def option_decode( block ):
-    pcapng.util.assert_type_str( block )
+    pcapng.util.assert_type_bytes( block )
     (opt_code, data_len_orig) = struct.unpack( '=HH', block[0:4] )
     data_len_pad    = pcapng.util.block32_pad_len( data_len_orig )
     assert (4 + data_len_pad) == len( block )

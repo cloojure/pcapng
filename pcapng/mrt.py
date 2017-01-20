@@ -14,17 +14,17 @@ pcapng.util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 
 
 # IANA type codes; MRT types  ("_ET" suffix => Extended Timestamp field is present)
-NULL                        =   0
-START                       =   1
-DIE                         =   2
-I_AM_DEAD                   =   3
-PEER_DOWN                   =   4
-BGP                         =   5
-RIP                         =   6
-IDRP                        =   7
-RIPNG                       =   8
-BGP4PLUS                    =   9
-BGP4PLUS_01                 =  10
+NULL                        =   0       # deprecated
+START                       =   1       # deprecated
+DIE                         =   2       # deprecated
+I_AM_DEAD                   =   3       # deprecated
+PEER_DOWN                   =   4       # deprecated
+BGP                         =   5       # deprecated
+RIP                         =   6       # deprecated
+IDRP                        =   7       # deprecated
+RIPNG                       =   8       # deprecated
+BGP4PLUS                    =   9       # deprecated
+BGP4PLUS_01                 =  10       # deprecated
 OSPFv2                      =  11
 TABLE_DUMP                  =  12
 TABLE_DUMP_V2               =  13
@@ -36,14 +36,14 @@ OSPFv3                      =  48
 OSPFv3_ET                   =  49
 
 # IANA BGP, BGP4PLUS, and BGP4PLUS_01 Subtype Codes
-BGP_NULL                    = 0
-BGP_UPDATE                  = 1
-BGP_PREF_UPDATE             = 2
-BGP_STATE_CHANGE            = 3
-BGP_SYNC                    = 4
-BGP_OPEN                    = 5
-BGP_NOTIFY                  = 6
-BGP_KEEPALIVE               = 7
+BGP_NULL                    = 0       # deprecated
+BGP_UPDATE                  = 1       # deprecated
+BGP_PREF_UPDATE             = 2       # deprecated
+BGP_STATE_CHANGE            = 3       # deprecated
+BGP_SYNC                    = 4       # deprecated
+BGP_OPEN                    = 5       # deprecated
+BGP_NOTIFY                  = 6       # deprecated
+BGP_KEEPALIVE               = 7       # deprecated
 
 # IANA TABLE_DUMP subtypes
 AFI_IPv4                    = 1
@@ -61,8 +61,8 @@ RIB_GENERIC                 = 6
 
 BGP4MP_STATE_CHANGE         =  0
 BGP4MP_MESSAGE              =  1
-BGP4MP_ENTRY                =  2
-BGP4MP_SNAPSHOT             =  3
+BGP4MP_ENTRY                =  2       # deprecated
+BGP4MP_SNAPSHOT             =  3       # deprecated
 BGP4MP_MESSAGE_AS4          =  4
 BGP4MP_STATE_CHANGE_AS4     =  5
 BGP4MP_MESSAGE_LOCAL        =  6

@@ -103,14 +103,14 @@ def test_types():
 def test_uint8():
     for ub in range(256):
         pcapng.util.assert_uint8(ub)
-    with pytest.raises(AssertionError): pcapng.util.assert_uint8(-1)
-    with pytest.raises(AssertionError): pcapng.util.assert_uint8(256)
+    with pytest.raises(AssertionError): pcapng.util.assert_uint8(  -1 )
+    with pytest.raises(AssertionError): pcapng.util.assert_uint8( 256 )
 
 def test_int8():
     for sb in range(-128,127):
         pcapng.util.assert_int8(sb)
-    with pytest.raises(AssertionError): pcapng.util.assert_int8(-129)
-    with pytest.raises(AssertionError): pcapng.util.assert_int8(128)
+    with pytest.raises(AssertionError): pcapng.util.assert_int8( -129 )
+    with pytest.raises(AssertionError): pcapng.util.assert_int8(  128 )
 
 def test_bytearray():
     pcapng.util.assert_type_bytearray( bytearray( [1,2,255] ))

@@ -71,17 +71,21 @@ def test_section_header_block():
     assert blk_data['options_dict']         == opts
 
 def test_interface_desc_block():
-    blk_str    = pcapng.core.interface_desc_block_encode()
+    opts = { pcapng.option.IF_NAME           : "SuperSpeed",
+             pcapng.option.IF_DESCRIPTION    : "don't you wish",
+             pcapng.option.IF_IPV4ADDR       : "192.168.13.7",
+             pcapng.option.IF_OS             : "NitrOS" }
+    blk_str    = pcapng.core.interface_desc_block_encode( opts )
     blk_data   = pcapng.core.interface_desc_block_decode(blk_str)
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']          == 0x00000001
-    assert blk_data['block_total_len']     == 20
-    assert blk_data['block_total_len']     == blk_data['block_total_len_end']
     assert blk_data['block_total_len']     == len(blk_str)
+    assert blk_data['block_total_len']     == blk_data['block_total_len_end']
     assert blk_data['link_type']           == pcapng.linktype.LINKTYPE_ETHERNET
     assert blk_data['reserved']            == 0
     assert blk_data['snaplen']             == 0
+    assert blk_data['options_dict']        == opts
 
 def test_simple_pkt_block():
     blk_str   = pcapng.core.simple_pkt_block_encode('abc')

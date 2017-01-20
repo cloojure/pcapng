@@ -78,6 +78,7 @@ def ChrList_to_str(arg):
     strval = ''.join( arg )
     return strval
 
+#todo move to pcapng.list (or delete?); only(), second(), last(), butlast(), rest()
 def first( lst ):
     return lst[0]
 

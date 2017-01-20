@@ -75,17 +75,16 @@ def option_comment_decode(opt_bytes):  #todo add unicode => utf-8 support
     assert opt_code == pcapng.option.OPT_COMMENT
     return opt_bytes
 
-#todo: "create" -> "encode" ?
-def section_header_block_encode( options_dict={} ):    #todo data_len, options
+def section_header_block_encode(opts_dict={}):    #todo data_len
     block_type = 0x0A0D0D0A
     byte_order_magic = 0x1A2B3C4D
     major_version = 1
     minor_version = 0
     section_len = -1        #todo set to actual (incl padding)
 
-    for opt_code in options_dict.keys():
+    for opt_code in opts_dict.keys():
         pcapng.option.assert_shb_option(opt_code)
-    options_bytes = options_encode( options_dict )
+    options_bytes = options_encode(opts_dict)
 
     block_total_len =    ( 4 +      # block type
                            4 +      # block total length
@@ -112,7 +111,7 @@ def section_header_block_decode(block):
     options_bytes       = block[24:-4]
     options_dict        = options_decode( options_bytes )
 
-    block_total_len_end = pcapng.util.first( struct.unpack( '=l', block[-4:] ))
+    block_total_len_end = struct.unpack( '=l', block[-4:] )[0]
 
     block_data = {  'block_type'          : block_type ,
                     'block_total_len'     : block_total_len ,
@@ -124,12 +123,16 @@ def section_header_block_decode(block):
                     'block_total_len_end' : block_total_len_end }
     return block_data
 
-def interface_desc_block_encode():
+def interface_desc_block_encode( opts_dict={} ):
     block_type = 0x00000001
     link_type = pcapng.linktype.LINKTYPE_ETHERNET   # todo how determine?
     reserved = 0
     snaplen = 0                     # 0 => no limit
-    options_bytes=to_bytes( [] )                #todo none at present
+
+    for opt_code in opts_dict.keys():
+        pcapng.option.assert_if_option(opt_code)
+    options_bytes = options_encode(opts_dict)
+
     pcapng.util.assert_block32_length(options_bytes)
     block_total_len =   (  4 +         # block type
                            4 +         # block total length
@@ -149,15 +152,18 @@ def interface_desc_block_decode(block):
     link_type               = struct.unpack( '=H', block[8:10]  )[0]
     reserved                = struct.unpack( '=H', block[10:12] )[0]
     snaplen                 = struct.unpack( '=l', block[12:16] )[0]
-  # options_bytes  #todo
+
+    options_bytes           = block[16:-4]
+    options_dict            = options_decode( options_bytes )
+
     block_total_len_end     = struct.unpack( '=l', block[-4:]   )[0]
-    block_data = { 'block_type'              : block_type ,
-                   'block_total_len'         : block_total_len ,
-                   'link_type'               : link_type ,
-                   'reserved'                : reserved ,
-                   'snaplen'                 : snaplen ,
-                   # options_bytes  #todo
-                   'block_total_len_end'     : block_total_len_end }
+    block_data = { 'block_type'             : block_type ,
+                   'block_total_len'        : block_total_len ,
+                   'link_type'              : link_type ,
+                   'reserved'               : reserved ,
+                   'snaplen'                : snaplen ,
+                   'options_dict'           : options_dict,
+                   'block_total_len_end'    : block_total_len_end }
     return block_data
 
 

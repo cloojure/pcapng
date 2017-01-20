@@ -22,17 +22,17 @@ def test_pad_to_len():
     with pytest.raises(AssertionError): pcapng.util.pad_to_len( 'superlong', 3 )
 
     assert to_bytes( 'superlong' + chr(0)*23 ) == pcapng.util.pad_to_len( 'superlong', 32 )
-    assert to_bytes([0, 0, 0, 0]) == pcapng.util.pad_to_len( [          ], 4 )
-    assert to_bytes([1, 0, 0, 0]) == pcapng.util.pad_to_len( [1,        ], 4 )
-    assert to_bytes([1, 2, 0, 0]) == pcapng.util.pad_to_len( [1, 2      ], 4 )
-    assert to_bytes([1, 2, 3, 0]) == pcapng.util.pad_to_len( [1, 2, 3   ], 4 )
-    assert to_bytes([1, 2, 3, 4]) == pcapng.util.pad_to_len( [1, 2, 3, 4], 4 )
+    assert to_bytes( [0, 0, 0, 0] ) == pcapng.util.pad_to_len( [          ], 4 )
+    assert to_bytes( [1, 0, 0, 0] ) == pcapng.util.pad_to_len( [1,        ], 4 )
+    assert to_bytes( [1, 2, 0, 0] ) == pcapng.util.pad_to_len( [1, 2      ], 4 )
+    assert to_bytes( [1, 2, 3, 0] ) == pcapng.util.pad_to_len( [1, 2, 3   ], 4 )
+    assert to_bytes( [1, 2, 3, 4] ) == pcapng.util.pad_to_len( [1, 2, 3, 4], 4 )
 
-    assert to_bytes([9, 9, 9, 9]) == pcapng.util.pad_to_len( [          ], 4, 9)
-    assert to_bytes([1, 9, 9, 9]) == pcapng.util.pad_to_len( [1,        ], 4, 9)
-    assert to_bytes([1, 2, 9, 9]) == pcapng.util.pad_to_len( [1, 2      ], 4, 9)
-    assert to_bytes([1, 2, 3, 9]) == pcapng.util.pad_to_len( [1, 2, 3   ], 4, 9)
-    assert to_bytes([1, 2, 3, 4]) == pcapng.util.pad_to_len( [1, 2, 3, 4], 4, 9)
+    assert to_bytes( [9, 9, 9, 9] ) == pcapng.util.pad_to_len( [          ], 4, 9)
+    assert to_bytes( [1, 9, 9, 9] ) == pcapng.util.pad_to_len( [1,        ], 4, 9)
+    assert to_bytes( [1, 2, 9, 9] ) == pcapng.util.pad_to_len( [1, 2      ], 4, 9)
+    assert to_bytes( [1, 2, 3, 9] ) == pcapng.util.pad_to_len( [1, 2, 3   ], 4, 9)
+    assert to_bytes( [1, 2, 3, 4] ) == pcapng.util.pad_to_len( [1, 2, 3, 4], 4, 9)
 
 def test_pad_to_block32():
     assert to_bytes( [                      ] ) == pcapng.util.pad_to_block32( [                      ] )

@@ -12,6 +12,7 @@ def is_python3():
     (major, minor, micro, release_level, serial) = sys.version_info
     return ((major == 3) and (minor >= 5))
 
+
 def assert_python2():
     assert is_python2()
 
@@ -37,9 +38,13 @@ def assert_int8(arg):          # signed byte
     assert (-128 <= arg <= 127)
 
 
-
 def to_bytes( arg ):
     return bytes( bytearray( arg ))    # if python2, 'bytes' is synonym for 'str'
+
+def str_to_bytes( arg ):
+    """Convert an ASCII string to 'bytes'. Works on both Python2 and Python3."""
+    return to_bytes( map(ord,arg))
+
 
 #todo move to pcap
 def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):

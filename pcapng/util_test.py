@@ -2,7 +2,7 @@ import struct
 import time
 import pytest
 import pcapng.util
-from pcapng.util import to_bytes
+from pcapng.util import to_bytes, str_to_bytes
 
 def test_block32_pad_len():
     assert 0 == pcapng.util.block32_ceil_bytes(0)
@@ -124,3 +124,6 @@ def test_to_bytes():
         assert str( 'abc' ) == to_bytes( 'abc' )
     if pcapng.util.is_python3():
         assert bytes( [97,98,99] ) == to_bytes( [97,98,99] )
+
+def test_str_to_bytes():
+    assert to_bytes( [97,98,99] ) == str_to_bytes( 'abc' )

@@ -38,19 +38,22 @@ def test_option_comment():
 
 
 def test_section_header_block():
-    blk_str     = pcapng.core.section_header_block_encode()
+    opts = { pcapng.option.OPT_SHB_OS : "Ubuntu" }
+    blk_str     = pcapng.core.section_header_block_encode( opts )
     blk_data    = pcapng.core.section_header_block_decode(blk_str)
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']           == 0x0A0D0D0A
-    assert blk_data['block_total_len']      == 28
+#   assert blk_data['block_total_len']      == 28
     assert blk_data['block_total_len']      == len( blk_str )
     assert blk_data['block_total_len']      == blk_data['block_total_len_end']
     assert blk_data['byte_order_magic']     == 0x1A2B3C4D
     assert blk_data['major_version']        == 1
     assert blk_data['minor_version']        == 0
     assert blk_data['section_len']          == -1
-    assert blk_data['options_dict']         == {} #   *** continue here ***
+    assert blk_data['options_dict']         == { pcapng.option.OPT_SHB_OS : "Ubuntu" }
+
+    #   *** continue here ***
 
 
 def test_interface_desc_block():

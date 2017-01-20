@@ -67,9 +67,6 @@ def test_xxx():
     assert (3, 140000) == pcapng.util.split_float(3.14)
     assert (3, 141593) == pcapng.util.split_float(3.141592654)
 
-    assert [97, 98, 99]      == pcapng.util.str_to_ByteList('abc')
-    assert ['a', 'b', 'c']   == pcapng.util.ByteList_to_ChrList([97, 98, 99])
-    assert 'abc'             == pcapng.util.ByteList_to_str([97, 98, 99])
     assert 'abc'             == pcapng.util.ChrList_to_str(['a', 'b', 'c'])
 
     ts1 = pcapng.util.curr_utc_time_tuple()
@@ -114,14 +111,6 @@ def test_int8():
         pcapng.util.assert_int8(sb)
     with pytest.raises(AssertionError): pcapng.util.assert_int8(-129)
     with pytest.raises(AssertionError): pcapng.util.assert_int8(128)
-
-def test_ByteList():
-    pcapng.util.assert_type_ByteList( [] )
-    pcapng.util.assert_type_ByteList( [0] )
-    pcapng.util.assert_type_ByteList( [1,2,3] )
-    pcapng.util.assert_type_ByteList( [1,2,255] )
-    with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,-2,25] )
-    with pytest.raises(AssertionError): pcapng.util.assert_type_ByteList( [1,2,256] )
 
 def test_bytearray():
     pcapng.util.assert_type_bytearray( bytearray( [1,2,255] ))

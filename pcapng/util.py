@@ -40,11 +40,6 @@ def assert_int8(arg):          # signed byte
 
 
 
-def assert_type_ByteList( lst ):    #todo UByteList ?
-    assert_type_list( lst )
-    for elem in lst:
-        assert_uint8(elem)
-
 def to_bytes( arg ):
     return bytes( bytearray( arg ))    # if python2, 'bytes' is synonym for 'str'
 
@@ -74,22 +69,9 @@ def timetup_subtract( ts1, ts2 ):
     delta = t2 - t1
     return delta
 
-def str_to_ByteList(arg):
-    bytearr = list( map( int, bytearray(arg) ))
-    return bytearr
-
-def ByteList_to_ChrList(arg):
-    charArray = list( map( chr, bytearray(arg) ))
-    return charArray
-
-#todo rename char_list_to_str
 def ChrList_to_str(arg):
     #todo verify input type & values [0..255]
     strval = ''.join( arg )
-    return strval
-
-def ByteList_to_str(arg):
-    strval = ChrList_to_str(ByteList_to_ChrList(arg))
     return strval
 
 def first( lst ):

@@ -21,7 +21,7 @@ def option_endofopt():
 
 def option_encode(opt_code, opt_bytes):
     data_len_orig   = len(opt_bytes)
-    data_pad        = pcapng.util.block32_pad_bytes(to_bytes(opt_bytes))
+    data_pad        = pcapng.util.block32_pad_bytes( to_bytes(opt_bytes))
     result_hdr      = struct.pack( '=HH', opt_code, data_len_orig )
     result          = result_hdr + data_pad
     return result
@@ -35,17 +35,17 @@ def option_decode( block ):
     return ( opt_code, data_len_orig, data_bytes[ :data_len_orig ] )
 
 #todo maybe merge these 2 fns?
-def option_decode_rolling(blocks):
-    pcapng.util.assert_type_str(blocks)
-    assert 4 <= len(blocks)
-    (opt_code, data_len_orig) = struct.unpack( '=HH', blocks[0:4])
-    data_len_pad = pcapng.util.block32_ceil_bytes(data_len_orig)
+def option_decode_rolling(opts_bytes):
+    pcapng.util.assert_type_str(opts_bytes)
+    assert 4 <= len(opts_bytes)
+    (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[0:4])
+    data_len_pad = pcapng.util.block32_ceil_bytes( data_len_orig )
     first_block_len_pad = 4+data_len_pad
-    assert first_block_len_pad <= len(blocks)
-    curr_block = blocks[ :first_block_len_pad ]
-    blocks_remaining = blocks[ first_block_len_pad: ]
+    assert first_block_len_pad <= len(opts_bytes)
+    curr_block = opts_bytes[:first_block_len_pad]
+    opts_bytes_remaining = opts_bytes[first_block_len_pad:]
     data_str_orig = curr_block[ 4 : 4+data_len_orig ]
-    return ( opt_code, data_str_orig, blocks_remaining )
+    return ( opt_code, data_str_orig, opts_bytes_remaining )
 
 def options_encode( opts ):
     pcapng.util.assert_type_dict( opts )
@@ -56,13 +56,13 @@ def options_encode( opts ):
         cum_result += opt_str
     return cum_result
 
-def options_decode( opts_str ):
-    pcapng.util.assert_type_str( opts_str )
+def options_decode(opts_bytes):
+    pcapng.util.assert_type_bytes(opts_bytes)
     cum_result_dict = {}
-    while (0 < len(opts_str)):
-        ( opt_code, data_str_orig, blocks_remaining ) = option_decode_rolling( opts_str )
-        cum_result_dict[ opt_code ] = data_str_orig
-        opts_str = blocks_remaining
+    while (0 < len(opts_bytes)):
+        ( opt_code, opt_value, opts_bytes_remaining ) = option_decode_rolling(opts_bytes)
+        cum_result_dict[ opt_code ] = opt_value
+        opts_bytes = opts_bytes_remaining
     return cum_result_dict
 
 def option_comment_encode( comment_str ):  #todo add unicode => utf-8 support

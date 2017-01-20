@@ -71,9 +71,6 @@ def test_section_header_block():
     assert blk_data['section_len']          == -1
     assert blk_data['options_dict']         == opts
 
-    #   *** continue here ***
-
-
 def test_interface_desc_block():
     blk_str    = pcapng.core.interface_desc_block_encode()
     blk_data   = pcapng.core.interface_desc_block_decode(blk_str)

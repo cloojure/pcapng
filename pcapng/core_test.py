@@ -71,7 +71,7 @@ def test_section_header_block():
     assert blk_data['options_dict']         == opts
 
 def test_interface_desc_block():
-    opts = { pcapng.option.IF_NAME           : "SuperSpeed",
+    opts = { pcapng.option.IF_NAME           : "Carrier Pigeon",
              pcapng.option.IF_DESCRIPTION    : "don't you wish",
              pcapng.option.IF_IPV4ADDR       : to_bytes( [ 192,168,13,7,  255,255,255,0 ] ),
              pcapng.option.IF_OS             : "NitrOS" }

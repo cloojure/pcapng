@@ -1,8 +1,0 @@
-
-PCAPNG
-
-A tool for reading/writing PCAPNG network packet capture files.
-
-Alan Thompson, Brocade
-athomps@brocade.com
-

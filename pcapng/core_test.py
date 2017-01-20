@@ -2,7 +2,7 @@ import struct
 import pcapng.linktype
 import pcapng.core
 import pcapng.util
-from pcapng.util import to_bytes
+from pcapng.util import to_bytes, str_to_bytes
 
 
 def test_option_endofopt():
@@ -23,6 +23,22 @@ def test_option_codec():
     assert_option_codec( 4, [1,2,3,4,] )
     assert_option_codec( 5, [1,2,3,4,5] )
 
+def test_options_codec():
+    def assert_options_codec( opts_dict ):
+        opts_dict_result = pcapng.core.options_decode(
+                           pcapng.core.options_encode( opts_dict ))
+        assert opts_dict_result == opts_dict
+
+    val0 = str_to_bytes( '' )
+    val1 = str_to_bytes( 'a' )
+    val2 = str_to_bytes( 'Doh!' )
+    assert_options_codec(  { 0:val0 } )
+    assert_options_codec(  { 0:val0,
+                             1:val1 } )
+    assert_options_codec(  { 0:val0,
+                             1:val1,
+                             2:val2 } )
+
 def test_option_comment():
     def assert_comment_codec( str_val ):
         result = pcapng.core.option_comment_decode(
@@ -38,20 +54,23 @@ def test_option_comment():
 
 
 def test_section_header_block():
-    opts = { pcapng.option.OPT_SHB_OS : "Ubuntu" }
+    opts = { pcapng.option.OPT_SHB_HARDWARE:"Dell",
+             pcapng.option.OPT_SHB_OS:"Ubuntu",
+             pcapng.option.OPT_SHB_USERAPPL:"IntelliJ Idea" }
     blk_str     = pcapng.core.section_header_block_encode( opts )
     blk_data    = pcapng.core.section_header_block_decode(blk_str)
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']           == 0x0A0D0D0A
-#   assert blk_data['block_total_len']      == 28
     assert blk_data['block_total_len']      == len( blk_str )
     assert blk_data['block_total_len']      == blk_data['block_total_len_end']
     assert blk_data['byte_order_magic']     == 0x1A2B3C4D
     assert blk_data['major_version']        == 1
     assert blk_data['minor_version']        == 0
     assert blk_data['section_len']          == -1
-    assert blk_data['options_dict']         == { pcapng.option.OPT_SHB_OS : "Ubuntu" }
+    assert blk_data['options_dict']         == { pcapng.option.OPT_SHB_HARDWARE:"Dell",
+                                                 pcapng.option.OPT_SHB_OS:"Ubuntu",
+                                                 pcapng.option.OPT_SHB_USERAPPL:"IntelliJ Idea" }
 
     #   *** continue here ***
 

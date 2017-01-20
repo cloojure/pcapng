@@ -73,7 +73,6 @@ def options_decode( opts_str ):
     cum_result_dict = {}
     while (0 < len(opts_str)):
         ( opt_code, data_str_orig, blocks_remaining ) = option_decode_rolling( opts_str )
-        pcapng.option.assert_shb_option( opt_code )
         cum_result_dict[ opt_code ] = data_str_orig
         opts_str = blocks_remaining
     return cum_result_dict

@@ -73,7 +73,7 @@ def test_section_header_block():
 def test_interface_desc_block():
     opts = { pcapng.option.IF_NAME           : "SuperSpeed",
              pcapng.option.IF_DESCRIPTION    : "don't you wish",
-             pcapng.option.IF_IPV4ADDR       : "192.168.13.7",
+             pcapng.option.IF_IPV4ADDR       : to_bytes( [ 192,168,13,7,  255,255,255,0 ] ),
              pcapng.option.IF_OS             : "NitrOS" }
     blk_str    = pcapng.core.interface_desc_block_encode( opts )
     blk_data   = pcapng.core.interface_desc_block_decode(blk_str)

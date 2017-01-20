@@ -6,17 +6,20 @@ OPT_END_OF_OPT    =     0
 
 OPT_COMMENT       =     1
 
-# custom options 
+#todo need to do validation on data values & lengths
+# custom options
 OPT_CUSTOM_0      =  2988
 OPT_CUSTOM_1      =  2989
 OPT_CUSTOM_2      = 19372
 OPT_CUSTOM_3      = 19373
 
-# section header block options 
+#todo need to do validation on data values & lengths
+# section header block options
 OPT_SHB_HARDWARE  = 2
 OPT_SHB_OS        = 3
 OPT_SHB_USERAPPL  = 4
 
+#todo need to do validation on data values & lengths
 # interface description block options
 IF_NAME           =   2
 IF_DESCRIPTION    =   3

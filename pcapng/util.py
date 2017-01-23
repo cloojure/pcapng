@@ -152,7 +152,6 @@ def assert_block32_length(data):
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True
 
-#todo add a "custom bytes" header tag? if so, verify on unpack
 def block32_bytes_pack(content):
     content_bytes = to_bytes( content )
     content_len = len( content_bytes )
@@ -160,9 +159,12 @@ def block32_bytes_pack(content):
     packed_bytes = struct.pack( '!L', content_len ) + content_bytes_pad
     return packed_bytes
 
-def block32_bytes_unpack(packed_bytes):
+def block32_bytes_unpack_rolling(packed_bytes):
     (content_len,) = struct.unpack( '!L', packed_bytes[:4] )
-    content_bytes = packed_bytes[4:4+content_len] # discard padding any any trailing bytes
-    return content_bytes
+    content_len_pad = block32_ceil_bytes(content_len)
+    packed_bytes_nohdr = packed_bytes[4:]
+    content_bytes = packed_bytes_nohdr[:content_len]
+    remaining_bytes = packed_bytes_nohdr[content_len_pad:]
+    return content_bytes, remaining_bytes
 
 

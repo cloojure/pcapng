@@ -12,7 +12,7 @@ def test_option_endofopt():
 def test_option_codec():
     def assert_option_codec(opt_code, opt_value):
         (res_code, res_bytes) = pcapng.core.option_decode(
-            pcapng.core.option_encode(opt_code, opt_value))
+                                pcapng.core.option_encode(opt_code, opt_value))
         assert res_code   == opt_code
         assert res_bytes  == to_bytes(opt_value)
 
@@ -71,10 +71,10 @@ def test_section_header_block():
     assert blk_data['options_dict']         == opts
 
 def test_interface_desc_block():
-    opts = { pcapng.option.IF_NAME           : "Carrier Pigeon",
-             pcapng.option.IF_DESCRIPTION    : "don't you wish",
-             pcapng.option.IF_IPV4ADDR       : to_bytes( [ 192,168,13,7,  255,255,255,0 ] ),
-             pcapng.option.IF_OS             : "NitrOS" }
+    opts = { pcapng.option.IF_NAME          : "Carrier Pigeon",
+             pcapng.option.IF_DESCRIPTION   : "don't you wish",
+             pcapng.option.IF_IPV4ADDR      : to_bytes( [ 192,168,13,7,  255,255,255,0 ] ),
+             pcapng.option.IF_OS            : "NitrOS" }
     blk_str    = pcapng.core.interface_desc_block_encode( opts )
     blk_data   = pcapng.core.interface_desc_block_decode(blk_str)
     pcapng.util.assert_type_str( blk_str )
@@ -93,10 +93,35 @@ def test_simple_pkt_block():
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']           == 0x00000003
-    assert blk_data['block_total_len']        == 20
-    assert blk_data['block_total_len']        == blk_data['block_total_len_end']
-    assert blk_data['block_total_len']        == len(blk_str)
-    assert blk_data['block_total_len']        == 16 + blk_data['pkt_data_pad_len']
+    assert blk_data['block_total_len']      == 20
+    assert blk_data['block_total_len']      == blk_data['block_total_len_end']
+    assert blk_data['block_total_len']      == len(blk_str)
+    assert blk_data['block_total_len']      == 16 + blk_data['pkt_data_pad_len']
     assert blk_data['original_pkt_len']     == 3
     assert blk_data['pkt_data']             == 'abc'
+
+
+def test_custom_block_pack():
+    def assert_custom_block_packing( data_bytes ):
+        opts = { pcapng.option.OPT_CUSTOM_0 : "O",
+                 pcapng.option.OPT_CUSTOM_1 : "Doh!",
+                 pcapng.option.OPT_CUSTOM_2 : "Release the hounds!",
+                 pcapng.option.OPT_CUSTOM_3 : to_bytes( [1,2,3] ) }
+        orig = to_bytes( data_bytes )
+        unpacked = pcapng.core.custom_block_unpack(
+                   pcapng.core.custom_block_pack(
+                       pcapng.core.CUSTOM_BLOCK_COPYABLE, pcapng.core.BROCADE_PEN, orig, opts ))
+        assert unpacked[ 'block_type'    ] == pcapng.core.CUSTOM_BLOCK_COPYABLE
+        assert unpacked[ 'pen'           ] == pcapng.core.BROCADE_PEN
+        assert unpacked[ 'content_bytes' ] == orig
+        assert unpacked[ 'options_dict'  ] == opts
+
+    assert_custom_block_packing( '' )
+    assert_custom_block_packing( 'a' )
+    assert_custom_block_packing( 'go' )
+    assert_custom_block_packing( 'ray' )
+    assert_custom_block_packing( 'Doh!' )
+    assert_custom_block_packing( 'How do you like me now?' )
+    for i in range(23):
+        assert_custom_block_packing( range(i) )
 

@@ -54,7 +54,7 @@ def test_pad_to_block32():
 def test_block32_bytes_pack():
     def assert_block32_bytes_packing( data_bytes ):
         orig = to_bytes( data_bytes )
-        unpacked = pcapng.util.block32_bytes_unpack(
+        unpacked, remaining = pcapng.util.block32_bytes_unpack_rolling(
             pcapng.util.block32_bytes_pack(orig))
         assert unpacked == orig
     assert_block32_bytes_packing( '' )

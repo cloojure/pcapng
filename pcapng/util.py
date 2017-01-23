@@ -162,9 +162,7 @@ def block32_bytes_pack(content):
 
 def block32_bytes_unpack(packed_bytes):
     (content_len,) = struct.unpack( '!L', packed_bytes[:4] )
-    content_bytes_pad = packed_bytes[4:]
-    content_bytes = content_bytes_pad[:content_len]
-    assert len(content_bytes_pad) == block32_ceil_bytes( content_len )
+    content_bytes = packed_bytes[4:4+content_len] # discard padding any any trailing bytes
     return content_bytes
 
 

@@ -81,10 +81,11 @@ def mrt_block_create(mrt_type=0, mrt_subtype=0, block_content=[]):
     block_bytes = block_hdr + pcapng.util.block32_pad_bytes( block_content )
     return block_bytes
 
-def mrt_header_parse( block_bytes ):
+def mrt_block_parse(block_bytes):
     """Decodes an MRT header block."""
     (time_secs, mrt_type, mrt_subtype, content_length) = struct.unpack( '!LHHL', block_bytes[0:12] )
-    content = block_bytes[ 12: 12+content_length ]
+    content_pad = block_bytes[12:]
+    content = content_pad[:content_length]
     parsed = { 'time_secs'      : time_secs,
                 'mrt_type'      : mrt_type,
                 'mrt_subtype'   : mrt_subtype,
@@ -100,15 +101,12 @@ def mrt_block_extended_create(mrt_type=0, mrt_subtype=0, block_content=[]):
 
 def mrt_block_extended_parse( block_bytes ):
     """Decodes an MRT header block."""
-    (time_secs, mrt_type, mrt_subtype, usec_content_length, time_usecs) = struct.unpack( '!LHHLL', block_bytes )
-    content_length = usec_content_length - 4
-    content = block_bytes[ 16 : content_length ]
-    parsed = { 'time_secs'     : time_secs,
-               'time_usecs'    : time_usecs,
-               'time_float'    : pcapng.util.timeTuple_to_float(time_secs, time_usecs),
-               'mrt_type'      : mrt_type,
-               'mrt_subtype'   : mrt_subtype,
-               'content'       : content }
+    parsed = mrt_block_parse( block_bytes )
+    usec_content = parsed['content']
+    (time_usecs,) = struct.unpack( '!L', usec_content[:4] )
+    content = usec_content[4:]
+    parsed[ 'time_usecs' ] = time_usecs
+    parsed[ 'content'    ] = content
     return parsed
 
 def ospfv2_block( local_ip_address, remote_ip_address, ospf_msg_content=[] ):

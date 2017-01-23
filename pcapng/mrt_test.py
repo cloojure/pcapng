@@ -9,8 +9,8 @@ from pcapng.util import to_bytes, str_to_bytes
 
 def test_mrt_block():
     pcapng.util.set_test_time_utc( 123.456789 )
-    blk_dict  = pcapng.mrt.mrt_block_parse(
-                pcapng.mrt.mrt_block_create( 2, 3, range(1,6) ))
+    blk_bytes = pcapng.mrt.mrt_block_create( 2, 3, range(1,6))
+    blk_dict  = pcapng.mrt.mrt_block_parse(blk_bytes)
     pcapng.util.assert_type_str(  blk_bytes )
     pcapng.util.assert_type_dict( blk_dict )
 
@@ -21,8 +21,8 @@ def test_mrt_block():
 
 def test_mrt_block_ext():
     pcapng.util.set_test_time_utc( 123.456789 )
-    blk_dict  = pcapng.mrt.mrt_block_extended_parse(
-                pcapng.mrt.mrt_block_extended_create( 4, 5, range(1,8) ))
+    blk_bytes = pcapng.mrt.mrt_block_extended_create( 4, 5, range(1,8))
+    blk_dict  = pcapng.mrt.mrt_block_extended_parse(blk_bytes)
     pcapng.util.assert_type_str(  blk_bytes )
     pcapng.util.assert_type_dict( blk_dict )
 

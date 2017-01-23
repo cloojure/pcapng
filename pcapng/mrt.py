@@ -12,13 +12,6 @@ from pcapng.util import to_bytes
 pcapng.util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
-# Brocade Private Enterprise Number (PEN)
-#   see:  http://www.iana.org/assignments/enterprise-numbers/enterprise-numbers
-#   Brocade Communications Systems, Inc.
-#     Scott Kipp
-#     skipp@brocade.com
-BROCADE_PEN = 1588
-
 # IANA type codes; MRT types  ("_ET" suffix => Extended Timestamp field is present)
 NULL                        =   0       # deprecated
 START                       =   1       # deprecated

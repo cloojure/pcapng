@@ -13,7 +13,6 @@ def test_mrt_block():
     blk_dict  = pcapng.mrt.mrt_block_parse(blk_bytes)
     pcapng.util.assert_type_str(  blk_bytes )
     pcapng.util.assert_type_dict( blk_dict )
-
     assert blk_dict[ 'time_secs'    ] == 123
     assert blk_dict[ 'mrt_type'     ] == 2
     assert blk_dict[ 'mrt_subtype'  ] == 3
@@ -25,7 +24,6 @@ def test_mrt_block_ext():
     blk_dict  = pcapng.mrt.mrt_block_extended_parse(blk_bytes)
     pcapng.util.assert_type_str(  blk_bytes )
     pcapng.util.assert_type_dict( blk_dict )
-
     assert blk_dict[ 'time_secs'    ] == 123
     assert blk_dict[ 'time_usecs'   ] == 456789
     assert blk_dict[ 'mrt_type'     ] == 4

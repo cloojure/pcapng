@@ -83,10 +83,8 @@ def mrt_block_create(mrt_type=0, mrt_subtype=0, block_content=[]):
 
 def mrt_header_parse( block_bytes ):
     """Decodes an MRT header block."""
-    print( 'len = %s' % len(block_bytes))
     (time_secs, mrt_type, mrt_subtype, content_length) = struct.unpack( '!LHHL', block_bytes[0:12] )
     content = block_bytes[ 12: 12+content_length ]
-    print( 'content %s' % content)
     parsed = { 'time_secs'      : time_secs,
                 'mrt_type'      : mrt_type,
                 'mrt_subtype'   : mrt_subtype,

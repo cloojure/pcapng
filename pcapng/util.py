@@ -3,6 +3,17 @@ import sys
 import time
 import math
 
+# Global var's
+test_ctx = {
+    'enable'    : False,
+    'utc_secs'  : -1.2      # floating point unix time
+}
+def set_test_time_utc( utc_secs ):
+    global test_ctx
+    test_ctx['enable']      = True
+    test_ctx['utc_time']    = utc_secs
+
+#-----------------------------------------------------------------------------
 
 def is_python2():
     (major, minor, micro, release_level, serial) = sys.version_info
@@ -62,31 +73,35 @@ def split_float( fval ):
     micros = int( round( frac * 1000000 ))
     return int(whole), micros
 
-def curr_utc_time_tuple():
+def curr_utc_timetuple():
     """Returns the current UTC time as a (secs, usecs) tuple."""
-    utc_secs = time.time()
+    global test_ctx
+    if test_ctx['enable']:
+        utc_secs = test_ctx['utc_time']
+    else:
+        utc_secs = time.time()
     secs, usecs = split_float( utc_secs )
     return secs, usecs
 
 def curr_utc_secs():
     """Returns the current UTC time in integer seconds."""
-    secs, usecs = curr_utc_time_tuple()
+    secs, usecs = curr_utc_timetuple()
     return secs
 
-def timetup_to_float( secs, usecs ):
+def timeTuple_to_float(secs, usecs):
     """Converts a time tuple from (secs, usecs) to float."""
     return secs + (usecs / 1000000.0)
 
-def timetup_subtract( ts1, ts2 ):
+def timeTuple_subtract(ts1, ts2):
     """Subtracts two time tuples in (secs, usecs) format, returning a float result."""
     (s1, us1) = ts1
     (s2, us2) = ts2
-    t1 = timetup_to_float( s1, us1 )
-    t2 = timetup_to_float( s2, us2 )
+    t1 = timeTuple_to_float(s1, us1)
+    t2 = timeTuple_to_float(s2, us2)
     delta = t2 - t1
     return delta
 
-def ChrList_to_str(arg):
+def chrList_to_str(arg):
     """ Convert a list of characters to a string"""
     #todo verify input type & values [0..255]
     strval = ''.join( arg )

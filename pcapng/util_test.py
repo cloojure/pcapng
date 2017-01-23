@@ -67,11 +67,11 @@ def test_xxx():
     assert (3, 140000) == pcapng.util.split_float(3.14)
     assert (3, 141593) == pcapng.util.split_float(3.141592654)
 
-    assert 'abc'             == pcapng.util.ChrList_to_str(['a', 'b', 'c'])
+    assert 'abc'             == pcapng.util.chrList_to_str(['a', 'b', 'c'])
 
-    ts1 = pcapng.util.curr_utc_time_tuple()
+    ts1 = pcapng.util.curr_utc_timetuple()
     time.sleep(0.1)
-    delta = pcapng.util.timetup_subtract( ts1, pcapng.util.curr_utc_time_tuple() )
+    delta = pcapng.util.timeTuple_subtract(ts1, pcapng.util.curr_utc_timetuple())
     assert ((0.09 < delta) and (delta < 0.11))
 
 def test_types():

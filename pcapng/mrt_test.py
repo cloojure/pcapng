@@ -6,10 +6,7 @@ import pcapng.util
 from pcapng.util import to_bytes, str_to_bytes
 
 
-# def test_section_header_block():
-#     opts = { pcapng.option.OPT_SHB_HARDWARE  : "Dell",
-#              pcapng.option.OPT_SHB_OS        : "Ubuntu",
-#              pcapng.option.OPT_SHB_USERAPPL  : "IntelliJ Idea" }
+# def test_mrt_header():
 #     blk_str     = pcapng.core.section_header_block_encode( opts )
 #     blk_data    = pcapng.core.section_header_block_decode( blk_str )
 #     pcapng.util.assert_type_str( blk_str )

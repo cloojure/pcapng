@@ -112,5 +112,7 @@ def test_custom_bytes_pack():
     assert_custom_bytes_packing( 'ray' )
     assert_custom_bytes_packing( 'Doh!' )
     assert_custom_bytes_packing( 'How do you like me now?' )
+    for i in range(23):
+        assert_custom_bytes_packing( range(i) )
 
 

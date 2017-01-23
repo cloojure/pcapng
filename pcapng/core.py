@@ -1,5 +1,6 @@
 #todo add brocade copyright / license
 import struct
+
 import pcapng.linktype
 import pcapng.option
 import pcapng.util
@@ -224,17 +225,6 @@ def simple_pkt_block_decode(block):
                       'block_total_len_end'     : block_total_len_end }
     return block_data
 
-def custom_bytes_pack( data_bytes ):
-    data_bytes_len = len( data_bytes )
-    data_bytes_pad = pcapng.util.block32_pad_bytes( data_bytes )
-    packed_bytes = struct.pack('!L', data_bytes_len) + data_bytes_pad
-    return packed_bytes
-
-def custom_bytes_unpack( packed_bytes ):
-    (data_bytes_len,) = struct.unpack( '!L', packed_bytes[:4] )
-    data_bytes_pad = packed_bytes[4:]
-    data_bytes = data_bytes_pad[:data_bytes_len]
-    return data_bytes
 
 
 # def custom_block_create(block_type=0, pen=-1, content=[], options_dict={}):

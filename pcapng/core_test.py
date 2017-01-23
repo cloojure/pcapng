@@ -100,19 +100,3 @@ def test_simple_pkt_block():
     assert blk_data['original_pkt_len']     == 3
     assert blk_data['pkt_data']             == 'abc'
 
-def test_custom_bytes_pack():
-    def assert_custom_bytes_packing( data_bytes ):
-        orig = to_bytes( data_bytes )
-        unpacked = pcapng.core.custom_bytes_unpack(
-                   pcapng.core.custom_bytes_pack( orig ))
-        assert unpacked == orig
-    assert_custom_bytes_packing( '' )
-    assert_custom_bytes_packing( 'a' )
-    assert_custom_bytes_packing( 'go' )
-    assert_custom_bytes_packing( 'ray' )
-    assert_custom_bytes_packing( 'Doh!' )
-    assert_custom_bytes_packing( 'How do you like me now?' )
-    for i in range(23):
-        assert_custom_bytes_packing( range(i) )
-
-

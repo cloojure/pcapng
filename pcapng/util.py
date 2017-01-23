@@ -131,8 +131,8 @@ def block32_ceil_bytes(curr_len):
     """Returns the number of bytes (n >= curr_len) at the next 32-bit boundary"""
     curr_blks = float(curr_len) / 4.0
     pad_blks = int( math.ceil( curr_blks ))
-    pad_len = pad_blks * 4
-    return pad_len
+    padded_len = pad_blks * 4
+    return padded_len
 
 def pad_bytes(data, tgt_length, padval=0):
     """Add (n>=0) 'padval' bytes to extend data to tgt_length"""
@@ -143,12 +143,26 @@ def pad_bytes(data, tgt_length, padval=0):
 
 def block32_pad_bytes(data):
     """Pad data with (n>=0) 0x00 bytes to reach the next 32-bit boundary"""
-    pad_len = block32_ceil_bytes(len(data))
-    result = pad_bytes(data, pad_len)
+    padded_len = block32_ceil_bytes(len(data))
+    result = pad_bytes(data, padded_len)
     return result
 
 def assert_block32_length(data):
     """Assert that data length is at a 32-bit boundary"""
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True
+
+#todo add a "custom bytes" header tag? if so, verify on unpack
+def block32_bytes_pack(data_bytes):
+    data_bytes = to_bytes( data_bytes )
+    data_bytes_len = len( data_bytes )
+    packed_bytes = struct.pack('!L', data_bytes_len) + block32_pad_bytes(data_bytes)
+    return packed_bytes
+
+def block32_bytes_unpack(packed_bytes):
+    (data_bytes_len,) = struct.unpack( '!L', packed_bytes[:4] )
+    data_bytes_pad = packed_bytes[4:]
+    data_bytes = data_bytes_pad[:data_bytes_len]
+    return data_bytes
+
 

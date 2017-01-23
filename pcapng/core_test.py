@@ -93,10 +93,24 @@ def test_simple_pkt_block():
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']           == 0x00000003
-    assert blk_data['block_tot_len']        == 20
-    assert blk_data['block_tot_len']        == blk_data['block_tot_len_end']
-    assert blk_data['block_tot_len']        == len(blk_str)
-    assert blk_data['block_tot_len']        == 16 + blk_data['pkt_data_pad_len']
+    assert blk_data['block_total_len']        == 20
+    assert blk_data['block_total_len']        == blk_data['block_total_len_end']
+    assert blk_data['block_total_len']        == len(blk_str)
+    assert blk_data['block_total_len']        == 16 + blk_data['pkt_data_pad_len']
     assert blk_data['original_pkt_len']     == 3
     assert blk_data['pkt_data']             == 'abc'
+
+def test_custom_bytes_pack():
+    def assert_custom_bytes_packing( data_bytes ):
+        orig = to_bytes( data_bytes )
+        unpacked = pcapng.core.custom_bytes_unpack(
+                   pcapng.core.custom_bytes_pack( orig ))
+        assert unpacked == orig
+    assert_custom_bytes_packing( '' )
+    assert_custom_bytes_packing( 'a' )
+    assert_custom_bytes_packing( 'go' )
+    assert_custom_bytes_packing( 'ray' )
+    assert_custom_bytes_packing( 'Doh!' )
+    assert_custom_bytes_packing( 'How do you like me now?' )
+
 

@@ -1,5 +1,4 @@
 import struct
-import time
 import pytest
 import pcapng.util
 from pcapng.util import to_bytes, str_to_bytes
@@ -69,10 +68,10 @@ def test_xxx():
 
     assert 'abc'             == pcapng.util.chrList_to_str(['a', 'b', 'c'])
 
-    ts1 = pcapng.util.curr_utc_timetuple()
-    time.sleep(0.1)
-    delta = pcapng.util.timeTuple_subtract(ts1, pcapng.util.curr_utc_timetuple())
-    assert ((0.09 < delta) and (delta < 0.11))
+    pcapng.util.set_test_time_utc( 123.456789 )
+    (secs,usecs) = pcapng.util.curr_utc_timetuple()
+    assert 123    == secs
+    assert 456789 == round( usecs )
 
 def test_types():
     pcapng.util.assert_type_str('')

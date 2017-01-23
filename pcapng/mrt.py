@@ -83,8 +83,10 @@ def mrt_block_create(mrt_type=0, mrt_subtype=0, block_content=[]):
 
 def mrt_header_parse( block_bytes ):
     """Decodes an MRT header block."""
-    (time_secs, mrt_type, mrt_subtype, content_length) = struct.unpack( '!LHHL', block_bytes )
-    content = block_bytes[ 12 : content_length ]
+    print( 'len = %s' % len(block_bytes))
+    (time_secs, mrt_type, mrt_subtype, content_length) = struct.unpack( '!LHHL', block_bytes[0:12] )
+    content = block_bytes[ 12: 12+content_length ]
+    print( 'content %s' % content)
     parsed = { 'time_secs'      : time_secs,
                 'mrt_type'      : mrt_type,
                 'mrt_subtype'   : mrt_subtype,
@@ -105,7 +107,7 @@ def mrt_block_extended_parse( block_bytes ):
     content = block_bytes[ 16 : content_length ]
     parsed = { 'time_secs'     : time_secs,
                'time_usecs'    : time_usecs,
-               'time_float'    : pcapng.util.timeTuple_to_float(time_secs, time_usecs)
+               'time_float'    : pcapng.util.timeTuple_to_float(time_secs, time_usecs),
                'mrt_type'      : mrt_type,
                'mrt_subtype'   : mrt_subtype,
                'content'       : content }

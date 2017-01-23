@@ -183,10 +183,9 @@ def interface_desc_block_decode(block_bytes):
 
 def simple_pkt_block_encode(pkt_data):
     """Encodes a simple packet block."""
-    pcapng.util.assert_type_bytes(pkt_data)        #todo is list & tuple & str ok?
-    pkt_data            = list(map(ord, pkt_data))
-    pkt_data_pad        = pcapng.util.block32_pad_bytes(pkt_data)
-    block_type = 0x00000003
+    pkt_data         = to_bytes(pkt_data)        #todo is list & tuple & str ok?
+    pkt_data_pad     = pcapng.util.block32_pad_bytes(pkt_data)
+    block_type       = 0x00000003
     original_pkt_len = len(pkt_data)
     pkt_data_pad_len = len(pkt_data_pad)
     block_total_len = ( 4 +      # block type

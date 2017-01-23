@@ -34,7 +34,7 @@ def test_pad_to_len():
     assert to_bytes( [1, 2, 3, 4] ) == pcapng.util.pad_bytes([1, 2, 3, 4], 4, 9)
 
 def test_pad_to_block32():
-    assert to_bytes( [                      ] ) == pcapng.util.block32_pad_bytes([                      ])
+    assert to_bytes( [                      ] ) == pcapng.util.block32_pad_bytes([])
     assert to_bytes( [1, 0, 0, 0            ] ) == pcapng.util.block32_pad_bytes([1])
     assert to_bytes( [1, 2, 0, 0            ] ) == pcapng.util.block32_pad_bytes([1, 2])
     assert to_bytes( [1, 2, 3, 0            ] ) == pcapng.util.block32_pad_bytes([1, 2, 3])

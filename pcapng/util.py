@@ -153,16 +153,18 @@ def assert_block32_length(data):
     return True
 
 #todo add a "custom bytes" header tag? if so, verify on unpack
-def block32_bytes_pack(data_bytes):
-    data_bytes = to_bytes( data_bytes )
-    data_bytes_len = len( data_bytes )
-    packed_bytes = struct.pack('!L', data_bytes_len) + block32_pad_bytes(data_bytes)
+def block32_bytes_pack(content):
+    content_bytes = to_bytes( content )
+    content_len = len( content_bytes )
+    content_bytes_pad = block32_pad_bytes( content_bytes )
+    packed_bytes = struct.pack( '!L', content_len ) + content_bytes_pad
     return packed_bytes
 
 def block32_bytes_unpack(packed_bytes):
-    (data_bytes_len,) = struct.unpack( '!L', packed_bytes[:4] )
-    data_bytes_pad = packed_bytes[4:]
-    data_bytes = data_bytes_pad[:data_bytes_len]
-    return data_bytes
+    (content_len,) = struct.unpack( '!L', packed_bytes[:4] )
+    content_bytes_pad = packed_bytes[4:]
+    content_bytes = content_bytes_pad[:content_len]
+    assert len(content_bytes_pad) == block32_ceil_bytes( content_len )
+    return content_bytes
 
 

@@ -53,7 +53,7 @@ def option_decode_rolling(opts_bytes):
     """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
     pcapng.util.assert_type_bytes(opts_bytes)
     assert 4 <= len(opts_bytes)
-    (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[0:4])
+    (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[:4])
     data_len_pad = pcapng.util.block32_ceil_bytes( data_len_orig )
     first_block_len_pad = 4+data_len_pad
     assert first_block_len_pad <= len(opts_bytes)
@@ -121,9 +121,9 @@ def section_header_block_encode(opts_dict={}):    #todo data_len
 
 def section_header_block_decode(block_bytes):
     """Decodes a bytes block into a section header block, returning a dictionary."""
-    assert type(block_bytes) == str
+    pcapng.util.assert_type_bytes(block_bytes)
     ( block_type, block_total_len, byte_order_magic, major_version,
-      minor_version, section_len ) = struct.unpack( '=LlLhhq', block_bytes[0:24])
+      minor_version, section_len ) = struct.unpack( '=LlLhhq', block_bytes[:24])
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
     assert ((block_total_len == len(block_bytes)) and
             (block_total_len == block_total_len_end))
@@ -162,20 +162,15 @@ def interface_desc_block_encode( opts_dict={} ):
                     struct.pack( '=l', block_total_len ))
     return block_bytes
 
-def interface_desc_block_decode(block):
+def interface_desc_block_decode(block_bytes):
     """Decodes a bytes block into an interface description block, returning a dictionary."""
-    assert type( block ) == str       #todo is tuple & str ok?
-    block_type              = struct.unpack( '=L', block[0:4]   )[0]    #todo  cleanup
-    block_total_len         = struct.unpack( '=l', block[4:8]   )[0]
-    link_type               = struct.unpack( '=H', block[8:10]  )[0]
-    reserved                = struct.unpack( '=H', block[10:12] )[0]
-    snaplen                 = struct.unpack( '=l', block[12:16] )[0]
-    block_total_len_end     = struct.unpack( '=l', block[-4:]   )[0]
-    assert block_total_len == block_total_len_end
-
-    options_bytes           = block[16:-4]
+    pcapng.util.assert_type_bytes(block_bytes)
+    ( block_type, block_total_len, link_type, reserved, snaplen ) = struct.unpack( '=LlHHl', block_bytes[:16])
+    (block_total_len_end,) = struct.unpack( '=l', block_bytes[-4:])
+    assert ((block_total_len == len(block_bytes)) and
+            (block_total_len == block_total_len_end))
+    options_bytes           = block_bytes[16:-4]
     options_dict            = options_decode( options_bytes )
-
     parsed = { 'block_type'             : block_type ,
                'block_total_len'        : block_total_len ,
                'link_type'              : link_type ,
@@ -208,9 +203,9 @@ def simple_pkt_block_decode(block_bytes):
     """Decodes a bytes block into a simple packet block, returning a dictionary."""
     pcapng.util.assert_type_bytes(block_bytes)
     (block_type, block_total_len, original_pkt_len) = struct.unpack( '=LLL', block_bytes[:12])
+    (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )
     pkt_data_pad_len    = pcapng.util.block32_ceil_bytes(original_pkt_len)
     pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
-    block_total_len_end = pcapng.util.first(struct.unpack( '=L', block_bytes[-4:block_total_len]))  #todo clean
     assert block_total_len == block_total_len_end
     parsed =    { 'block_type'          : block_type ,
                   'block_total_len'     : block_total_len ,
@@ -222,7 +217,7 @@ def simple_pkt_block_decode(block_bytes):
 
 
 
-# format realling needs a content_length field!
+# custom format really needs a content_length field!
 def custom_block_pack(block_type, pen, content=[], options_dict={}):
     """Creates an pcapng custom block."""
     assert ( (block_type == CUSTOM_BLOCK_COPYABLE) or

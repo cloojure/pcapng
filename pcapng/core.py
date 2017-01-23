@@ -119,21 +119,16 @@ def section_header_block_encode(opts_dict={}):    #todo data_len
                     struct.pack( '=l', block_total_len ))
     return block_bytes
 
-def section_header_block_decode(block):
+def section_header_block_decode(block_bytes):
     """Decodes a bytes block into a section header block, returning a dictionary."""
-    assert type( block ) == str
-    block_type             = pcapng.util.first( struct.unpack( '=l', block[0:4]   ))  #todo cleanup
-    block_total_len        = pcapng.util.first( struct.unpack( '=l', block[4:8]   ))
-    byte_order_magic       = pcapng.util.first( struct.unpack( '=L', block[8:12]  ))
-    major_version          = pcapng.util.first( struct.unpack( '=h', block[12:14] ))
-    minor_version          = pcapng.util.first( struct.unpack( '=h', block[14:16] ))
-    section_len            = pcapng.util.first( struct.unpack( '=q', block[16:24] ))
-    block_total_len_end    = struct.unpack( '=l', block[-4:] )[0]
-    assert block_total_len == block_total_len_end
-
-    options_bytes       = block[24:-4]
-    options_dict        = options_decode( options_bytes )
-
+    assert type(block_bytes) == str
+    ( block_type, block_total_len, byte_order_magic, major_version,
+      minor_version, section_len ) = struct.unpack( '=LlLhhq', block_bytes[0:24])
+    (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
+    assert ((block_total_len == len(block_bytes)) and
+            (block_total_len == block_total_len_end))
+    options_bytes = block_bytes[24:-4]
+    options_dict  = options_decode( options_bytes )
     parsed = { 'block_type'          : block_type ,
                'block_total_len'     : block_total_len ,
                'byte_order_magic'    : byte_order_magic ,

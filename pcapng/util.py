@@ -2,6 +2,7 @@ import struct
 import sys
 import time
 import math
+import pcapng.const
 
 # Global var's
 test_ctx = {
@@ -59,6 +60,11 @@ def str_to_bytes( arg ):
     """Convert an ASCII string to 'bytes'. Works on both Python2 and Python3."""
     return to_bytes( map(ord,arg))
 
+def int32_to_hexstr(arg):
+    """Converts a 32-bit unsigned integer value to a hex string ."""
+    assert ((0 <= arg) and (arg < pcapng.const.POW_2_32))
+    return ( '0x' + format( curr_utc_secs(), '08x' ))
+
 
 #todo move to pcap
 def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):
@@ -87,6 +93,10 @@ def curr_utc_secs():
     """Returns the current UTC time in integer seconds."""
     secs, usecs = curr_utc_timetuple()
     return secs
+
+def curr_utc_secs_hexstr():
+    """Returns the current UTC time in integer seconds."""
+    return int32_to_hexstr(curr_utc_secs())
 
 def timeTuple_to_float(secs, usecs):
     """Converts a time tuple from (secs, usecs) to float."""

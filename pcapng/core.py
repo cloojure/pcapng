@@ -211,7 +211,7 @@ def simple_pkt_block_decode(block_bytes):
                   'original_pkt_len'    : original_pkt_len ,
                   'pkt_data_pad_len'    : pkt_data_pad_len ,
                   'pkt_data'            : pkt_data ,
-                  'block_total_len_end'     : block_total_len_end }
+                  'block_total_len_end' : block_total_len_end }
     return parsed
 
 

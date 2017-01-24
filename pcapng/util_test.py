@@ -146,8 +146,11 @@ def test_xxx():
 
     assert 'abc'             == pcapng.util.chrList_to_str(['a', 'b', 'c'])
 
+def test_time():
     pcapng.util.set_test_time_utc( 123.456789 )
     (secs,usecs) = pcapng.util.curr_utc_timetuple()
     assert 123    == secs
     assert 456789 == round( usecs )
 
+    pcapng.util.set_test_time_utc( 123456 )
+    assert '0x0001e240' == pcapng.util.curr_utc_secs_hexstr()

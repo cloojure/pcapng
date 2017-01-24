@@ -54,7 +54,7 @@ def option_decode_rolling(opts_bytes):
     pcapng.util.assert_type_bytes(opts_bytes)
     assert 4 <= len(opts_bytes)
     (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[:4])
-    data_len_pad = pcapng.util.block32_ceil_bytes( data_len_orig )
+    data_len_pad = pcapng.util.block32_ceil_num_bytes(data_len_orig)
     first_block_len_pad = 4+data_len_pad
     assert first_block_len_pad <= len(opts_bytes)
     first_opt_bytes = opts_bytes[:first_block_len_pad]
@@ -203,7 +203,7 @@ def simple_pkt_block_decode(block_bytes):
     pcapng.util.assert_type_bytes(block_bytes)
     (block_type, block_total_len, original_pkt_len) = struct.unpack( '=LLL', block_bytes[:12])
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )
-    pkt_data_pad_len    = pcapng.util.block32_ceil_bytes(original_pkt_len)
+    pkt_data_pad_len    = pcapng.util.block32_ceil_num_bytes(original_pkt_len)
     pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
     assert block_total_len == block_total_len_end
     parsed =    { 'block_type'          : block_type ,

@@ -4,17 +4,17 @@ import pcapng.util
 from pcapng.util import to_bytes, str_to_bytes
 
 def test_block32_pad_len():
-    assert 0 == pcapng.util.block32_ceil_bytes(0)
+    assert 0 == pcapng.util.block32_ceil_num_bytes(0)
 
-    assert 4 == pcapng.util.block32_ceil_bytes(1)
-    assert 4 == pcapng.util.block32_ceil_bytes(2)
-    assert 4 == pcapng.util.block32_ceil_bytes(3)
-    assert 4 == pcapng.util.block32_ceil_bytes(4)
+    assert 4 == pcapng.util.block32_ceil_num_bytes(1)
+    assert 4 == pcapng.util.block32_ceil_num_bytes(2)
+    assert 4 == pcapng.util.block32_ceil_num_bytes(3)
+    assert 4 == pcapng.util.block32_ceil_num_bytes(4)
 
-    assert 8 == pcapng.util.block32_ceil_bytes(5)
-    assert 8 == pcapng.util.block32_ceil_bytes(6)
-    assert 8 == pcapng.util.block32_ceil_bytes(7)
-    assert 8 == pcapng.util.block32_ceil_bytes(8)
+    assert 8 == pcapng.util.block32_ceil_num_bytes(5)
+    assert 8 == pcapng.util.block32_ceil_num_bytes(6)
+    assert 8 == pcapng.util.block32_ceil_num_bytes(7)
+    assert 8 == pcapng.util.block32_ceil_num_bytes(8)
 
 def test_pad_to_len():
     with pytest.raises(AssertionError): pcapng.util.pad_bytes([1, 2, 3, 4], 3)

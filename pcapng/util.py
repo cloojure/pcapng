@@ -127,25 +127,24 @@ def ipAddr_decode( ip_bytes ):
 #todo move to pcapng.bytes
 #-----------------------------------------------------------------------------
 
-def block32_ceil_bytes(curr_len):
+def block32_ceil_num_bytes(curr_len):
     """Returns the number of bytes (n >= curr_len) at the next 32-bit boundary"""
-    curr_blks = float(curr_len) / 4.0
-    pad_blks = int( math.ceil( curr_blks ))
-    padded_len = pad_blks * 4
-    return padded_len
+    num_blks = float(curr_len) / 4.0
+    num_blks_pad = int( math.ceil( num_blks ))
+    num_bytes_pad = num_blks_pad * 4
+    return num_bytes_pad
 
-def pad_bytes(data, tgt_length, padval=0):
+def pad_bytes(data_bytes, tgt_length, padval=0):
     """Add (n>=0) 'padval' bytes to extend data to tgt_length"""
-    elem_needed = tgt_length - len(data)
-    assert (elem_needed >= 0), "padding cannot be negative"
-    result = to_bytes(data) + to_bytes( [padval] )*elem_needed
-    return result
+    num_bytes_needed = tgt_length - len(data_bytes)
+    assert (num_bytes_needed >= 0), "padding cannot be negative"
+    data_bytes_pad = to_bytes(data_bytes) + to_bytes([padval]) * num_bytes_needed
+    return data_bytes_pad
 
-def block32_pad_bytes(data):
+def block32_pad_bytes(data_bytes):
     """Pad data with (n>=0) 0x00 bytes to reach the next 32-bit boundary"""
-    padded_len = block32_ceil_bytes(len(data))
-    result = pad_bytes(data, padded_len)
-    return result
+    padded_len = block32_ceil_num_bytes(len(data_bytes))
+    return pad_bytes(data_bytes, padded_len)
 
 def assert_block32_length(data):
     """Assert that data length is at a 32-bit boundary"""
@@ -153,15 +152,14 @@ def assert_block32_length(data):
     return True
 
 def block32_bytes_pack(content):
-    content_bytes = to_bytes( content )
-    content_len = len( content_bytes )
-    content_bytes_pad = block32_pad_bytes( content_bytes )
+    content_len = len( content )
+    content_bytes_pad = block32_pad_bytes( content )
     packed_bytes = struct.pack( '!L', content_len ) + content_bytes_pad
     return packed_bytes
 
 def block32_bytes_unpack_rolling(packed_bytes):
     (content_len,) = struct.unpack( '!L', packed_bytes[:4] )
-    content_len_pad = block32_ceil_bytes(content_len)
+    content_len_pad = block32_ceil_num_bytes(content_len)
     packed_bytes_nohdr = packed_bytes[4:]
     content_bytes = packed_bytes_nohdr[:content_len]
     remaining_bytes = packed_bytes_nohdr[content_len_pad:]

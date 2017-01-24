@@ -11,8 +11,8 @@ def test_option_endofopt():
 
 def test_option_codec():
     def assert_option_codec(opt_code, opt_value):
-        (res_code, res_bytes) = pcapng.core.option_decode(
-                                pcapng.core.option_encode(opt_code, opt_value))
+        (res_code, res_bytes) = pcapng.core.option_unpack(
+                                pcapng.core.option_pack(opt_code, opt_value))
         assert res_code   == opt_code
         assert res_bytes  == to_bytes(opt_value)
 
@@ -25,8 +25,8 @@ def test_option_codec():
 
 def test_options_codec():
     def assert_options_codec( opts_dict ):
-        opts_dict_result = pcapng.core.options_decode(
-                           pcapng.core.options_encode( opts_dict ))
+        opts_dict_result = pcapng.core.options_unpack(
+                           pcapng.core.options_pack(opts_dict))
         assert opts_dict_result == opts_dict
 
     val0 = str_to_bytes( '' )
@@ -41,8 +41,8 @@ def test_options_codec():
 
 def test_option_comment_codec():
     def assert_comment_codec( str_val ):
-        result = pcapng.core.option_comment_decode(
-                 pcapng.core.option_comment_encode(str_val))
+        result = pcapng.core.option_comment_unpack(
+                 pcapng.core.option_comment_pack(str_val))
         assert result == str_val
 
     assert_comment_codec( '' )
@@ -57,8 +57,8 @@ def test_section_header_block():
     opts = { pcapng.option.OPT_SHB_HARDWARE  : "Dell",
              pcapng.option.OPT_SHB_OS        : "Ubuntu",
              pcapng.option.OPT_SHB_USERAPPL  : "IntelliJ Idea" }
-    blk_str     = pcapng.core.section_header_block_encode( opts )
-    blk_data    = pcapng.core.section_header_block_decode( blk_str )
+    blk_str     = pcapng.core.section_header_block_pack(opts)
+    blk_data    = pcapng.core.section_header_block_unpack(blk_str)
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']           == 0x0A0D0D0A
@@ -75,8 +75,8 @@ def test_interface_desc_block():
              pcapng.option.IF_DESCRIPTION   : "don't you wish",
              pcapng.option.IF_IPV4ADDR      : to_bytes( [ 192,168,13,7,  255,255,255,0 ] ),
              pcapng.option.IF_OS            : "NitrOS" }
-    blk_str    = pcapng.core.interface_desc_block_encode( opts )
-    blk_data   = pcapng.core.interface_desc_block_decode(blk_str)
+    blk_str    = pcapng.core.interface_desc_block_pack(opts)
+    blk_data   = pcapng.core.interface_desc_block_unpack(blk_str)
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']          == 0x00000001
@@ -88,8 +88,8 @@ def test_interface_desc_block():
     assert blk_data['options_dict']        == opts
 
 def test_simple_pkt_block():
-    blk_str   = pcapng.core.simple_pkt_block_encode('abc')
-    blk_data  = pcapng.core.simple_pkt_block_decode(blk_str)
+    blk_str   = pcapng.core.simple_pkt_block_pack('abc')
+    blk_data  = pcapng.core.simple_pkt_block_unpack(blk_str)
     pcapng.util.assert_type_str( blk_str )
     pcapng.util.assert_type_dict( blk_data )
     assert blk_data['block_type']           == 0x00000003

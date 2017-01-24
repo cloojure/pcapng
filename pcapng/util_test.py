@@ -66,6 +66,25 @@ def test_block32_bytes_pack():
     for i in range(23):
         assert_block32_bytes_packing( range(i) )
 
+def test_block32_labelled_bytes_pack():
+    block_label = pcapng.util.curr_utc_secs()
+    def assert_block32_labelled_bytes_packing( data_bytes ):
+        orig = to_bytes( data_bytes )
+        extra_bytes = to_bytes('dummy-start') + orig + to_bytes('dummy-end')
+        label, unpacked, remaining = pcapng.util.block32_labelled_bytes_unpack_rolling(
+                                     pcapng.util.block32_labelled_bytes_pack( block_label, orig ) + extra_bytes )
+        assert label     == block_label
+        assert unpacked  == orig
+        assert remaining == extra_bytes
+    assert_block32_labelled_bytes_packing( '' )
+    assert_block32_labelled_bytes_packing( 'a' )
+    assert_block32_labelled_bytes_packing( 'go' )
+    assert_block32_labelled_bytes_packing( 'ray' )
+    assert_block32_labelled_bytes_packing( 'Doh!' )
+    assert_block32_labelled_bytes_packing( 'How do you like me now?' )
+    for i in range(13):
+        assert_block32_labelled_bytes_packing( range(i) )
+
 #-----------------------------------------------------------------------------
 
 def test_types():
@@ -147,10 +166,12 @@ def test_xxx():
     assert 'abc'             == pcapng.util.chrList_to_str(['a', 'b', 'c'])
 
 def test_time():
-    pcapng.util.set_test_time_utc( 123.456789 )
+    pcapng.util.test_time_utc_set(123.456789)
     (secs,usecs) = pcapng.util.curr_utc_timetuple()
     assert 123    == secs
     assert 456789 == round( usecs )
+    pcapng.util.test_time_utc_unset()
 
-    pcapng.util.set_test_time_utc( 123456 )
+    pcapng.util.test_time_utc_set(123456)
     assert '0x0001e240' == pcapng.util.curr_utc_secs_hexstr()
+    pcapng.util.test_time_utc_unset()

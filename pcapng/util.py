@@ -9,10 +9,13 @@ test_ctx = {
     'enable'    : False,
     'utc_secs'  : -1.2      # floating point unix time
 }
-def set_test_time_utc( utc_secs ):
+def test_time_utc_set(utc_secs):
     global test_ctx
     test_ctx['enable']      = True
     test_ctx['utc_time']    = utc_secs
+def test_time_utc_unset():
+    global test_ctx
+    test_ctx['enable']      = False
 
 #-----------------------------------------------------------------------------
 
@@ -49,6 +52,8 @@ def assert_uint8(arg):        # unsigned byte
 def assert_int8(arg):          # signed byte
     assert (-128 <= arg <= 127)
 
+def assert_uint32(arg):        # unsigned byte
+    assert (0 <= arg < pcapng.const.POW_2_32)
 
 def to_bytes( arg ):
     """Converts arg to a 'bytes' object."""
@@ -62,7 +67,7 @@ def str_to_bytes( arg ):
 
 def int32_to_hexstr(arg):
     """Converts a 32-bit unsigned integer value to a hex string ."""
-    assert ((0 <= arg) and (arg < pcapng.const.POW_2_32))
+    assert_uint32(arg)
     return ( '0x' + format( curr_utc_secs(), '08x' ))
 
 
@@ -161,18 +166,31 @@ def assert_block32_length(data):
     assert (0 == len(data) % 4), "data must be 32-bit aligned"
     return True
 
-def block32_bytes_pack(content):
+def block32_bytes_pack( content=[] ):
     content_len = len( content )
     content_bytes_pad = block32_pad_bytes( content )
     packed_bytes = struct.pack( '!L', content_len ) + content_bytes_pad
     return packed_bytes
 
-def block32_bytes_unpack_rolling(packed_bytes):
+def block32_bytes_unpack_rolling( packed_bytes ):
     (content_len,) = struct.unpack( '!L', packed_bytes[:4] )
     content_len_pad = block32_ceil_num_bytes(content_len)
     packed_bytes_nohdr = packed_bytes[4:]
     content_bytes = packed_bytes_nohdr[:content_len]
     remaining_bytes = packed_bytes_nohdr[content_len_pad:]
     return content_bytes, remaining_bytes
+
+def block32_labelled_bytes_pack( label, content=[] ):
+    content_bytes_pad = block32_pad_bytes( content )
+    content_len = len( content )
+    total_len   = 12 + len( content_bytes_pad )
+    packed_bytes = struct.pack( '!LLL', label, total_len, content_len ) + content_bytes_pad
+    return packed_bytes
+
+def block32_labelled_bytes_unpack_rolling( packed_bytes ):
+    (label, total_len, content_len) = struct.unpack( '!LLL', packed_bytes[:12] )
+    content_bytes       = packed_bytes[12:12+content_len]
+    remaining_bytes     = packed_bytes[total_len:]
+    return label, content_bytes, remaining_bytes
 
 

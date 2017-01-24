@@ -26,8 +26,7 @@ print('\n')
 print("Saving sample ISIS packets to file:   %s" % out_file_name)
 pcap_fp = open( out_file_name, 'wb' )
 pcap_fp.write( pcapng.core.section_header_block_pack() )
-count = 20
-while (count > 0):
+for count in range(20):
     pkt_data = get_pkt()
 
     packed_bytes = pcapng.core.custom_block_pack(

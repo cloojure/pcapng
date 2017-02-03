@@ -109,8 +109,8 @@ def test_custom_block_pack():
                  pcapng.option.OPT_CUSTOM_3 : to_bytes( [1,2,3] ) }
         orig = to_bytes( data_bytes )
         unpacked = pcapng.core.custom_block_unpack(
-                   pcapng.core.custom_block_pack(
-                       pcapng.core.CUSTOM_BLOCK_COPYABLE, pcapng.core.BROCADE_PEN, orig, opts ))
+            pcapng.core.custom_block_pack(
+                pcapng.core.CUSTOM_BLOCK_COPYABLE, pcapng.core.BROCADE_PEN, orig, opts ))
         assert unpacked[ 'block_type'    ] == pcapng.core.CUSTOM_BLOCK_COPYABLE
         assert unpacked[ 'pen'           ] == pcapng.core.BROCADE_PEN
         assert unpacked[ 'content_bytes' ] == orig
@@ -123,5 +123,25 @@ def test_custom_block_pack():
     assert_custom_block_packing( 'Doh!' )
     assert_custom_block_packing( 'How do you like me now?' )
     for i in range(23):
+        assert_custom_block_packing( range(i) )
+
+def test_custom_block_pack():
+    def assert_custom_block_packing( data_bytes ):
+        orig = to_bytes( data_bytes )
+        unpacked = pcapng.core.custom_mrt_isis_block_unpack(
+                   pcapng.core.custom_mrt_isis_block_pack(
+                       pcapng.core.CUSTOM_BLOCK_COPYABLE, pcapng.core.BROCADE_PEN, orig, opts ))
+        assert unpacked[ 'block_type'    ] == pcapng.core.CUSTOM_BLOCK_COPYABLE
+        assert unpacked[ 'pen'           ] == pcapng.core.BROCADE_PEN
+        assert unpacked[ 'content_bytes' ] == orig
+        assert unpacked[ 'options_dict'  ] == { pcapng.option.OPT_CUSTOM_0 : 'EMBEDDED_ISIS_MRT_BLOCK' }
+
+    assert_custom_block_packing( '' )
+    assert_custom_block_packing( 'a' )
+    assert_custom_block_packing( 'go' )
+    assert_custom_block_packing( 'ray' )
+    assert_custom_block_packing( 'Doh!' )
+    assert_custom_block_packing( "Don't have a cow, man." )
+    for i in range(13):
         assert_custom_block_packing( range(i) )
 

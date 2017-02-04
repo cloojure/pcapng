@@ -247,27 +247,25 @@ def custom_block_unpack(block_bytes):
     options_dict = options_unpack(options_bytes)
     parsed = { 'block_type'     : block_type,
                'pen'            : pen,
-               'content_bytes'  : content_bytes,
+               'content'        : content_bytes,
                'options_dict'   : options_dict }
     return parsed
 
 def custom_mrt_isis_block_pack( pkt_data ):
     "Packs ISIS MRT block into and wraps in a custom pcapnt block"
-    opts = { pcapng.option.OPT_CUSTOM_0 : 'EMBEDDED_ISIS_MRT_BLOCK' }
+    opts = { pcapng.option.OPT_CUSTOM_0 : 'EMBEDDED_MRT_ISIS_BLOCK' }
     packed_bytes = pcapng.core.custom_block_pack(
         pcapng.core.CUSTOM_BLOCK_COPYABLE, pcapng.core.BROCADE_PEN,
         pcapng.mrt.mrt_isis_block_pack( pkt_data ), opts )
     return packed_bytes
-    #todo need unpack;  assert 'EMBEDDED_ISIS_MRT_BLOCK'
+    #todo need unpack;  assert 'EMBEDDED_MRT_ISIS_BLOCK'
 
 def custom_mrt_isis_block_unpack(block_bytes):
     """Unpacks a mrt/isis block wrapped in a pcapng custom block."""
     pcapng.util.assert_type_bytes( block_bytes )
-    ( block_type, block_total_len, pen ) = struct.unpack( '=LLL', block_bytes[:12] )
-    (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )  #todo clean
-    assert block_total_len == block_total_len_end == len(block_bytes)
-    assert block_type == pcapng.core.CUSTOM_BLOCK_COPYABLE
-    assert pen == pcapng.core.BROCADE_PEN
-    block_bytes_stripped = block_bytes[12:-4]
-    content_bytes, options_bytes = pcapng.util.block32_bytes_unpack_rolling( block_bytes_stripped )
-    xxx continue-here
+    parsed_custom = custom_block_unpack( block_bytes )
+    assert parsed_custom[ 'block_type'     ] == pcapng.core.CUSTOM_BLOCK_COPYABLE
+    assert parsed_custom[ 'pen'            ] == pcapng.core.BROCADE_PEN
+    assert parsed_custom[ 'options_dict'   ] == { pcapng.option.OPT_CUSTOM_0 : 'EMBEDDED_MRT_ISIS_BLOCK' }
+    parsed_mrt = pcapng.mrt.mrt_isis_block_unpack( parsed_custom[ 'content' ] )
+    return parsed_mrt

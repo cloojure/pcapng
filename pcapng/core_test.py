@@ -101,7 +101,7 @@ def test_simple_pkt_block():
     assert blk_data['pkt_data']             == 'abc'
 
 
-def test_custom_block_pack():
+def test_custom_block():
     def assert_custom_block_packing( data_bytes ):
         opts = { pcapng.option.OPT_CUSTOM_0 : "O",
                  pcapng.option.OPT_CUSTOM_1 : "Doh!",
@@ -113,7 +113,7 @@ def test_custom_block_pack():
                 pcapng.core.CUSTOM_BLOCK_COPYABLE, pcapng.core.BROCADE_PEN, orig, opts ))
         assert unpacked[ 'block_type'    ] == pcapng.core.CUSTOM_BLOCK_COPYABLE
         assert unpacked[ 'pen'           ] == pcapng.core.BROCADE_PEN
-        assert unpacked[ 'content_bytes' ] == orig
+        assert unpacked[ 'content'       ] == orig
         assert unpacked[ 'options_dict'  ] == opts
 
     assert_custom_block_packing( '' )
@@ -125,23 +125,21 @@ def test_custom_block_pack():
     for i in range(23):
         assert_custom_block_packing( range(i) )
 
-def test_custom_block_pack():
-    def assert_custom_block_packing( data_bytes ):
+def test_custom_mrt_isis_block():
+    def assert_custom_mrt_isis_block_packing( data_bytes ):
         orig = to_bytes( data_bytes )
-        unpacked = pcapng.core.custom_mrt_isis_block_unpack(
-                   pcapng.core.custom_mrt_isis_block_pack(
-                       pcapng.core.CUSTOM_BLOCK_COPYABLE, pcapng.core.BROCADE_PEN, orig, opts ))
-        assert unpacked[ 'block_type'    ] == pcapng.core.CUSTOM_BLOCK_COPYABLE
-        assert unpacked[ 'pen'           ] == pcapng.core.BROCADE_PEN
-        assert unpacked[ 'content_bytes' ] == orig
-        assert unpacked[ 'options_dict'  ] == { pcapng.option.OPT_CUSTOM_0 : 'EMBEDDED_ISIS_MRT_BLOCK' }
+        blk_dict = pcapng.core.custom_mrt_isis_block_unpack(
+                   pcapng.core.custom_mrt_isis_block_pack( orig ))
+        assert blk_dict[ 'mrt_type'     ] == pcapng.mrt.ISIS
+        assert blk_dict[ 'mrt_subtype'  ] == 0
+        assert blk_dict[ 'content'      ] == str(orig)
 
-    assert_custom_block_packing( '' )
-    assert_custom_block_packing( 'a' )
-    assert_custom_block_packing( 'go' )
-    assert_custom_block_packing( 'ray' )
-    assert_custom_block_packing( 'Doh!' )
-    assert_custom_block_packing( "Don't have a cow, man." )
+    assert_custom_mrt_isis_block_packing( '' )
+    assert_custom_mrt_isis_block_packing( 'a' )
+    assert_custom_mrt_isis_block_packing( 'go' )
+    assert_custom_mrt_isis_block_packing( 'ray' )
+    assert_custom_mrt_isis_block_packing( 'Doh!' )
+    assert_custom_mrt_isis_block_packing( "Don't have a cow, man." )
     for i in range(13):
-        assert_custom_block_packing( range(i) )
+        assert_custom_mrt_isis_block_packing( range(i) )
 

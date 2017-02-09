@@ -41,9 +41,9 @@ OPT_IDB_TSOFFSET        =  14
 
 #todo need to do validation on data values & lengths
 # enhanced packet block options
-OPT_EPB_FLAGS           =   2
-OPT_EPB_HASH            =   3
-OPT_EPB_DROPCOUNT       =   4
+OPT_EPB_FLAGS           =   2   #todo need validation fn & use it
+OPT_EPB_HASH            =   3   #todo need validation fn & use it
+OPT_EPB_DROPCOUNT       =   4   #todo need validation fn & use it
 
 #todo maybe need func to verify valid any option codes?
 

@@ -4,6 +4,8 @@ import time
 import math
 import pcapng.const
 
+#todo verify have tests for all
+
 # Global var's
 test_ctx = {
     'enable'    : False,
@@ -30,6 +32,8 @@ def is_python3():
 def assert_python2():
     assert is_python2()
 
+#-----------------------------------------------------------------------------
+#todo need tests for all
 
 def assert_type_bytearray( arg ):
     assert type( arg ) == bytearray
@@ -54,6 +58,27 @@ def assert_int8(arg):          # signed byte
 
 def assert_uint32(arg):        # unsigned byte
     assert (0 <= arg < pcapng.const.POW_2_32)
+
+#-----------------------------------------------------------------------------
+
+def fibonacci_list( n ):
+    "Returns a list of the first n Fibonacci numbers"
+    result = [0, 1]
+    while len(result) < n:
+        result += [ result[-1] + result[-2] ]
+    return result[:n]   # in case ask for len smaller than seed list
+
+def fibonacci_list_bounded( maxVal ):   #todo need test
+    "Returns a list of the first n Fibonacci numbers"
+    result = [0, 1]
+    done = False
+    while not done:
+        next = result[-1] + result[-2]
+        if next <= maxVal:
+            result += next
+        else:
+            done = True
+    return result
 
 def to_bytes( arg ):
     """Converts arg to a 'bytes' object."""
@@ -138,6 +163,11 @@ def ipAddr_decode( ip_bytes ):
     assert 4 == len( ip_bytes )
     ip_vals = list( struct.unpack( '!BBBB',  ip_bytes ))
     return ip_vals
+
+#todo add integer_pack/unpack
+#todo add float_pack/unpack
+#todo add string pack/unpack ?  (noop?)
+#todo add other pack/unpack ?
 
 #todo move to pcapng.bytes
 #-----------------------------------------------------------------------------

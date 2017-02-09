@@ -1,10 +1,13 @@
 #todo add brocade copyright / license
-import struct
 
-import pcapng.linktype  as linktype
-import pcapng.option as option
-import pcapng.util as util
-from pcapng.util import to_bytes
+#todo rename module to pcapng.block
+
+import struct
+import pcapng.linktype          as linktype
+import pcapng.mrt               as mrt
+import pcapng.option            as option
+import pcapng.util              as util
+from   pcapng.util              import to_bytes
 
 #todo think about how to handle a block of packets
 #todo look at "docopt" usage -> cmdopts processing
@@ -18,7 +21,7 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #   Brocade Communications Systems, Inc.
 #     Scott Kipp
 #     skipp@brocade.com
-BROCADE_PEN = 1588      #todo move to custom namespace?
+BROCADE_PEN = 1588      #todo move to custom pcapng.pen namespace?  add other PEN values?
 
 #todo add all block types here
 BLOCK_TYPE_EPB = 0x00000006
@@ -28,31 +31,39 @@ CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
 CUSTOM_BLOCK_NONCOPYABLE = 0x40000BAD
 
 
+#-----------------------------------------------------------------------------
+
+# #todo move to pcapng.option
 # #todo add options for all
 def option_endofopt():
     """Returns a bytes block for 'end of options' """
     result = struct.pack( '=HH', option.OPT_END_OF_OPT, 0 )
     return result
 
+#todo need way to pack generic options: integer, string, float, object
+
 #todo verify all fields
-def option_pack(opt_code, opt_bytes):
+def option_pack(opt_code, opt_bytes):   #todo needs test
     """Encodes an option into a bytes block."""
+    #todo validate opt_code
+    util.assert_type_bytes(opt_bytes)
     data_len_orig   = len(opt_bytes)
-    data_pad        = util.block32_pad_bytes( to_bytes(opt_bytes))
+    data_pad        = util.block32_pad_bytes(opt_bytes)
     result_hdr      = struct.pack( '=HH', opt_code, data_len_orig )
     result          = result_hdr + data_pad
     return result
 
 #todo verify all fields
-def options_pack(opts_dict):
+def options_pack(opts_dict):  #todo needs test
     """Encodes an options from a dictionary into a bytes block."""
     util.assert_type_dict(opts_dict)
     cum_result = ""
     for opt_code in opts_dict.keys():
-        opt_value = opts_dict[ opt_code]
+        opt_value = opts_dict[opt_code]
         opt_bytes = option_pack(opt_code, opt_value)
         cum_result += opt_bytes
     return cum_result
+    #todo ***** MUST ADD { opt_endofopt : 0 }  *****
 
 #todo verify all fields
 def option_unpack_rolling(opts_bytes):
@@ -60,6 +71,7 @@ def option_unpack_rolling(opts_bytes):
     util.assert_type_bytes(opts_bytes)
     assert 4 <= len(opts_bytes)
     (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[:4])
+    #todo validate opt_code
     data_len_pad = util.block32_ceil_num_bytes(data_len_orig)
     first_block_len_pad = 4+data_len_pad
     assert first_block_len_pad <= len(opts_bytes)
@@ -67,6 +79,7 @@ def option_unpack_rolling(opts_bytes):
     opts_bytes_remaining = opts_bytes[first_block_len_pad:]
     first_opt_value = first_opt_bytes[ 4 : 4+data_len_orig ]
     return ( opt_code, first_opt_value, opts_bytes_remaining )
+    #todo make sure don't return { opt_endofopt : 0 }
 
 #todo verify all fields
 def options_unpack(opts_bytes):
@@ -79,6 +92,7 @@ def options_unpack(opts_bytes):
         cum_result_dict[ opt_code ] = opt_value
         opts_bytes = opts_bytes_remaining
     return cum_result_dict
+    #todo make sure don't return { opt_endofopt : 0 }
 
 #todo verify all fields
 def option_unpack(block_bytes):
@@ -101,6 +115,10 @@ def option_comment_unpack(opt_bytes):  #todo add unicode => utf-8 support
     ( opt_code, opt_bytes ) = option_unpack(opt_bytes)
     assert opt_code == option.OPT_COMMENT
     return opt_bytes
+
+#todo need to add custom options
+
+#-----------------------------------------------------------------------------
 
 def section_header_block_pack(options_dict={}):    #todo data_len
     """Encodes a section header block, including the specified options."""
@@ -223,16 +241,16 @@ def simple_pkt_block_unpack(block_bytes):      #todo verify block type & all fie
 
 #-----------------------------------------------------------------------------
 
-def enhanced_pkt_block_pack(interface_id, pkt_data_captured, pkt_data_orig_len=None, options_dict={}):
+def enhanced_pkt_block_pack( interface_id, pkt_data_captured, pkt_data_orig_len=None, options_dict={} ):
     """Encodes a simple packet block. Default value for pkt_data_orig_len is the length
     of the supplied pkt_data."""
     #todo make all arg validation look like this (in order, at top)
-    assert util.assert_uint32(interface_id)  #todo verify args in all fns
-    pkt_data_captured = to_bytes(pkt_data_captured)        #todo is list & tuple & str ok?
+    util.assert_uint32( interface_id )  #todo verify args in all fns
+    pkt_data_captured = to_bytes( pkt_data_captured )        #todo is list & tuple & str ok?
     if pkt_data_orig_len == None:
         pkt_data_orig_len = len(pkt_data_captured)
     else:
-        assert util.assert_uint32(pkt_data_orig_len)
+        util.assert_uint32(pkt_data_orig_len)
         assert len(pkt_data_captured) <= pkt_data_orig_len
     util.assert_type_dict( options_dict )   #todo check type on all fns
     for opt_code in options_dict.keys():
@@ -257,7 +275,7 @@ def enhanced_pkt_block_pack(interface_id, pkt_data_captured, pkt_data_orig_len=N
     block_bytes = (struct.pack( '=LLLLLLL', BLOCK_TYPE_EPB, block_total_len, interface_id,
                                 time_secs, time_usecs, pkt_data_captured_len, pkt_data_orig_len) +
                    pkt_data_pad +
-                   options_bytes,
+                   options_bytes +
                    struct.pack( '=L', block_total_len ))
     return block_bytes
 

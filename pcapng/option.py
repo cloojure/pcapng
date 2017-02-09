@@ -25,29 +25,50 @@ OPT_SHB_USERAPPL  = 4
 
 #todo need to do validation on data values & lengths
 # interface description block options
-IF_NAME           =   2
-IF_DESCRIPTION    =   3
-IF_IPV4ADDR       =   4
-IF_IPV6ADDR       =   5
-IF_MACADDR        =   6
-IF_EUIADDR        =   7
-IF_SPEED          =   8
-IF_TSRESOL        =   9
-IF_TZONE          =  10
-IF_FILTER         =  11
-IF_OS             =  12
-IF_FCSLEN         =  13
-IF_TSOFFSET       =  14
+OPT_IDB_NAME            =   2
+OPT_IDB_DESCRIPTION     =   3
+OPT_IDB_IPV4ADDR        =   4
+OPT_IDB_IPV6ADDR        =   5
+OPT_IDB_MACADDR         =   6
+OPT_IDB_EUIADDR         =   7
+OPT_IDB_SPEED           =   8
+OPT_IDB_TSRESOL         =   9
+OPT_IDB_TZONE           =  10
+OPT_IDB_FILTER          =  11
+OPT_IDB_OS              =  12
+OPT_IDB_FCSLEN          =  13
+OPT_IDB_TSOFFSET        =  14
 
+#todo need to do validation on data values & lengths
+# enhanced packet block options
+OPT_EPB_FLAGS           =   2
+OPT_EPB_HASH            =   3
+OPT_EPB_DROPCOUNT       =   4
+
+#todo maybe need func to verify valid any option codes?
+
+#todo need to do validation on data values & lengths
 def assert_custom_option(opt_code):
+    "Returns true if option code is valid for a custom block"
     valid_opts = { OPT_CUSTOM_0, OPT_CUSTOM_1, OPT_CUSTOM_2, OPT_CUSTOM_3 }
     assert (opt_code in valid_opts)
 
+#todo need to do validation on data values & lengths
 def assert_shb_option(opt_code):
+    "Returns true if option code is valid for a segment header block"
     valid_opts = { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
     assert (opt_code in valid_opts)
 
-def assert_if_option(opt_code):
-    valid_opts = {  IF_NAME, IF_DESCRIPTION, IF_IPV4ADDR, IF_IPV6ADDR, IF_MACADDR, IF_EUIADDR,
-                    IF_SPEED, IF_TSRESOL, IF_TZONE, IF_FILTER, IF_OS, IF_FCSLEN, IF_TSOFFSET }
+#todo need to do validation on data values & lengths
+def assert_ifc_desc_option(opt_code):
+    "Returns true if option code is valid for a interface description block"
+    valid_opts = {OPT_IDB_NAME, OPT_IDB_DESCRIPTION, OPT_IDB_IPV4ADDR, OPT_IDB_IPV6ADDR, OPT_IDB_MACADDR, OPT_IDB_EUIADDR,
+                  OPT_IDB_SPEED, OPT_IDB_TSRESOL, OPT_IDB_TZONE, OPT_IDB_FILTER, OPT_IDB_OS, OPT_IDB_FCSLEN, OPT_IDB_TSOFFSET}
     assert (opt_code in valid_opts)
+
+#todo need to do validation on data values & lengths
+def assert_epb_option(opt_code):
+    "Returns true if option code is valid for a enhanced packet block"
+    valid_opts = { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
+    assert (opt_code in valid_opts)
+

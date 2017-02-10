@@ -20,6 +20,8 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #todo add all block types here
 BLOCK_TYPE_EPB = 0x00000006
 BLOCK_TYPE_SHB = 0x0A0D0D0A             #todo -> const & verify on unpack
+BLOCK_TYPE_IDB = 0x00000001             #todo -> const & verify on unpack
+BLOCK_TYPE_SPB = 0x00000003             #todo -> const & verify on unpack
 
 # For PCAPNG custom blocks
 CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
@@ -60,8 +62,9 @@ def section_header_block_unpack(block_bytes):      #todo verify block type & all
     """Decodes a bytes block into a section header block, returning a dictionary."""
     util.assert_type_bytes(block_bytes)
     ( block_type, block_total_len, byte_order_magic, major_version,
-      minor_version, section_len ) = struct.unpack( '=LlLhhq', block_bytes[:24])
+            minor_version, section_len ) = struct.unpack( '=LlLhhq', block_bytes[:24])
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
+    assert block_type == BLOCK_TYPE_SHB
     assert (block_total_len == block_total_len_end == len(block_bytes))  #todo simplify all 'and' & 'or'
     options_bytes = block_bytes[24:-4]
     options_lst  = option.unpack_all(options_bytes)  #todo verify only valid options
@@ -77,16 +80,14 @@ def section_header_block_unpack(block_bytes):      #todo verify block type & all
 
 def interface_desc_block_pack(options_lst=[]):
     util.assert_type_list(options_lst)   #todo check type on all fns
-
-    """Encodes an interface description block, including the specified options."""
-    block_type = 0x00000001             #todo -> const & verify on unpack
-    link_type = linktype.LINKTYPE_ETHERNET   # todo how determine?
-    reserved = 0
-    snaplen = 0                     # 0 => no limit
-
     for opt in options_lst:
         option.assert_ifc_desc_option(opt)
-    options_bytes = option.pack_all(options_lst)
+
+    """Encodes an interface description block, including the specified options."""
+    link_type       = linktype.LINKTYPE_ETHERNET   # todo how determine?
+    reserved        = 0
+    snaplen         = 0   # 0 => no limit
+    options_bytes   = option.pack_all(options_lst)
 
     block_total_len =   (  4 +         # block type
                            4 +         # block total length
@@ -94,7 +95,7 @@ def interface_desc_block_pack(options_lst=[]):
                            4 +         # snaplen
                            len(options_bytes) +
                            4 )         # block total length
-    block_bytes = ( struct.pack( '=LlHHl', block_type, block_total_len, link_type, reserved, snaplen ) +
+    block_bytes = ( struct.pack( '=LlHHl', BLOCK_TYPE_IDB, block_total_len, link_type, reserved, snaplen ) +
                     options_bytes +
                     struct.pack( '=l', block_total_len ))
     return block_bytes
@@ -103,6 +104,7 @@ def interface_desc_block_unpack(block_bytes):      #todo verify block type & all
     """Decodes a bytes block into an interface description block, returning a dictionary."""
     util.assert_type_bytes(block_bytes)
     ( block_type, block_total_len, link_type, reserved, snaplen ) = struct.unpack( '=LlHHl', block_bytes[:16])
+    assert  block_type == BLOCK_TYPE_IDB
     (block_total_len_end,) = struct.unpack( '=l', block_bytes[-4:])
     assert ((block_total_len == len(block_bytes)) and
             (block_total_len == block_total_len_end))
@@ -121,7 +123,6 @@ def simple_pkt_block_pack(pkt_data):
     """Encodes a simple packet block."""
     pkt_data         = to_bytes(pkt_data)        #todo is list & tuple & str ok?
     pkt_data_pad     = util.block32_pad_bytes(pkt_data)
-    block_type       = 0x00000003             #todo -> const & verify on unpack
     original_pkt_len = len(pkt_data)
     pkt_data_pad_len = len(pkt_data_pad)
     block_total_len = ( 4 +      # block type
@@ -129,7 +130,7 @@ def simple_pkt_block_pack(pkt_data):
                         4 +      # original packet length
                         pkt_data_pad_len +
                         4 )      # block total length
-    block_bytes = ( struct.pack( '=LLL', block_type, block_total_len, original_pkt_len ) +
+    block_bytes = ( struct.pack( '=LLL', BLOCK_TYPE_SPB, block_total_len, original_pkt_len ) +
                     pkt_data_pad +
                     struct.pack( '=L', block_total_len ))
     return block_bytes
@@ -141,6 +142,7 @@ def simple_pkt_block_unpack(block_bytes):      #todo verify block type & all fie
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )
     pkt_data_pad_len    = util.block32_ceil_num_bytes(original_pkt_len)
     pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
+    assert block_type == BLOCK_TYPE_SPB
     assert block_total_len == block_total_len_end
     parsed =    { 'block_type'          : block_type ,
                   'block_total_len'     : block_total_len ,

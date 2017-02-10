@@ -67,8 +67,9 @@ BGP4MP_MESSAGE_LOCAL        =  6
 BGP4MP_MESSAGE_AS4_LOCAL    =  7
 
 
-def mrt_block_pack( mrt_type=0, mrt_subtype=0, content=[] ):
+def mrt_block_pack( mrt_type, mrt_subtype, content ):
     """Creates an MRT header block."""
+    #todo verify mrt_type, mrt_subtype
     time_secs = pcapng.util.curr_utc_secs()
     block_hdr = struct.pack('!LHHL', time_secs, mrt_type, mrt_subtype, len(content))
     block_bytes = block_hdr + pcapng.util.block32_pad_bytes(content)
@@ -85,8 +86,9 @@ def mrt_block_unpack( packed_bytes ):
                 'content'       : content }
     return parsed
 
-def mrt_block_extended_pack(mrt_type=0, mrt_subtype=0, content=[]):
+def mrt_block_extended_pack(mrt_type, mrt_subtype, content):
     """Encodes an MRT header block."""
+    #todo verify mrt_type, mrt_subtype
     time_secs, time_usecs = pcapng.util.curr_utc_timetuple()
     block_hdr = struct.pack( '!LHHLL', time_secs, mrt_type, mrt_subtype, (4 + len(content)), time_usecs)
     block_bytes = block_hdr + pcapng.util.block32_pad_bytes(content)
@@ -102,7 +104,7 @@ def mrt_block_extended_unpack( packed_bytes ):
     parsed[ 'content'    ] = content
     return parsed
 
-def mrt_isis_block_pack( content=[] ):
+def mrt_isis_block_pack( content ):
     return mrt_block_pack( ISIS, 0, content )
 
 def mrt_isis_block_unpack( packed_bytes ):
@@ -110,7 +112,7 @@ def mrt_isis_block_unpack( packed_bytes ):
     assert result['mrt_type'] == ISIS
     return result
 
-def mrt_isis_block_extended_pack( content=[] ):
+def mrt_isis_block_extended_pack( content ):
     return mrt_block_extended_pack( ISIS_ET, 0, content )
 
 def mrt_isis_block_extended_unpack( packed_bytes ):

@@ -16,6 +16,7 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
 OPT_END_OF_OPT    =     0
+OPT_END_OF_OPT    =     0xAB     #todo #debug
 
 OPT_COMMENT       =     1
 
@@ -61,125 +62,119 @@ OPT_EPB_DROPCOUNT       =   4   #todo need validation fn & use it
 CUSTOM_OPTIONS = { OPT_CUSTOM_UTF8_COPYABLE,        OPT_CUSTOM_BINARY_COPYABLE,
                    OPT_CUSTOM_UTF8_NON_COPYABLE,    OPT_CUSTOM_BINARY_NON_COPYABLE }
 
-SHB_OPTIONS = CUSTOM_OPTIONS | { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
+GENERAL_OPTIONS = { OPT_COMMENT } | CUSTOM_OPTIONS
 
-IDB_OPTIONS = CUSTOM_OPTIONS | {
+SHB_OPTIONS = GENERAL_OPTIONS | { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
+
+IDB_OPTIONS = GENERAL_OPTIONS | {
     OPT_IDB_NAME, OPT_IDB_DESCRIPTION, OPT_IDB_IPV4ADDR, OPT_IDB_IPV6ADDR,
     OPT_IDB_MACADDR, OPT_IDB_EUIADDR, OPT_IDB_SPEED, OPT_IDB_TSRESOL,
     OPT_IDB_TZONE, OPT_IDB_FILTER, OPT_IDB_OS, OPT_IDB_FCSLEN, OPT_IDB_TSOFFSET}
 
-EPB_OPTIONS = CUSTOM_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
+EPB_OPTIONS = GENERAL_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
 
 #todo need to do validation on data values & lengths
-def assert_custom_option(opt_code):
-    """Returns true if option code is valid for a custom block"""
-    assert (opt_code in CUSTOM_OPTIONS)
-
-#todo need to do validation on data values & lengths
-def assert_shb_option(opt_code):
+def assert_shb_option(option):
     "Returns true if option code is valid for a segment header block"
-    assert (opt_code in SHB_OPTIONS)
+    assert (option.code in SHB_OPTIONS)
 
 #todo need to do validation on data values & lengths
-def assert_ifc_desc_option(opt_code):
+def assert_ifc_desc_option(option):
     "Returns true if option code is valid for a interface description block"
-    assert (opt_code in IDB_OPTIONS)
+    assert (option.code in IDB_OPTIONS)
 
 #todo need to do validation on data values & lengths
-def assert_epb_option(opt_code):
+def assert_epb_option(option):
     "Returns true if option code is valid for a enhanced packet block"
-    assert (opt_code in EPB_OPTIONS)
+    assert (option.code in EPB_OPTIONS)
+
+#todo need to do validation on data values & lengths
+def assert_custom_block_option(option):
+    """Returns true if option code is valid for a custom block"""
+    assert (option.code in CUSTOM_OPTIONS)
+
+class Option:
+    def __init__(self, code, content): #todo validate code
+        self.code       = code
+        self.content    = to_bytes(content)
+    def to_map(self):
+        m = {}
+        m[ 'code'    ] = self.code
+        m[ 'content' ] = self.content
+        return m
+    def __eq__(self, other):
+        return self.to_map() == other.to_map()
+    def __ne__(self, other):
+        return (not __eq__(self,other))
+    def __repr__(self):
+        return str( self.to_map() )
+
+    #todo verify all fields
+    def pack(self):   #todo needs test
+        """Encodes an option into a bytes block."""
+        #todo validate code
+        data_len_orig   = len(self.content)
+        data_pad        = util.block32_pad_bytes(self.content)
+        packed_bytes    = struct.pack('=HH', self.code, data_len_orig) + data_pad
+        return packed_bytes
 
 
 # #todo add options for all
 
 #todo need way to pack generic options: integer, string, float, object
-def option_endofopt():
-    """Returns a bytes block for 'end of options' """
-    result = struct.pack( '=HH', OPT_END_OF_OPT, 0 )
-    return result
 
-def option_pack(opt_code, opt_bytes):   #todo needs test
-    #todo verify all fields
-    """Encodes an option into a bytes block."""
-    #todo validate opt_code
-    util.assert_type_bytes(opt_bytes)
-    data_len_orig   = len(opt_bytes)
-    data_pad        = util.block32_pad_bytes(opt_bytes)
-    result_hdr      = struct.pack( '=HH', opt_code, data_len_orig )
-    result          = result_hdr + data_pad
-    return result
-
-
-def options_pack(opts_dict):  #todo needs test
+def pack_all(opts_lst):  #todo needs test
     #todo verify all fields
     """Encodes an options from a dictionary into a bytes block."""
-    util.assert_type_dict(opts_dict)
+    util.assert_type_list(opts_lst)
     cum_result = ""
-    for opt_code in opts_dict.keys():
-        opt_value = opts_dict[opt_code]
-        opt_bytes = option_pack(opt_code, opt_value)
-        cum_result += opt_bytes
+    for opt in opts_lst:
+        cum_result += opt.pack()
+    cum_result += Option(OPT_END_OF_OPT, 0).pack()
     return cum_result
-    #todo ***** MUST ADD { opt_endofopt : 0 }  *****
 
-
-def option_unpack_rolling(opts_bytes):
+def unpack_rolling(raw_bytes):
     #todo verify all fields
     """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
-    util.assert_type_bytes(opts_bytes)
-    assert 4 <= len(opts_bytes)
-    (opt_code, data_len_orig) = struct.unpack( '=HH', opts_bytes[:4])
-    #todo validate opt_code
-    data_len_pad = util.block32_ceil_num_bytes(data_len_orig)
-    first_block_len_pad = 4+data_len_pad
-    assert first_block_len_pad <= len(opts_bytes)
-    first_opt_bytes = opts_bytes[:first_block_len_pad]
-    opts_bytes_remaining = opts_bytes[first_block_len_pad:]
-    first_opt_value = first_opt_bytes[ 4 : 4+data_len_orig ]
-    return ( opt_code, first_opt_value, opts_bytes_remaining )
-    #todo make sure don't return { opt_endofopt : 0 }
+    util.assert_type_bytes(raw_bytes)
+    assert 4 <= len(raw_bytes)
+    (opt_code, content_len_orig) = struct.unpack( '=HH', raw_bytes[:4])
+    content_len_pad = util.block32_ceil_num_bytes(content_len_orig)
+    first_block_len_pad = 4 + content_len_pad
+    assert first_block_len_pad <= len(raw_bytes)
+    opt_bytes             = raw_bytes[ :first_block_len_pad   ]
+    raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
+    opt_content           = opt_bytes[ 4 : 4+content_len_orig ]
+    option_read = Option( opt_code, opt_content )
+    return ( option_read, raw_bytes_remaining )
 
+def unpack_all(raw_bytes):
+    """Decodes a block of raw bytes into a list of options."""
+    util.assert_type_bytes(raw_bytes)
+    util.assert_block32_length(raw_bytes)
+    options = []
+    while (0 < len(raw_bytes)):
+        ( option, raw_bytes_remaining ) = unpack_rolling(raw_bytes)
+        if option.code == OPT_END_OF_OPT:
+            break
+        else:
+            options.append( option )
+            raw_bytes = raw_bytes_remaining
+    print( 101, options )
+    return options
 
-def options_unpack(opts_bytes):
-    """Given an bytes block of options, decodes and returns options as a dictionary."""
-    util.assert_type_bytes(opts_bytes)
-    util.assert_block32_length(opts_bytes)
-    cum_result_dict = {}
-    while (0 < len(opts_bytes)):
-        ( opt_code, opt_value, opts_bytes_remaining ) = option_unpack_rolling(opts_bytes)
-        cum_result_dict[ opt_code ] = opt_value
-        opts_bytes = opts_bytes_remaining
-    return cum_result_dict
-    #todo make sure don't return { opt_endofopt : 0 }
-
-
-def option_unpack(block_bytes):
+def unpack_one(raw_bytes):
     #todo verify all fields
     """Given an bytes block of for one option, decodes and returns the option as a dictionary."""
-    opts_dict = options_unpack(block_bytes)
-    assert 1 == len( opts_dict )
-    opt_code  = opts_dict.keys()[0]
-    opt_bytes = opts_dict[opt_code]
-    return (opt_code, opt_bytes)
-
-def option_comment_pack(comment_str):  #todo add unicode => utf-8 support
-    "Encodes a string into a comment option."
-    util.assert_type_str( comment_str )
-    result = option_pack(OPT_COMMENT, comment_str)
-    return result
-
-def option_comment_unpack(opt_bytes):  #todo add unicode => utf-8 support
-    "Decodes a comment option into a string."
-    util.assert_type_bytes(opt_bytes)
-    ( opt_code, opt_bytes ) = option_unpack(opt_bytes)
-    assert opt_code == OPT_COMMENT
-    return opt_bytes
+    options = unpack_all(raw_bytes)
+    print( 110, options )
+    assert 1 == len( options )
+    return options[0]
 
 #todo need to add custom options
 def custom_option_value_pack( pen, content=[] ):
     """Packes the *value* of a custom option, i.e. the pair [PEN, content].
-    Does not include the custom opiton code."""
+    Does not include the custom option code."""
     pcapng.pen.assert_valid_pen( pen )
     #todo use block32_bytes_pack/unpack() to avoid padding on output?
     value_packed_bytes = struct.pack('=L', pen ) + util.block32_pad_bytes( content )

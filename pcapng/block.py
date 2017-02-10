@@ -5,6 +5,7 @@ import struct
 import pcapng.linktype          as linktype
 import pcapng.mrt               as mrt
 import pcapng.option            as option
+from   pcapng.option            import Option
 import pcapng.pen               as pen
 import pcapng.util              as util
 from   pcapng.util              import to_bytes
@@ -26,17 +27,23 @@ CUSTOM_BLOCK_NONCOPYABLE = 0x40000BAD
 
 #-----------------------------------------------------------------------------
 
-def section_header_block_pack(options_dict={}):    #todo data_len
+#todo options_lst => options
+
+def section_header_block_pack(options_lst=[]):    #todo data_len
     """Encodes a section header block, including the specified options."""
+    util.assert_type_list(options_lst)   #todo check type on all fns
+
     block_type = 0x0A0D0D0A             #todo -> const & verify on unpack
     byte_order_magic = 0x1A2B3C4D             #todo -> const & verify on unpack
     major_version = 1
     minor_version = 0
     section_len = -1        #todo set to actual (incl padding)
 
-    for opt_code in options_dict.keys():
-        option.assert_shb_option(opt_code)
-    options_bytes = option.options_pack(options_dict)
+    for opt in options_lst:
+        option.assert_shb_option(opt)
+    options_bytes = option.pack_all(options_lst)
+    print(200, options_lst)
+    print(201, options_bytes)
 
     block_total_len =    ( 4 +      # block type
                            4 +      # block total length
@@ -46,7 +53,7 @@ def section_header_block_pack(options_dict={}):    #todo data_len
                            len(options_bytes) +
                            4 )      # block total length
     block_bytes = ( struct.pack( '=LlLhhq', block_type, block_total_len, byte_order_magic,
-                                      major_version, minor_version, section_len ) +
+                                            major_version, minor_version, section_len ) +
                     options_bytes +
                     struct.pack( '=l', block_total_len ))
     return block_bytes
@@ -59,29 +66,32 @@ def section_header_block_unpack(block_bytes):      #todo verify block type & all
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
     assert (block_total_len == block_total_len_end == len(block_bytes))  #todo simplify all 'and' & 'or'
     options_bytes = block_bytes[24:-4]
-    options_dict  = option.options_unpack(options_bytes)  #todo verify only valid options
+    print( 210, options_bytes )
+    options_lst  = option.unpack_all(options_bytes)  #todo verify only valid options
+    print( 211, options_lst )
     parsed = { 'block_type'          : block_type ,
                'block_total_len'     : block_total_len ,
                'byte_order_magic'    : byte_order_magic ,
                'major_version'       : major_version ,
                'minor_version'       : minor_version ,
                'section_len'         : section_len ,
-               'options_dict'        : options_dict,
+               'options_lst'         : options_lst,
                'block_total_len_end' : block_total_len_end }
     return parsed
 
-def interface_desc_block_pack(options_dict={}):
+def interface_desc_block_pack(options_lst=[]):
+    util.assert_type_list(options_lst)   #todo check type on all fns
+
     """Encodes an interface description block, including the specified options."""
     block_type = 0x00000001             #todo -> const & verify on unpack
     link_type = linktype.LINKTYPE_ETHERNET   # todo how determine?
     reserved = 0
     snaplen = 0                     # 0 => no limit
 
-    for opt_code in options_dict.keys():
-        option.assert_ifc_desc_option(opt_code)
-    options_bytes = option.options_pack(options_dict)
+    for opt in options_lst:
+        option.assert_ifc_desc_option(opt)
+    options_bytes = option.pack_all(options_lst)
 
-    util.assert_block32_length(options_bytes)
     block_total_len =   (  4 +         # block type
                            4 +         # block total length
                            2 + 2 +     # linktype + reserved
@@ -100,17 +110,16 @@ def interface_desc_block_unpack(block_bytes):      #todo verify block type & all
     (block_total_len_end,) = struct.unpack( '=l', block_bytes[-4:])
     assert ((block_total_len == len(block_bytes)) and
             (block_total_len == block_total_len_end))
-    options_bytes           = block_bytes[16:-4]
-    options_dict            = option.options_unpack(options_bytes)  #todo verify only valid options
+    options_bytes = block_bytes[16:-4]
+    options_lst   = option.unpack_all(options_bytes)  #todo verify only valid options
     parsed = { 'block_type'             : block_type ,
                'block_total_len'        : block_total_len ,
                'link_type'              : link_type ,
                'reserved'               : reserved ,
                'snaplen'                : snaplen ,
-               'options_dict'           : options_dict,
+               'options_lst'            : options_lst,
                'block_total_len_end'    : block_total_len_end }
     return parsed
-
 
 def simple_pkt_block_pack(pkt_data):
     """Encodes a simple packet block."""
@@ -145,7 +154,7 @@ def simple_pkt_block_unpack(block_bytes):      #todo verify block type & all fie
                   'block_total_len_end' : block_total_len_end }
     return parsed
 
-def enhanced_pkt_block_pack( interface_id, pkt_data_captured, pkt_data_orig_len=None, options_dict={} ):
+def enhanced_pkt_block_pack(interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[]):
     """Encodes a simple packet block. Default value for pkt_data_orig_len is the length
     of the supplied pkt_data."""
     #todo make all arg validation look like this (in order, at top)
@@ -156,15 +165,15 @@ def enhanced_pkt_block_pack( interface_id, pkt_data_captured, pkt_data_orig_len=
     else:
         util.assert_uint32(pkt_data_orig_len)
         assert len(pkt_data_captured) <= pkt_data_orig_len
-    util.assert_type_dict( options_dict )   #todo check type on all fns
-    for opt_code in options_dict.keys():
-        option.assert_shb_option(opt_code)
+    util.assert_type_list(options_lst)   #todo check type on all fns
+    for opt in options_lst:
+        option.assert_shb_option(opt)
 
     time_secs, time_usecs       = util.curr_utc_timetuple()
     pkt_data_pad                = util.block32_pad_bytes(pkt_data_captured)
     pkt_data_captured_len       = len(pkt_data_captured)
     pkt_data_captured_pad_len   = len(pkt_data_pad)
-    options_bytes               = option.options_pack(options_dict)
+    options_bytes               = option.pack_all(options_lst)
 
     block_total_len = ( 4 +      # block type
                         4 +      # block total length
@@ -197,7 +206,7 @@ def enhanced_pkt_block_unpack(block_bytes):
     block_bytes_stripped        = block_bytes[28:-4]
     pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
     options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
-    options_dict                = option.options_unpack(options_bytes)
+    options_lst                 = option.unpack_all(options_bytes)
 
     parsed =    { 'block_type'              : block_type ,
                   'block_total_len'         : block_total_len ,
@@ -207,25 +216,25 @@ def enhanced_pkt_block_unpack(block_bytes):
                   'pkt_data_captured_len'   : pkt_data_captured_len ,
                   'pkt_data_orig_len'       : pkt_data_orig_len ,
                   'pkt_data'                : pkt_data ,
-                  'options_dict'            : options_dict,
+                  'options_lst'             : options_lst,
                   'block_total_len_end'     : block_total_len_end }
     return parsed
 
 # custom format really needs a content_length field!
-def custom_block_pack(block_type, pen, content=[], options_dict={}):
+def custom_block_pack(block_type, pen, content=[], options_lst=[]):
     """Creates an pcapng custom block."""
     assert ( (block_type == CUSTOM_BLOCK_COPYABLE) or
              (block_type == CUSTOM_BLOCK_NONCOPYABLE) )
-    for opt in options_dict.keys():
-        assert opt in (option.OPT_CUSTOM_UTF8_COPYABLE, option.OPT_CUSTOM_BINARY_COPYABLE,
-                       option.OPT_CUSTOM_UTF8_NON_COPYABLE, option.OPT_CUSTOM_BINARY_NON_COPYABLE)
+    for opt in options_lst:
+        option.assert_custom_block_option(opt)
+
     content_bytes = util.block32_bytes_pack( content )
-    opt_bytes = option.options_pack(options_dict)
-    block_total_len = 16 + len(content_bytes) + len(opt_bytes)
+    options_bytes = option.pack_all(options_lst)
+    block_total_len = 16 + len(content_bytes) + len(options_bytes)
 
     packed_bytes = ( struct.pack('=LLL', block_type, block_total_len, pen ) +
                      content_bytes +
-                     opt_bytes +
+                     options_bytes +
                      struct.pack('=L', block_total_len ))
     return packed_bytes
 
@@ -239,16 +248,16 @@ def custom_block_unpack(block_bytes):      #todo verify block type & all fields
 
     block_bytes_stripped = block_bytes[12:-4]
     content_bytes, options_bytes = util.block32_bytes_unpack_rolling( block_bytes_stripped )
-    options_dict = option.options_unpack(options_bytes)
+    options_lst = option.unpack_all(options_bytes)
     parsed = { 'block_type'     : block_type,
                'pen'            : pen,
                'content'        : content_bytes,
-               'options_dict'   : options_dict }
+               'options_lst'    : options_lst }
     return parsed
 
 def custom_mrt_isis_block_pack( pkt_data ):
     "Packs ISIS MRT block into and wraps in a custom pcapnt block"
-    opts = {option.OPT_CUSTOM_UTF8_COPYABLE : 'EMBEDDED_MRT_ISIS_BLOCK'}
+    opts = [ Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' ) ]
     packed_bytes = custom_block_pack(
         CUSTOM_BLOCK_COPYABLE, pen.BROCADE_PEN,
         mrt.mrt_isis_block_pack( pkt_data ), opts )
@@ -261,6 +270,7 @@ def custom_mrt_isis_block_unpack(block_bytes):
     parsed_custom = custom_block_unpack( block_bytes )
     assert parsed_custom[ 'block_type'     ] == CUSTOM_BLOCK_COPYABLE
     assert parsed_custom[ 'pen'            ] == pen.BROCADE_PEN
-    assert parsed_custom[ 'options_dict'   ] == {option.OPT_CUSTOM_UTF8_COPYABLE : 'EMBEDDED_MRT_ISIS_BLOCK'}
+    assert parsed_custom[ 'options_lst'    ] == [
+                Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' ) ]
     parsed_mrt = mrt.mrt_isis_block_unpack( parsed_custom[ 'content' ] )
     return parsed_mrt

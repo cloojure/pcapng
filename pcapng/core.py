@@ -239,8 +239,6 @@ def simple_pkt_block_unpack(block_bytes):      #todo verify block type & all fie
                   'block_total_len_end' : block_total_len_end }
     return parsed
 
-#-----------------------------------------------------------------------------
-
 def enhanced_pkt_block_pack( interface_id, pkt_data_captured, pkt_data_orig_len=None, options_dict={} ):
     """Encodes a simple packet block. Default value for pkt_data_orig_len is the length
     of the supplied pkt_data."""
@@ -306,9 +304,6 @@ def enhanced_pkt_block_unpack(block_bytes):
                   'options_dict'            : options_dict,
                   'block_total_len_end'     : block_total_len_end }
     return parsed
-
-
-#-----------------------------------------------------------------------------
 
 # custom format really needs a content_length field!
 def custom_block_pack(block_type, pen, content=[], options_dict={}):

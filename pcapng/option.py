@@ -160,14 +160,12 @@ def unpack_all(raw_bytes):
         else:
             options.append( option )
             raw_bytes = raw_bytes_remaining
-    print( 101, options )
     return options
 
 def unpack_one(raw_bytes):
     #todo verify all fields
     """Given an bytes block of for one option, decodes and returns the option as a dictionary."""
     options = unpack_all(raw_bytes)
-    print( 110, options )
     assert 1 == len( options )
     return options[0]
 

@@ -19,6 +19,7 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 
 #todo add all block types here
 BLOCK_TYPE_EPB = 0x00000006
+BLOCK_TYPE_SHB = 0x0A0D0D0A             #todo -> const & verify on unpack
 
 # For PCAPNG custom blocks
 CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
@@ -33,7 +34,6 @@ def section_header_block_pack(options_lst=[]):    #todo data_len
     """Encodes a section header block, including the specified options."""
     util.assert_type_list(options_lst)   #todo check type on all fns
 
-    block_type = 0x0A0D0D0A             #todo -> const & verify on unpack
     byte_order_magic = 0x1A2B3C4D             #todo -> const & verify on unpack
     major_version = 1
     minor_version = 0
@@ -42,8 +42,6 @@ def section_header_block_pack(options_lst=[]):    #todo data_len
     for opt in options_lst:
         option.assert_shb_option(opt)
     options_bytes = option.pack_all(options_lst)
-    print(200, options_lst)
-    print(201, options_bytes)
 
     block_total_len =    ( 4 +      # block type
                            4 +      # block total length
@@ -52,7 +50,7 @@ def section_header_block_pack(options_lst=[]):    #todo data_len
                            8 +      # section length
                            len(options_bytes) +
                            4 )      # block total length
-    block_bytes = ( struct.pack( '=LlLhhq', block_type, block_total_len, byte_order_magic,
+    block_bytes = ( struct.pack( '=LlLhhq', BLOCK_TYPE_SHB, block_total_len, byte_order_magic,
                                             major_version, minor_version, section_len ) +
                     options_bytes +
                     struct.pack( '=l', block_total_len ))
@@ -66,9 +64,7 @@ def section_header_block_unpack(block_bytes):      #todo verify block type & all
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
     assert (block_total_len == block_total_len_end == len(block_bytes))  #todo simplify all 'and' & 'or'
     options_bytes = block_bytes[24:-4]
-    print( 210, options_bytes )
     options_lst  = option.unpack_all(options_bytes)  #todo verify only valid options
-    print( 211, options_lst )
     parsed = { 'block_type'          : block_type ,
                'block_total_len'     : block_total_len ,
                'byte_order_magic'    : byte_order_magic ,

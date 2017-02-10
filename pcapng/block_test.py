@@ -27,17 +27,7 @@ def test_section_header_block():
     assert blk_data['major_version']        == 1
     assert blk_data['minor_version']        == 0
     assert blk_data['section_len']          == -1
-    opts_out = blk_data['options_lst']
-    print( 100, opts,       len(opts) )
-    print( 101, opts_out,   len(opts_out) )
-    for ii in range(len(opts)):
-        v1 = opts[ii]
-        v2 = opts_out[ii]
-        print()
-        print( 102, ii, v1, v2, v1 == v2 )
-        print( 103, ii, v1.code, v2.code, v1.code == v2.code )
-        print( 104, ii, v1.content, v2.content, v1.content == v2.content )
-    assert  opts_out == opts
+    assert blk_data['options_lst']          == opts
 
 def test_interface_desc_block():
     opts = [ Option( option.OPT_IDB_NAME          , "Carrier Pigeon" ),

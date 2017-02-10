@@ -17,16 +17,16 @@ from   pcapng.util              import to_bytes
 util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
-#todo add all block types here
 BLOCK_TYPE_EPB = 0x00000006
-BLOCK_TYPE_SHB = 0x0A0D0D0A             #todo -> const & verify on unpack
-BLOCK_TYPE_IDB = 0x00000001             #todo -> const & verify on unpack
-BLOCK_TYPE_SPB = 0x00000003             #todo -> const & verify on unpack
+BLOCK_TYPE_SHB = 0x0A0D0D0A
+BLOCK_TYPE_IDB = 0x00000001
+BLOCK_TYPE_SPB = 0x00000003
 
 # For PCAPNG custom blocks
 CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
 CUSTOM_BLOCK_NONCOPYABLE = 0x40000BAD
 
+CUSTOM_MRT_ISIS_BLOCK_OPT = Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' )
 
 #-----------------------------------------------------------------------------
 
@@ -104,8 +104,8 @@ def interface_desc_block_unpack(block_bytes):      #todo verify block type & all
     """Decodes a bytes block into an interface description block, returning a dictionary."""
     util.assert_type_bytes(block_bytes)
     ( block_type, block_total_len, link_type, reserved, snaplen ) = struct.unpack( '=LlHHl', block_bytes[:16])
-    assert  block_type == BLOCK_TYPE_IDB
     (block_total_len_end,) = struct.unpack( '=l', block_bytes[-4:])
+    assert  block_type == BLOCK_TYPE_IDB
     assert ((block_total_len == len(block_bytes)) and
             (block_total_len == block_total_len_end))
     options_bytes = block_bytes[16:-4]
@@ -241,6 +241,8 @@ def custom_block_unpack(block_bytes):      #todo verify block type & all fields
     util.assert_type_bytes( block_bytes )
     ( block_type, block_total_len, pen ) = struct.unpack( '=LLL', block_bytes[:12] )
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )  #todo clean
+    assert ( (block_type == CUSTOM_BLOCK_COPYABLE) or
+             (block_type == CUSTOM_BLOCK_NONCOPYABLE) )
     assert ((block_total_len == len(block_bytes)) and
             (block_total_len == block_total_len_end))
 
@@ -255,12 +257,10 @@ def custom_block_unpack(block_bytes):      #todo verify block type & all fields
 
 def custom_mrt_isis_block_pack( pkt_data ):
     "Packs ISIS MRT block into and wraps in a custom pcapnt block"
-    opts = [ Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' ) ]
-    packed_bytes = custom_block_pack(
-        CUSTOM_BLOCK_COPYABLE, pen.BROCADE_PEN,
-        mrt.mrt_isis_block_pack( pkt_data ), opts )
+    packed_bytes = custom_block_pack( CUSTOM_BLOCK_COPYABLE, pen.BROCADE_PEN,
+                                      mrt.mrt_isis_block_pack( pkt_data ),
+                                      [CUSTOM_MRT_ISIS_BLOCK_OPT])
     return packed_bytes
-    #todo need unpack;  assert 'EMBEDDED_MRT_ISIS_BLOCK'
 
 def custom_mrt_isis_block_unpack(block_bytes):
     """Unpacks a mrt/isis block wrapped in a pcapng custom block."""
@@ -268,7 +268,6 @@ def custom_mrt_isis_block_unpack(block_bytes):
     parsed_custom = custom_block_unpack( block_bytes )
     assert parsed_custom[ 'block_type'     ] == CUSTOM_BLOCK_COPYABLE
     assert parsed_custom[ 'pen'            ] == pen.BROCADE_PEN
-    assert parsed_custom[ 'options_lst'    ] == [
-                Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' ) ]
+    assert parsed_custom[ 'options_lst'    ] == [CUSTOM_MRT_ISIS_BLOCK_OPT]
     parsed_mrt = mrt.mrt_isis_block_unpack( parsed_custom[ 'content' ] )
     return parsed_mrt

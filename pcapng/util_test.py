@@ -1,6 +1,5 @@
-import struct
 import pytest
-import pcapng.core as core
+import struct
 import pcapng.util as util
 from   pcapng.util import to_bytes, str_to_bytes
 

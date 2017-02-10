@@ -193,8 +193,9 @@ def block32_pad_bytes(data_bytes):
 
 def assert_block32_length(data):
     """Assert that data length is at a 32-bit boundary"""
-    assert (0 == len(data) % 4), "data must be 32-bit aligned"
-    return True
+    rem_bytes = len(data) % 4
+    assert (0 == rem_bytes), ("data must be 32-bit aligned; len={}  rem_bytes={}".format(
+        len(data), rem_bytes ))
 
 def block32_bytes_pack( content=[] ):
     content_len = len( content )

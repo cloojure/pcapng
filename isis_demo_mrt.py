@@ -2,7 +2,7 @@
 from __future__ import print_function
 import time
 import sys
-import pcapng.core
+import pcapng.block
 import pcapng.mrt
 from   pcapng.util import to_bytes
 
@@ -25,10 +25,10 @@ out_file_name = 'isis.pcapng'
 print('\n')
 print("Saving sample ISIS packets to file:   %s" % out_file_name)
 pcap_fp = open( out_file_name, 'wb' )
-pcap_fp.write( pcapng.core.section_header_block_pack() )
+pcap_fp.write(pcapng.block.section_header_block_pack())
 for count in range(20):
     pkt_data = get_pkt()
-    packed_bytes = pcapng.core.custom_mrt_isis_block_pack( pkt_data )
+    packed_bytes = pcapng.block.custom_mrt_isis_block_pack(pkt_data)
     pcap_fp.write( packed_bytes )
     time.sleep(0.1)
     print( '.', end='' )

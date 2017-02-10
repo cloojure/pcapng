@@ -1,10 +1,11 @@
+import pytest
 import struct
 import pcapng.linktype
-import pcapng.core
+import pcapng.block
 import pcapng.option
 import pcapng.mrt
 import pcapng.util
-from pcapng.util import to_bytes, str_to_bytes
+from   pcapng.util import to_bytes, str_to_bytes
 
 
 def test_mrt_block():

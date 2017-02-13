@@ -67,6 +67,8 @@ BGP4MP_MESSAGE_LOCAL        =  6
 BGP4MP_MESSAGE_AS4_LOCAL    =  7
 
 
+#todo check type on all fns
+
 def mrt_block_pack( mrt_type, mrt_subtype, content ):
     """Creates an MRT header block."""
     #todo verify mrt_type, mrt_subtype

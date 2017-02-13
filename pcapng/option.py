@@ -73,6 +73,8 @@ IDB_OPTIONS = GENERAL_OPTIONS | {
 
 EPB_OPTIONS = GENERAL_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
 
+#todo check type on all fns
+
 #todo need to do validation on data values & lengths
 def assert_shb_option(option):
     "Returns true if option code is valid for a segment header block"
@@ -98,10 +100,7 @@ class Option:
         self.code       = code
         self.content    = to_bytes(content)
     def to_map(self):
-        m = {}
-        m[ 'code'    ] = self.code
-        m[ 'content' ] = self.content
-        return m
+        return util.select_keys(self.__dict__, ['code', 'content'])
     def __eq__(self, other):
         return self.to_map() == other.to_map()
     def __ne__(self, other):

@@ -17,7 +17,7 @@ from   pcapng.util              import to_bytes
 util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
-BYTE_ORDER_MAGIC    = 0x1A2B3C4D             #todo -> const & verify on unpack
+BYTE_ORDER_MAGIC    = 0x1A2B3C4D
 
 BLOCK_TYPE_EPB      = 0x00000006
 BLOCK_TYPE_SHB      = 0x0A0D0D0A
@@ -39,7 +39,7 @@ CUSTOM_MRT_ISIS_BLOCK_OPT = Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_M
 
 def section_header_block_pack(options_lst=[]):    #todo data_len
     """Encodes a section header block, including the specified options."""
-    util.assert_type_list(options_lst)   #todo check type on all fns
+    util.assert_type_list(options_lst)
     for opt in options_lst:
         option.assert_shb_option(opt)
 

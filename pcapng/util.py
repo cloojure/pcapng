@@ -4,6 +4,7 @@ import time
 import math
 import pcapng.const
 
+#todo check type on all fns
 #todo verify have tests for all
 
 # Global var's
@@ -152,6 +153,13 @@ def first( lst ):
     """Returns the first item in a sequence."""
     return lst[0]
 
+def select_keys( src_dict, keys_lst ):
+    """Returns a new dict containing the specified keys (& values) from src_dict."""
+    result = {}
+    for key in keys_lst:
+        result[ key ] = src_dict[ key ]
+    return result
+
 #todo move to pcapng.types ?
 #-----------------------------------------------------------------------------
 def ipAddr_encode( ip_vals ):
@@ -223,5 +231,4 @@ def block32_labelled_bytes_unpack_rolling( packed_bytes ):
     content_bytes       = packed_bytes[12:12+content_len]
     remaining_bytes     = packed_bytes[total_len:]
     return label, content_bytes, remaining_bytes
-
 

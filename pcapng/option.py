@@ -99,14 +99,10 @@ class Option:
     def __init__(self, code, content): #todo validate code
         self.code       = code
         self.content    = to_bytes(content)
-    def to_map(self):
-        return util.select_keys(self.__dict__, ['code', 'content'])
-    def __eq__(self, other):
-        return self.to_map() == other.to_map()
-    def __ne__(self, other):
-        return (not __eq__(self,other))
-    def __repr__(self):
-        return str( self.to_map() )
+    def to_map(self):           return util.select_keys(self.__dict__, ['code', 'content'])
+    def __repr__(self):         return str( self.to_map() )
+    def __eq__(self, other):    return self.to_map() == other.to_map()
+    def __ne__(self, other):    return (not __eq__(self,other))
 
     #todo verify all fields
     def pack(self):   #todo needs test

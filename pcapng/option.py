@@ -16,7 +16,6 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
 OPT_END_OF_OPT    =     0
-OPT_END_OF_OPT    =     0xAB     #todo #debug
 
 OPT_COMMENT       =     1
 
@@ -67,11 +66,14 @@ GENERAL_OPTIONS = { OPT_COMMENT } | CUSTOM_OPTIONS
 SHB_OPTIONS = GENERAL_OPTIONS | { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
 
 IDB_OPTIONS = GENERAL_OPTIONS | {
-    OPT_IDB_NAME, OPT_IDB_DESCRIPTION, OPT_IDB_IPV4ADDR, OPT_IDB_IPV6ADDR,
-    OPT_IDB_MACADDR, OPT_IDB_EUIADDR, OPT_IDB_SPEED, OPT_IDB_TSRESOL,
-    OPT_IDB_TZONE, OPT_IDB_FILTER, OPT_IDB_OS, OPT_IDB_FCSLEN, OPT_IDB_TSOFFSET}
+    OPT_IDB_NAME,       OPT_IDB_DESCRIPTION,    OPT_IDB_IPV4ADDR,   OPT_IDB_IPV6ADDR,
+    OPT_IDB_MACADDR,    OPT_IDB_EUIADDR,        OPT_IDB_SPEED,      OPT_IDB_TSRESOL,
+    OPT_IDB_TZONE,      OPT_IDB_FILTER,         OPT_IDB_OS,         OPT_IDB_FCSLEN,
+    OPT_IDB_TSOFFSET }
 
 EPB_OPTIONS = GENERAL_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
+
+ALL_OPTIONS = CUSTOM_OPTIONS | GENERAL_OPTIONS | SHB_OPTIONS | IDB_OPTIONS | EPB_OPTIONS
 
 #todo check type on all fns
 
@@ -96,9 +98,13 @@ def assert_custom_block_option(option):
     assert (option.code in CUSTOM_OPTIONS)
 
 class Option:
-    def __init__(self, code, content): #todo validate code
+    def __init__( self, code, content, unchecked_flg=False ):
+        """Creates an Option with the specified option code & content."""
+        if not unchecked_flg:
+            assert (code in ALL_OPTIONS)
         self.code       = code
         self.content    = to_bytes(content)
+
     def to_map(self):           return util.select_keys(self.__dict__, ['code', 'content'])
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
@@ -113,6 +119,8 @@ class Option:
         packed_bytes    = struct.pack('=HH', self.code, data_len_orig) + data_pad
         return packed_bytes
 
+    OPTION_TERM_BYTES = struct.pack('=HH', OPT_END_OF_OPT, 0)
+
 
 # #todo add options for all
 
@@ -125,7 +133,7 @@ def pack_all(opts_lst):  #todo needs test
     cum_result = ""
     for opt in opts_lst:
         cum_result += opt.pack()
-    cum_result += Option(OPT_END_OF_OPT, 0).pack()
+    cum_result += Option.OPTION_TERM_BYTES
     return cum_result
 
 def unpack_rolling(raw_bytes):
@@ -140,13 +148,19 @@ def unpack_rolling(raw_bytes):
     opt_bytes             = raw_bytes[ :first_block_len_pad   ]
     raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
     opt_content           = opt_bytes[ 4 : 4+content_len_orig ]
-    option_read = Option( opt_code, opt_content )
+    option_read = Option( opt_code, opt_content, True )
     return ( option_read, raw_bytes_remaining )
 
+#todo add strict string reading conformance?
+    # Section 3.5 of https://pcapng.github.io/pcapng states: "Software that reads these
+    # files MUST NOT assume that strings are zero-terminated, and MUST treat a
+    # zero-value octet as a string terminator."   We just use th length field to read in
+    # strings, and don't terminate early if there is a zero-value byte.
 def unpack_all(raw_bytes):
     """Decodes a block of raw bytes into a list of options."""
     util.assert_type_bytes(raw_bytes)
     util.assert_block32_length(raw_bytes)
+    print( 101, len(raw_bytes), raw_bytes)
     options = []
     while (0 < len(raw_bytes)):
         ( option, raw_bytes_remaining ) = unpack_rolling(raw_bytes)
@@ -156,13 +170,6 @@ def unpack_all(raw_bytes):
             options.append( option )
             raw_bytes = raw_bytes_remaining
     return options
-
-def unpack_one(raw_bytes):
-    #todo verify all fields
-    """Given an bytes block of for one option, decodes and returns the option as a dictionary."""
-    options = unpack_all(raw_bytes)
-    assert 1 == len( options )
-    return options[0]
 
 #todo need to add custom options
 def custom_option_value_pack( pen, content=[] ):

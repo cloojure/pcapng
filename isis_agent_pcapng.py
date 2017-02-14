@@ -7,16 +7,19 @@ from __future__ import print_function
 
 from   bcc import BPF
 import os
+import struct
 import sys
 from   sys import argv
 import socket
 import pcapng.block
+import pcapng.option as option
+from   pcapng.option import Option
 
 
 DEBUG_ARGS = False
 
 # interface = "eth0"
-interface = "wlx803f5d22051b"
+interface_name = "wlx803f5d22051b"
 
 usage_text = """
 USAGE: {0} [-i <if_name>]
@@ -91,7 +94,7 @@ def dbg_print(pkt_bytes):
         sys.stdout.flush()
 
 def main():
-  global interface
+  global interface_name
 
   arg1 = str(argv[1]) if 1 < len(argv) else None
   arg2 = str(argv[2]) if 2 < len(argv) else None
@@ -123,13 +126,13 @@ def main():
     exit()
 
   if two_args and interface_flag:
-    interface = argv[2]
+    interface_name = argv[2]
 
   bpf = BPF(text=prog, debug=2)
   is_is_filter = bpf.load_func("isis_filter", BPF.SOCKET_FILTER)
 
-  print("binding socket to '%s'" % interface)
-  BPF.attach_raw_socket(is_is_filter, interface)
+  print("binding socket to '%s'" % interface_name)
+  BPF.attach_raw_socket(is_is_filter, interface_name)
 
   #get file descriptor of the socket previously created inside BPF.attach_raw_socket
   socket_fd = is_is_filter.sock
@@ -139,10 +142,15 @@ def main():
   #set it as blocking socket
   sock.setblocking(True)
 
-  print("Starting to listen on socket {}\n".format(interface))
+  print("Starting to listen on socket {}\n".format(interface_name))
   pcap_fp = open( 'data.pcapng', 'wb' );
   pcap_fp.write( pcapng.block.section_header_block_pack());
-  pcap_fp.write( pcapng.block.interface_desc_block_pack());
+  idb_options = [
+      Option( option.OPT_IDB_NAME, interface_name ),
+      Option( option.OPT_IDB_DESCRIPTION, "primary interface on host" ),
+      Option( option.OPT_IDB_SPEED, struct.pack('!Q', 12345) )
+    ]
+  pcap_fp.write( pcapng.block.interface_desc_block_pack( idb_options ))
   while True:
       pkt_bytes = get_next_packet( socket_fd );
       dbg_print( pkt_bytes );

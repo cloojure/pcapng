@@ -154,12 +154,12 @@ def select_keys( src_dict, keys_lst ):
 
 #todo move to pcapng.types ?
 #-----------------------------------------------------------------------------
-def ipAddr_encode( ip_vals ):
+def ip_addr_pack(ip_vals):
     assert 4 == len( ip_vals )
     ip_bytes = struct.pack( '!BBBB', *ip_vals )  #todo native endian?
     return ip_bytes
 
-def ipAddr_decode( ip_bytes ):
+def ip_addr_unpack(ip_bytes):
     assert 4 == len( ip_bytes )
     ip_vals = list( struct.unpack( '!BBBB',  ip_bytes ))  #todo native endian?
     return ip_vals

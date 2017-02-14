@@ -32,6 +32,7 @@ OPT_SHB_OS        = 3
 OPT_SHB_USERAPPL  = 4
 
 #todo need to do validation on data values & lengths
+#todo   make subclasses of Option
 # interface description block options
 OPT_IDB_NAME            =   2
 OPT_IDB_DESCRIPTION     =   3

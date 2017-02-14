@@ -99,9 +99,9 @@ def assert_custom_block_option(option):
 
 #todo verify all fields
 class Option:
-    def __init__( self, code, content, unchecked_flg=False ):
+    def __init__(self, code, content, code_verify_disable=False):
         """Creates an Option with the specified option code & content."""
-        if not unchecked_flg:
+        if not code_verify_disable:
             assert (code in ALL_OPTIONS)
         self.code       = code
         self.content    = to_bytes(content)

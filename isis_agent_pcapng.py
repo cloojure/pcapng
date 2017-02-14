@@ -120,42 +120,40 @@ def main():
     exit()
 
   if three_or_more_args or \
-     (two_args and not interface_flag) or \
-     (one_arg and not help_flag):
+         (two_args and not interface_flag) or \
+         (one_arg and not help_flag):
     usage()
     exit()
 
   if two_args and interface_flag:
     interface_name = argv[2]
 
-  bpf = BPF(text=prog, debug=2)
+  bpf = BPF( text=prog, debug=2 )
   is_is_filter = bpf.load_func("isis_filter", BPF.SOCKET_FILTER)
 
   print("binding socket to '%s'" % interface_name)
   BPF.attach_raw_socket(is_is_filter, interface_name)
 
-  #get file descriptor of the socket previously created inside BPF.attach_raw_socket
+  # get file descriptor of the socket previously created inside BPF.attach_raw_socket
   socket_fd = is_is_filter.sock
 
   #create python socket object, from the file descriptor
-  sock = socket.fromfd(socket_fd, socket.AF_PACKET, socket.SOCK_RAW, 0)
-  #set it as blocking socket
+  sock = socket.fromfd( socket_fd, socket.AF_PACKET, socket.SOCK_RAW, 0 )
   sock.setblocking(True)
 
   print("Starting to listen on socket {}\n".format(interface_name))
   pcap_fp = open( 'data.pcapng', 'wb' );
-  pcap_fp.write( pcapng.block.section_header_block_pack());
+  pcap_fp.write( pcapng.block.section_header_block_pack())  # must be 1st block
   idb_options = [
       Option( option.OPT_IDB_NAME, interface_name ),
       Option( option.OPT_IDB_DESCRIPTION, "primary interface on host" ),
       Option( option.OPT_IDB_SPEED, struct.pack('!Q', 12345) )
     ]
-  pcap_fp.write( pcapng.block.interface_desc_block_pack( idb_options ))
+  pcap_fp.write( pcapng.block.interface_desc_block_pack( idb_options ))     # optional block
   while True:
-      pkt_bytes = get_next_packet( socket_fd );
-      dbg_print( pkt_bytes );
-      simple_pkt_blk = pcapng.block.simple_pkt_block_pack( pkt_bytes )
-      pcap_fp.write( simple_pkt_blk );
+      pkt_bytes = get_next_packet( socket_fd )
+      dbg_print( pkt_bytes )
+      pcap_fp.write( pcapng.block.simple_pkt_block_pack( pkt_bytes ))
 
 if __name__ == "__main__":
   main()

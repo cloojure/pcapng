@@ -1,5 +1,6 @@
 *.pyc
 *.pcapng
+*.mrt
 .cache
 dist
 *.egg-info

@@ -33,6 +33,8 @@ CUSTOM_BLOCK_NONCOPYABLE = 0x40000BAD
 
 CUSTOM_MRT_ISIS_BLOCK_OPT = Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' )
 
+#todo convert result to object
+#todo read_*_block must detect & handle any endian data (per block)
 #-----------------------------------------------------------------------------
 
 #todo options_lst => options

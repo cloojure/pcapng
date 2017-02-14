@@ -197,29 +197,29 @@ def assert_block32_length(data):
     assert (0 == rem_bytes), ("data must be 32-bit aligned; len={}  rem_bytes={}".format(
         len(data), rem_bytes ))
 
-def block32_bytes_pack( content=[] ):  #todo native endian?
+def block32_bytes_pack( content=[] ):
     content_len = len( content )
     content_bytes_pad = block32_pad_bytes( content )
-    packed_bytes = struct.pack( '!L', content_len ) + content_bytes_pad
+    packed_bytes = struct.pack( '=L', content_len ) + content_bytes_pad
     return packed_bytes
 
 def block32_bytes_unpack_rolling( packed_bytes ):
-    (content_len,) = struct.unpack( '!L', packed_bytes[:4] )  #todo native endian?
+    (content_len,) = struct.unpack( '=L', packed_bytes[:4] )
     content_len_pad = block32_ceil_num_bytes(content_len)
     packed_bytes_nohdr = packed_bytes[4:]
     content_bytes = packed_bytes_nohdr[:content_len]
     remaining_bytes = packed_bytes_nohdr[content_len_pad:]
     return content_bytes, remaining_bytes
 
-def block32_labelled_bytes_pack( label, content=[] ):  #todo native endian?
+def block32_labelled_bytes_pack( label, content=[] ):
     content_bytes_pad = block32_pad_bytes( content )
     content_len = len( content )
     total_len   = 12 + len( content_bytes_pad )
-    packed_bytes = struct.pack( '!LLL', label, total_len, content_len ) + content_bytes_pad
+    packed_bytes = struct.pack( '=LLL', label, total_len, content_len ) + content_bytes_pad
     return packed_bytes
 
-def block32_labelled_bytes_unpack_rolling( packed_bytes ):  #todo native endian?
-    (label, total_len, content_len) = struct.unpack( '!LLL', packed_bytes[:12] )
+def block32_labelled_bytes_unpack_rolling( packed_bytes ):
+    (label, total_len, content_len) = struct.unpack( '=LLL', packed_bytes[:12] )
     content_bytes       = packed_bytes[12:12+content_len]
     remaining_bytes     = packed_bytes[total_len:]
     return label, content_bytes, remaining_bytes

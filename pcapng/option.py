@@ -16,7 +16,6 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
 OPT_END_OF_OPT    =     0
-
 OPT_COMMENT       =     1
 
 #todo need to do validation on data values & lengths

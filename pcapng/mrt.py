@@ -122,21 +122,3 @@ def mrt_isis_block_extended_unpack( packed_bytes ):
     assert result['mrt_type'] == ISIS_ET
     return result
 
-
-
-# def ospfv2_block( local_ip_address, remote_ip_address, ospf_msg_content=[] ):
-#     block = ( struct.pack( '!LL', local_ip_address, remote_ip_address ) +
-#               pcapng.util.block32_pad_bytes( ospf_msg_content ))
-#     hdr = mrt_block_pack(OSPFv2, 0, block)
-#     result = hdr + block
-#     return result
-
-# peer_as_number  =
-# local_as_number =
-# interface_idx   =
-# address_family  =
-# remote_ip_address =
-# local_ip_address =
-# old_state
-# new_state
-

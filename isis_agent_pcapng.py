@@ -147,7 +147,7 @@ def main():
   idb_options = [
       Option( option.OPT_IDB_NAME, interface_name ),
       Option( option.OPT_IDB_DESCRIPTION, "primary interface on host" ),
-      Option( option.OPT_IDB_SPEED, struct.pack('!Q', 12345) )
+      Option( option.OPT_IDB_SPEED, struct.pack('=Q', 12345) )
     ]
   pcap_fp.write( pcapng.block.interface_desc_block_pack( idb_options ))     # optional block
   while True:

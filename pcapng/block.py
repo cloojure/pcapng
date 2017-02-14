@@ -75,10 +75,10 @@ def section_header_block_unpack(block_bytes):      #todo verify block type & all
     ( block_type, block_total_len, byte_order_magic, major_version, minor_version,
             section_len ) = struct.unpack( '=LlLhhq', block_bytes[:24])
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
-    assert block_type == BLOCK_TYPE_SHB
+    assert block_type       == BLOCK_TYPE_SHB
     assert byte_order_magic == BYTE_ORDER_MAGIC
-    assert major_version == SHB_MAJOR_VERSION
-    assert minor_version == SHB_MINOR_VERSION
+    assert major_version    == SHB_MAJOR_VERSION
+    assert minor_version    == SHB_MINOR_VERSION
     assert (block_total_len == block_total_len_end == len(block_bytes))  #todo simplify all 'and' & 'or'
     # section_len currently ignored
     options_bytes = block_bytes[24:-4]
@@ -157,8 +157,8 @@ def simple_pkt_block_unpack(block_bytes):      #todo verify block type & all fie
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )
     pkt_data_pad_len    = util.block32_ceil_num_bytes(original_pkt_len)
     pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
-    assert block_type == BLOCK_TYPE_SPB
-    assert block_total_len == block_total_len_end
+    assert block_type       == BLOCK_TYPE_SPB
+    assert block_total_len  == block_total_len_end
     parsed =    { 'block_type'          : block_type ,
                   'block_total_len'     : block_total_len ,
                   'original_pkt_len'    : original_pkt_len ,
@@ -211,8 +211,8 @@ def enhanced_pkt_block_unpack(block_bytes):
     (block_type, block_total_len, interface_id, time_secs, time_usecs,
             pkt_data_captured_len, pkt_data_orig_len) = struct.unpack( '=LLLLLLL', block_bytes[:28])
     (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
-    assert block_type == BLOCK_TYPE_EPB      #todo verify block type & all fields, all fns
-    assert block_total_len == block_total_len_end == len(block_bytes)
+    assert block_type           == BLOCK_TYPE_EPB      #todo verify block type & all fields, all fns
+    assert block_total_len      == block_total_len_end == len(block_bytes)
     assert pkt_data_captured_len <= pkt_data_orig_len
 
     pkt_data_captured_pad_len   = util.block32_ceil_num_bytes(pkt_data_captured_len)

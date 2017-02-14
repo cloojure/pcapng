@@ -33,8 +33,16 @@ CUSTOM_BLOCK_NONCOPYABLE = 0x40000BAD
 
 CUSTOM_MRT_ISIS_BLOCK_OPT = Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' )
 
-#todo convert result to object
-#todo read_*_block must detect & handle any endian data (per block)
+#todo read must find mandatory SHB at beginning
+    #todo global byte-order starts off undefined; is reset by each SHB
+    #todo read_*_block must detect & handle any endian data (per SHB)
+#todo need generic read_block(raw bytes) method
+#todo need generic read_next_block(file_ptr) method
+    #todo read_block_hdr(file_ptr),  block_hdr_unpack
+    #todo read_block_body(file_ptr), block_body_unpack
+#todo must skip any unrecognized blocks version: (major,minor) > current
+#todo convert read result to object
+
 #-----------------------------------------------------------------------------
 
 #todo options_lst => options
@@ -280,8 +288,3 @@ def custom_mrt_isis_block_unpack( block_bytes ):
     parsed_mrt = mrt.mrt_isis_block_unpack( parsed_custom[ 'content' ] )
     return parsed_mrt
 
-#todo need generic read_block(raw bytes) method
-#todo need generic read_next_block(file_ptr) method
-    # read_block_hdr(file_ptr), block_hdr_unpack
-    # read_block_body(file_ptr), block_body_unpack
-#todo must skip any unrecognized blocks

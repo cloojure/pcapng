@@ -4,7 +4,7 @@ import pcapng.option    as option
 from   pcapng.option    import Option
 import pcapng.pen       as pen
 import pcapng.util      as util
-from   pcapng.util      import to_bytes, str_to_bytes
+from   pcapng.util      import to_bytes
 
 def test_option_codec():
     def assert_option_codec(opt_code, opt_value):

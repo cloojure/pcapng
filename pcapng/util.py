@@ -96,14 +96,6 @@ def int32_to_hexstr(arg):
     assert_uint32(arg)
     return ( '0x' + format( curr_utc_secs(), '08x' ))
 
-
-#todo move to pcap
-def fmt_pcap_hdr( ts_sec, ts_usec, incl_len, orig_len ):
-    """Format a PCAP block header."""
-    packed = struct.pack( '>LLLL', ts_sec, ts_usec, incl_len, orig_len)
-    return packed
-
-
 def split_float( fval ):
     """Splits a float into integer and fractional parts."""
     frac, whole = math.modf( fval )
@@ -164,12 +156,12 @@ def select_keys( src_dict, keys_lst ):
 #-----------------------------------------------------------------------------
 def ipAddr_encode( ip_vals ):
     assert 4 == len( ip_vals )
-    ip_bytes = struct.pack( '!BBBB', *ip_vals )
+    ip_bytes = struct.pack( '!BBBB', *ip_vals )  #todo native endian?
     return ip_bytes
 
 def ipAddr_decode( ip_bytes ):
     assert 4 == len( ip_bytes )
-    ip_vals = list( struct.unpack( '!BBBB',  ip_bytes ))
+    ip_vals = list( struct.unpack( '!BBBB',  ip_bytes ))  #todo native endian?
     return ip_vals
 
 #todo add integer_pack/unpack
@@ -205,28 +197,28 @@ def assert_block32_length(data):
     assert (0 == rem_bytes), ("data must be 32-bit aligned; len={}  rem_bytes={}".format(
         len(data), rem_bytes ))
 
-def block32_bytes_pack( content=[] ):
+def block32_bytes_pack( content=[] ):  #todo native endian?
     content_len = len( content )
     content_bytes_pad = block32_pad_bytes( content )
     packed_bytes = struct.pack( '!L', content_len ) + content_bytes_pad
     return packed_bytes
 
 def block32_bytes_unpack_rolling( packed_bytes ):
-    (content_len,) = struct.unpack( '!L', packed_bytes[:4] )
+    (content_len,) = struct.unpack( '!L', packed_bytes[:4] )  #todo native endian?
     content_len_pad = block32_ceil_num_bytes(content_len)
     packed_bytes_nohdr = packed_bytes[4:]
     content_bytes = packed_bytes_nohdr[:content_len]
     remaining_bytes = packed_bytes_nohdr[content_len_pad:]
     return content_bytes, remaining_bytes
 
-def block32_labelled_bytes_pack( label, content=[] ):
+def block32_labelled_bytes_pack( label, content=[] ):  #todo native endian?
     content_bytes_pad = block32_pad_bytes( content )
     content_len = len( content )
     total_len   = 12 + len( content_bytes_pad )
     packed_bytes = struct.pack( '!LLL', label, total_len, content_len ) + content_bytes_pad
     return packed_bytes
 
-def block32_labelled_bytes_unpack_rolling( packed_bytes ):
+def block32_labelled_bytes_unpack_rolling( packed_bytes ):  #todo native endian?
     (label, total_len, content_len) = struct.unpack( '!LLL', packed_bytes[:12] )
     content_bytes       = packed_bytes[12:12+content_len]
     remaining_bytes     = packed_bytes[total_len:]

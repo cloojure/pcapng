@@ -277,3 +277,9 @@ def custom_mrt_isis_block_unpack( block_bytes ):
     assert parsed_custom[ 'options_lst'    ] == [CUSTOM_MRT_ISIS_BLOCK_OPT]
     parsed_mrt = mrt.mrt_isis_block_unpack( parsed_custom[ 'content' ] )
     return parsed_mrt
+
+#todo need generic read_block(raw bytes) method
+#todo need generic read_next_block(file_ptr) method
+    # read_block_hdr(file_ptr), block_hdr_unpack
+    # read_block_body(file_ptr), block_body_unpack
+#todo must skip any unrecognized blocks

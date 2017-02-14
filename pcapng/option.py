@@ -97,6 +97,7 @@ def assert_custom_block_option(option):
     """Returns true if option code is valid for a custom block"""
     assert (option.code in CUSTOM_OPTIONS)
 
+#todo verify all fields
 class Option:
     def __init__( self, code, content, unchecked_flg=False ):
         """Creates an Option with the specified option code & content."""
@@ -109,8 +110,6 @@ class Option:
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
-
-    #todo verify all fields
     def pack(self):   #todo needs test
         """Encodes an option into a bytes block."""
         #todo validate code
@@ -118,11 +117,9 @@ class Option:
         data_pad        = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack('=HH', self.code, data_len_orig) + data_pad
         return packed_bytes
-
     OPTION_TERM_BYTES = struct.pack('=HH', OPT_END_OF_OPT, 0)
 
-
-# #todo add options for all
+#todo add options for all
 
 #todo need way to pack generic options: integer, string, float, object
 

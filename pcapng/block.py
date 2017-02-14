@@ -83,12 +83,12 @@ def section_header_block_unpack(block_bytes):      #todo verify block type & all
     # section_len currently ignored
     options_bytes = block_bytes[24:-4]
     options_lst  = option.unpack_all(options_bytes)  #todo verify only valid options
-    parsed = { 'block_type'          : block_type ,
-               'block_total_len'     : block_total_len ,
-               'byte_order_magic'    : byte_order_magic ,
-               'major_version'       : major_version ,
-               'minor_version'       : minor_version ,
-               'section_len'         : section_len ,
+    parsed = { 'block_type'          : block_type,
+               'block_total_len'     : block_total_len,
+               'byte_order_magic'    : byte_order_magic,
+               'major_version'       : major_version,
+               'minor_version'       : minor_version,
+               'section_len'         : section_len,
                'options_lst'         : options_lst,
                'block_total_len_end' : block_total_len_end }
     return parsed
@@ -125,11 +125,11 @@ def interface_desc_block_unpack(block_bytes):      #todo verify block type & all
             (block_total_len == block_total_len_end))
     options_bytes = block_bytes[16:-4]
     options_lst   = option.unpack_all(options_bytes)  #todo verify only valid options
-    parsed = { 'block_type'             : block_type ,
-               'block_total_len'        : block_total_len ,
-               'link_type'              : link_type ,
-               'reserved'               : reserved ,
-               'snaplen'                : snaplen ,
+    parsed = { 'block_type'             : block_type,
+               'block_total_len'        : block_total_len,
+               'link_type'              : link_type,
+               'reserved'               : reserved,
+               'snaplen'                : snaplen,
                'options_lst'            : options_lst,
                'block_total_len_end'    : block_total_len_end }
     return parsed
@@ -159,11 +159,11 @@ def simple_pkt_block_unpack(block_bytes):      #todo verify block type & all fie
     pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
     assert block_type       == BLOCK_TYPE_SPB
     assert block_total_len  == block_total_len_end
-    parsed =    { 'block_type'          : block_type ,
-                  'block_total_len'     : block_total_len ,
-                  'original_pkt_len'    : original_pkt_len ,
-                  'pkt_data_pad_len'    : pkt_data_pad_len ,
-                  'pkt_data'            : pkt_data ,
+    parsed =    { 'block_type'          : block_type,
+                  'block_total_len'     : block_total_len,
+                  'original_pkt_len'    : original_pkt_len,
+                  'pkt_data_pad_len'    : pkt_data_pad_len,
+                  'pkt_data'            : pkt_data,
                   'block_total_len_end' : block_total_len_end }
     return parsed
 
@@ -221,14 +221,14 @@ def enhanced_pkt_block_unpack(block_bytes):
     options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
     options_lst                 = option.unpack_all(options_bytes)
 
-    parsed =    { 'block_type'              : block_type ,
-                  'block_total_len'         : block_total_len ,
+    parsed =    { 'block_type'              : block_type,
+                  'block_total_len'         : block_total_len,
                   'interface_id'            : interface_id,
                   'time_secs'               : time_secs,
                   'time_usecs'              : time_usecs,
-                  'pkt_data_captured_len'   : pkt_data_captured_len ,
-                  'pkt_data_orig_len'       : pkt_data_orig_len ,
-                  'pkt_data'                : pkt_data ,
+                  'pkt_data_captured_len'   : pkt_data_captured_len,
+                  'pkt_data_orig_len'       : pkt_data_orig_len,
+                  'pkt_data'                : pkt_data,
                   'options_lst'             : options_lst,
                   'block_total_len_end'     : block_total_len_end }
     return parsed

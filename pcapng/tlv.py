@@ -2,8 +2,11 @@
 trailing padding supplied as required."""
 
 import struct
-import pcapng.util              as util
-from   pcapng.util              import to_bytes
+import pcapng.util      as util
+from   pcapng.util      import to_bytes
+
+#todo need a generic version that accepts an endian flag
+#todo need a specialized version that sets/reads global endian flag based on hdr blocks
 
 #todo think about how to handle a block of packets
 #todo look at "docopt" usage -> cmdopts processing
@@ -41,15 +44,41 @@ FLOAT64         = 408
 #todo add string pack/unpack ?  (noop?)
 #todo add other pack/unpack ?
 
+def uint8_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHB', UINT8, 1, value ))
+    return packed_bytes
+
+def uint8_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 8
+    (type, length, value) = struct.unpack( '=HHB', packed_bytes[:5] )   #todo use endian flag
+    assert (type, length) == (UINT8, 1)
+    return value
+
 def uint16_pack(value):
     packed_bytes = util.block32_pad_bytes( struct.pack( '=HHH', UINT16, 2, value ))
     return packed_bytes
 
 def uint16_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
     assert len(packed_bytes) == 8
     (type, length, value) = struct.unpack( '=HHH', packed_bytes[:6] )   #todo use endian flag
     assert (type, length) == (UINT16, 2)
     return value
+
+def uint32_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHL', UINT32, 4, value ))
+    return packed_bytes
+
+def uint32_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 8
+    (type, length, value) = struct.unpack( '=HHL', packed_bytes[:8] )   #todo use endian flag
+    assert (type, length) == (UINT32, 4)
+    return value
+
+
+
 
 def string_utf8_pack( value ):
     value = to_bytes(value)
@@ -58,6 +87,7 @@ def string_utf8_pack( value ):
     return packed_bytes
 
 def string_utf8_unpack( packed_bytes ):
+    util.assert_type_bytes(packed_bytes)
     (type, length) = struct.unpack( '=HH', packed_bytes[:4] )   #todo use endian flag
     assert type == STRING_UTF8
     assert 0 <= length

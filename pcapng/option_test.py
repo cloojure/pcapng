@@ -3,7 +3,7 @@ import struct
 import pcapng.option    as option
 from   pcapng.option    import Option
 import pcapng.pen       as pen
-import pcapng.type      as type
+import pcapng.tlv       as tlv
 import pcapng.util      as util
 from   pcapng.util      import to_bytes
 

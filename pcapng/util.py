@@ -64,10 +64,13 @@ def assert_uint32(arg):        # unsigned byte
 
 #-----------------------------------------------------------------------------
 
-#todo make a pow2_range(), pow2_thru() fns (0 1 2 3 4 5  7 8 9  15 16 17  31 32 33 ...)
-#todo make a sqrt_range(), sqrt_thru() fns (0 1 2 3 4 5   8 9 10  15 16 17  24 25 26  35 36 37 ...)
+#todo make a pow2_range(), pow2_thru() fns (0 1 2 4 8 16 32 ...)
+#todo make a sqr_range(), sqr_thru() fns (0 1 2 4 9 16 25 36 ...)
 
-#todo convert to common generator function
+#todo make a pow2_nbr_range(), pow2_nbr_thru() fns (0 1 2 3 4 5  7 8 9  15 16 17  31 32 33 ...)
+#todo make a sqr_nbr_range(), sqr_nbr_thru() fns (0 1 2 3 4 5   8 9 10  15 16 17  24 25 26  35 36 37 ...)
+
+#todo convert to common generator fn
 def fibonacci_list( n ):
     "Returns a list of the first n Fibonacci numbers"
     result = [0, 1]

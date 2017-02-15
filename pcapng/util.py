@@ -79,16 +79,23 @@ def fibonacci_list( n ):
         result.append( next_fibo )
     return result[:n]   # in case ask for len smaller than seed list
 
-def fibonacci_range(maxVal):   #todo need test
-    "Returns a list of Fibonacci numbers less than or equal to maxVal"
+def fibonacci_range(limit):   #todo need test
+    "Returns a list of Fibonacci numbers less than limit"
     result = [0, 1]
     done = False
     while not done:
         next_fibo = result[-1] + result[-2]
-        if next_fibo <= maxVal:
+        if next_fibo < limit:
             result.append( next_fibo )
         else:
             done = True
+    return result
+
+def fibonacci_range_signed(limit):   #todo need test
+    "Returns a symmetric list of pos/neg Fibonacci numbers with abs(val) less than to limit"
+    pos_vals = fibonacci_range(limit)
+    neg_vals = map( (lambda x: -x), fibonacci_range(limit) )
+    result = sorted( (pos_vals + neg_vals), key=(lambda x: abs(x)))
     return result
 
 def to_bytes( arg ):

@@ -44,10 +44,10 @@ FLOAT64         = 408
 #todo add string pack/unpack ?  (noop?)
 #todo add other pack/unpack ?
 
+#-----------------------------------------------------------------------------
 def uint8_pack(value):
     packed_bytes = util.block32_pad_bytes( struct.pack( '=HHB', UINT8, 1, value ))
     return packed_bytes
-
 def uint8_unpack(packed_bytes):
     util.assert_type_bytes(packed_bytes)
     assert len(packed_bytes) == 8
@@ -58,7 +58,6 @@ def uint8_unpack(packed_bytes):
 def uint16_pack(value):
     packed_bytes = util.block32_pad_bytes( struct.pack( '=HHH', UINT16, 2, value ))
     return packed_bytes
-
 def uint16_unpack(packed_bytes):
     util.assert_type_bytes(packed_bytes)
     assert len(packed_bytes) == 8
@@ -69,12 +68,62 @@ def uint16_unpack(packed_bytes):
 def uint32_pack(value):
     packed_bytes = util.block32_pad_bytes( struct.pack( '=HHL', UINT32, 4, value ))
     return packed_bytes
-
 def uint32_unpack(packed_bytes):
     util.assert_type_bytes(packed_bytes)
     assert len(packed_bytes) == 8
     (type, length, value) = struct.unpack( '=HHL', packed_bytes[:8] )   #todo use endian flag
     assert (type, length) == (UINT32, 4)
+    return value
+
+def uint64_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHQ', UINT64, 8, value ))
+    return packed_bytes
+def uint64_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 12
+    (type, length, value) = struct.unpack( '=HHQ', packed_bytes[:12] )   #todo use endian flag
+    assert (type, length) == (UINT64, 8)
+    return value
+
+#-----------------------------------------------------------------------------
+def int8_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHb', INT8, 1, value ))
+    return packed_bytes
+def int8_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 8
+    (type, length, value) = struct.unpack( '=HHb', packed_bytes[:5] )   #todo use endian flag
+    assert (type, length) == (INT8, 1)
+    return value
+
+def int16_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHh', INT16, 2, value ))
+    return packed_bytes
+def int16_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 8
+    (type, length, value) = struct.unpack( '=HHh', packed_bytes[:6] )   #todo use endian flag
+    assert (type, length) == (INT16, 2)
+    return value
+
+def int32_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHl', INT32, 4, value ))
+    return packed_bytes
+def int32_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 8
+    (type, length, value) = struct.unpack( '=HHl', packed_bytes[:8] )   #todo use endian flag
+    assert (type, length) == (INT32, 4)
+    return value
+
+def int64_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHq', INT64, 8, value ))
+    return packed_bytes
+def int64_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 12
+    (type, length, value) = struct.unpack( '=HHq', packed_bytes[:12] )   #todo use endian flag
+    assert (type, length) == (INT64, 8)
     return value
 
 

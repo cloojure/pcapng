@@ -106,6 +106,8 @@ class Option:
         self.code       = code
         self.content    = to_bytes(content)
 
+    END_OF_OPT_BYTES = struct.pack('=HH', OPT_END_OF_OPT, 0)
+
     def to_map(self):           return util.select_keys(self.__dict__, ['code', 'content'])
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
@@ -117,7 +119,24 @@ class Option:
         data_pad        = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack('=HH', self.code, data_len_orig) + data_pad
         return packed_bytes
-    OPTION_TERM_BYTES = struct.pack('=HH', OPT_END_OF_OPT, 0)
+    @staticmethod
+    def unpack(packed_bytes):
+        """Factory method to generate an Option from its packed bytes."""
+        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len_orig]
+        if opt_code == OPT_COMMENT:
+            return Comment( content )
+        else:
+            print( 'unpack(): warning - unrecognized Option={}'.format( opt_code ))
+            return Option(opt_code, content, True)
+
+class Comment(Option):
+    def __init__(self, comment_str):
+        Option.__init__(self, OPT_COMMENT, comment_str)
+    def value(self):
+        return str(self.content)
+
 
 #todo add options for all
 
@@ -130,7 +149,7 @@ def pack_all(opts_lst):  #todo needs test
     cum_result = ""
     for opt in opts_lst:
         cum_result += opt.pack()
-    cum_result += Option.OPTION_TERM_BYTES
+    cum_result += Option.END_OF_OPT_BYTES
     return cum_result
 
 def unpack_rolling(raw_bytes):

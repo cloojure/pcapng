@@ -65,3 +65,12 @@ def test_custom_option_value():
         Option( 9, "9" ) ]
     result_lst = option.unpack_all( option.pack_all( opts_lst ))
     assert opts_lst == result_lst
+
+def test_Comment():
+    s1 = 'Five Stars!'
+    c1 = option.Comment(s1)
+    c1_unpacked = Option.unpack( c1.pack() )
+    assert c1.value()           == s1
+    assert c1_unpacked.value()  == s1
+    assert util.class_str(c1_unpacked)  == 'Comment'
+

@@ -152,6 +152,11 @@ def select_keys( src_dict, keys_lst ):
         result[ key ] = src_dict[ key ]
     return result
 
+def class_str( obj ):
+    "Returns the class name of an object as a string"
+    return obj.__class__.__name__
+
+
 #todo move to pcapng.types ?
 #-----------------------------------------------------------------------------
 def ip_addr_pack(ip_vals):

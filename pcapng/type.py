@@ -42,13 +42,14 @@ FLOAT64         = 408
 #todo add other pack/unpack ?
 
 def uint16_pack(value):
-    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHH', UINT8, 2, value ))
+    print( 'uint16_pack() value = ', value )
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHH', UINT16, 2, value ))
     return packed_bytes
 
 def uint16_unpack(packed_bytes):
     assert len(packed_bytes) == 8
     (type, length, value) = struct.unpack( '=HHH', packed_bytes[:6] )   #todo use endian flag
-    assert (type, length) == (UINT8, 2)
+    assert (type, length) == (UINT16, 2)
     return value
 
 def string_utf8_pack( value ):

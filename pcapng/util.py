@@ -66,7 +66,8 @@ def fibonacci_list( n ):
     "Returns a list of the first n Fibonacci numbers"
     result = [0, 1]
     while len(result) < n:
-        result += [ result[-1] + result[-2] ]
+        next_fibo = result[-1] + result[-2]
+        result.append( next_fibo )
     return result[:n]   # in case ask for len smaller than seed list
 
 def fibonacci_less_than( maxVal ):   #todo need test
@@ -74,9 +75,9 @@ def fibonacci_less_than( maxVal ):   #todo need test
     result = [0, 1]
     done = False
     while not done:
-        next = result[-1] + result[-2]
-        if next <= maxVal:
-            result += next
+        next_fibo = result[-1] + result[-2]
+        if next_fibo <= maxVal:
+            result.append( next_fibo )
         else:
             done = True
     return result

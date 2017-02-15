@@ -98,6 +98,20 @@ def fibonacci_range_signed(limit):   #todo need test
     result = sorted( (pos_vals + neg_vals), key=(lambda x: abs(x)))
     return result
 
+def assert_rel_equal( x, y, digits=None ):
+    assert digits
+    max_val = max( abs(x), abs(y) )
+    delta = abs( x - y )
+    ratio = delta / max_val
+    cmpr = pow( 10, -digits )
+    if (ratio < cmpr):
+        assert True
+    else:
+        print( 'assert_rel_equal(): x={}  y={}  digits={}  ratio={}  cmpr={} '.format(
+            x, y, digits, ratio, cmpr ))
+        assert False
+
+
 def to_bytes( arg ):
     """Converts arg to a 'bytes' object."""
     return bytes( bytearray( arg ))    # if python2, 'bytes' is synonym for 'str'

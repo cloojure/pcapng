@@ -126,6 +126,27 @@ def int64_unpack(packed_bytes):
     assert (type, length) == (INT64, 8)
     return value
 
+#-----------------------------------------------------------------------------
+def float32_pack(value):
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHf', FLOAT32, 4, value ))
+    return packed_bytes
+def float32_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 8
+    (type, length, value) = struct.unpack( '=HHf', packed_bytes[:8] )   #todo use endian flag
+    assert (type, length) == (FLOAT32, 4)
+    return value
+
+def float64_pack(value):   #todo need double_pack/unpack synonym?
+    packed_bytes = util.block32_pad_bytes( struct.pack( '=HHd', FLOAT64, 8, value ))
+    return packed_bytes
+def float64_unpack(packed_bytes):
+    util.assert_type_bytes(packed_bytes)
+    assert len(packed_bytes) == 12
+    (type, length, value) = struct.unpack( '=HHd', packed_bytes[:12] )   #todo use endian flag
+    assert (type, length) == (FLOAT64, 8)
+    return value
+
 
 
 

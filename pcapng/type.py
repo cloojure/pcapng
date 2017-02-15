@@ -42,7 +42,6 @@ FLOAT64         = 408
 #todo add other pack/unpack ?
 
 def uint16_pack(value):
-    print( 'uint16_pack() value = ', value )
     packed_bytes = util.block32_pad_bytes( struct.pack( '=HHH', UINT16, 2, value ))
     return packed_bytes
 

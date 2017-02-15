@@ -77,23 +77,12 @@ def test_Comment():
     assert c1_unpacked.value()  == s1
     assert util.class_str(c1_unpacked)  == 'Comment'
 
-# struct.pack( '=H', 5555555 )  #todo this one will crash
-
 def test_uint16():
-    struct.pack( '=H', 999999 )  #todo why doesn't this crash? !!!
-    for val in util.fibonacci_less_than( 65535 ):
+    for val in util.fibonacci_range( 65535 ):
         packed_bytes = type.uint16_pack(val)
         assert len(packed_bytes) == 8
         val_unpacked = type.uint16_unpack(packed_bytes)
         assert val == val_unpacked
 
-
-def test_uint16():
-    test_vals = [0, 1, 2, 3, 15, 255, 999, 3333, 44444]
-    for val  in test_vals:
-        packed_bytes = type.uint16_pack(val)
-        assert len(packed_bytes) == 8
-        val_unpacked = type.uint16_unpack( packed_bytes )
-        assert val == val_unpacked
 
 

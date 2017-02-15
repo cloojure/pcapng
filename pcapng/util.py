@@ -7,6 +7,8 @@ import pcapng.const
 #todo check type on all fns
 #todo verify have tests for all
 
+#todo migrate fns to general libs
+
 # Global var's
 test_ctx = {
     'enable'    : False,
@@ -62,6 +64,10 @@ def assert_uint32(arg):        # unsigned byte
 
 #-----------------------------------------------------------------------------
 
+#todo make a pow2_range(), pow2_thru() fns (0 1 2 3 4 5  7 8 9  15 16 17  31 32 33 ...)
+#todo make a sqrt_range(), sqrt_thru() fns (0 1 2 3 4 5   8 9 10  15 16 17  24 25 26  35 36 37 ...)
+
+#todo convert to common generator function
 def fibonacci_list( n ):
     "Returns a list of the first n Fibonacci numbers"
     result = [0, 1]
@@ -70,7 +76,7 @@ def fibonacci_list( n ):
         result.append( next_fibo )
     return result[:n]   # in case ask for len smaller than seed list
 
-def fibonacci_less_than( maxVal ):   #todo need test
+def fibonacci_range(maxVal):   #todo need test
     "Returns a list of Fibonacci numbers less than or equal to maxVal"
     result = [0, 1]
     done = False

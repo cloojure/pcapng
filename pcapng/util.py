@@ -69,8 +69,8 @@ def fibonacci_list( n ):
         result += [ result[-1] + result[-2] ]
     return result[:n]   # in case ask for len smaller than seed list
 
-def fibonacci_list_bounded( maxVal ):   #todo need test
-    "Returns a list of the first n Fibonacci numbers"
+def fibonacci_less_than( maxVal ):   #todo need test
+    "Returns a list of Fibonacci numbers less than or equal to maxVal"
     result = [0, 1]
     done = False
     while not done:
@@ -156,23 +156,6 @@ def class_str( obj ):
     "Returns the class name of an object as a string"
     return obj.__class__.__name__
 
-
-#todo move to pcapng.types ?
-#-----------------------------------------------------------------------------
-def ip_addr_pack(ip_vals):
-    assert 4 == len( ip_vals )
-    ip_bytes = struct.pack( '!BBBB', *ip_vals )  #todo native endian?
-    return ip_bytes
-
-def ip_addr_unpack(ip_bytes):
-    assert 4 == len( ip_bytes )
-    ip_vals = list( struct.unpack( '!BBBB',  ip_bytes ))  #todo native endian?
-    return ip_vals
-
-#todo add integer_pack/unpack
-#todo add float_pack/unpack
-#todo add string pack/unpack ?  (noop?)
-#todo add other pack/unpack ?
 
 #todo move to pcapng.bytes
 #-----------------------------------------------------------------------------

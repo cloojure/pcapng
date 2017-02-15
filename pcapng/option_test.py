@@ -3,8 +3,11 @@ import struct
 import pcapng.option    as option
 from   pcapng.option    import Option
 import pcapng.pen       as pen
+import pcapng.type      as type
 import pcapng.util      as util
 from   pcapng.util      import to_bytes
+
+#todo add generative testing for all
 
 def test_option_codec():
     def assert_option_codec(opt_code, opt_value):
@@ -74,3 +77,10 @@ def test_Comment():
     assert c1_unpacked.value()  == s1
     assert util.class_str(c1_unpacked)  == 'Comment'
 
+def test_uint16():
+    test_vals = [0, 1, 2, 3, 15, 255, 999, 3333, 44444]
+    for val  in test_vals:
+        packed_bytes = type.uint16_pack(val)
+        assert len(packed_bytes) == 8
+        val_unpacked = type.uint16_unpack( packed_bytes )
+        assert val == val_unpacked

@@ -112,6 +112,7 @@ class Option:
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
+
     def pack(self):   #todo needs test
         """Encodes an option into a bytes block."""
         #todo validate code
@@ -119,6 +120,7 @@ class Option:
         data_pad        = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack('=HH', self.code, data_len_orig) + data_pad
         return packed_bytes
+
     @staticmethod
     def unpack(packed_bytes):
         """Factory method to generate an Option from its packed bytes."""

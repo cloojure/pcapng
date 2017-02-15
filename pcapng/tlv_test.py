@@ -63,14 +63,6 @@ def test_int64():
         assert val == val_unpacked
 
 #-----------------------------------------------------------------------------
-
-def test_assert_rel_equal():
-    util.assert_rel_equal( 1000, 1001, digits=1 )
-    util.assert_rel_equal( 1000, 1001, digits=2 )
-    util.assert_rel_equal( 1000, 1001, digits=2.5 )
-    util.assert_rel_equal( 1000, 1001, digits=4 )
-
-
 def test_float32():
     sqrt_2 = math.sqrt(2)
     for x in util.fibonacci_range_signed( pow(2,77) ):

@@ -155,6 +155,16 @@ def test_fibonacci_list():
     assert util.fibonacci_list(8) ==  [0, 1, 1, 2, 3, 5, 8, 13]
     assert util.fibonacci_list(9) ==  [0, 1, 1, 2, 3, 5, 8, 13, 21]
 
+#todo need test fibo_list_signed
+
+def test_assert_rel_equal():
+    util.assert_rel_equal( 1000, 1001, digits=1 )
+    util.assert_rel_equal( 1000, 1001, digits=2 )
+    util.assert_rel_equal( 1000, 1001, digits=2.5 )
+    with pytest.raises(AssertionError):
+        util.assert_rel_equal( 1000, 1001, digits=4 )
+        util.assert_rel_equal( 1000, 1001, digits=5 )
+
 #-----------------------------------------------------------------------------
 def test_xxx():
     xx1 = struct.pack(   '!hhl', 1, 2, 3 )  # h='short', l='long'

@@ -100,15 +100,15 @@ def fibonacci_range_signed(limit):   #todo need test
 
 def assert_rel_equal( x, y, digits=None ):
     assert digits
-    max_val = max( abs(x), abs(y) )
-    delta = abs( x - y )
+    max_val = float( max( abs(x), abs(y) ))
+    delta = float(abs( x - y ))
     ratio = delta / max_val
     cmpr = pow( 10, -digits )
     if (ratio < cmpr):
         assert True
     else:
-        print( 'assert_rel_equal(): x={}  y={}  digits={}  ratio={}  cmpr={} '.format(
-            x, y, digits, ratio, cmpr ))
+        print( 'assert_rel_equal(): x={}  y={}  digits={}  max_val={}  delta={}  ratio={}  cmpr={} '.format(
+            x, y, digits, max_val, delta, ratio, cmpr ))
         assert False
 
 

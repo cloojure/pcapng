@@ -135,3 +135,10 @@ def test_IdbName():
     c1u = Option.unpack_idb( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'IdbName'
+
+def test_IdbDescription():
+    s1 = 'ifc downlow'
+    c1 = option.IdbDescription(s1)
+    c1u = Option.unpack_idb( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert util.class_str(c1) == util.class_str(c1u) == 'IdbDescription'

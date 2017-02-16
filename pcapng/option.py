@@ -153,6 +153,7 @@ class Option:
         """Factory method to generate an Interface Desc Block Option from its packed bytes."""
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
         if   opt_code == OPT_IDB_NAME:                  return IdbName.unpack( packed_bytes )
+        elif opt_code == OPT_IDB_DESCRIPTION:           return IdbDescription.unpack( packed_bytes )
         else:
             print( 'unpack_idb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
             stripped_bytes = packed_bytes[4:]
@@ -289,6 +290,16 @@ class IdbName(Option):
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return IdbName(content)
+
+class IdbDescription(Option):
+    def __init__(self, content_str):
+        Option.__init__(self, OPT_IDB_DESCRIPTION, content_str)
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return IdbDescription(content)
 
 
 

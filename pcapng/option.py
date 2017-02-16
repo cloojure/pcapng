@@ -164,25 +164,68 @@ class CustomStringCopyable(Option):
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
         return CustomStringCopyable( pen_val, content )
+class CustomBinaryCopyable(Option):
+    def __init__(self, pen_val, content):
+        pen.assert_valid_pen(pen_val)
+        self.code       = CUSTOM_BINARY_COPYABLE
+        self.pen_val    = pen_val
+        self.content    = to_bytes(content)
+    def pack(self):
+        content_len     = len(self.content)
+        spec_len        = content_len + 4   # spec definition of length includes PEN
+        content_pad     = util.block32_pad_bytes(self.content)
+        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        return packed_bytes
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        content_len     = spec_len - 4
+        content_pad     = packed_bytes[8:]
+        content         = content_pad[:content_len]
+        return CustomBinaryCopyable( pen_val, content )
 
 
-# class CustomBinaryCopyable(Option):
-#     def __init__(self, pen_val, content):
-#         Option.__init__(self, CUSTOM_BINARY_COPYABLE, content)
-#     def value(self):
-#         return str(self.content)
-#
-# class CustomStringNonCopyable(Option):
-#     def __init__(self, pen_val, custom_str):
-#         Option.__init__(self, CUSTOM_STRING_NON_COPYABLE, custom_str)
-#     def value(self):
-#         return str(self.content)
-#
-# class CustomBinaryNonCopyable(Option):
-#     def __init__(self, pen_val, content):
-#         Option.__init__(self, CUSTOM_BINARY_NON_COPYABLE, content)
-#     def value(self):
-#         return str(self.content)
+
+class CustomStringNonCopyable(Option):
+    def __init__(self, pen_val, content):
+        pen.assert_valid_pen(pen_val)
+        self.code       = CUSTOM_STRING_NON_COPYABLE
+        self.pen_val    = pen_val
+        self.content    = to_bytes(content)
+    def pack(self):
+        content_len     = len(self.content)
+        spec_len        = content_len + 4   # spec definition of length includes PEN
+        content_pad     = util.block32_pad_bytes(self.content)
+        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        return packed_bytes
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        content_len     = spec_len - 4
+        content_pad     = packed_bytes[8:]
+        content         = content_pad[:content_len]
+        return CustomStringNonCopyable( pen_val, content )
+class CustomBinaryNonCopyable(Option):
+    def __init__(self, pen_val, content):
+        pen.assert_valid_pen(pen_val)
+        self.code       = CUSTOM_BINARY_NON_COPYABLE
+        self.pen_val    = pen_val
+        self.content    = to_bytes(content)
+    def pack(self):
+        content_len     = len(self.content)
+        spec_len        = content_len + 4   # spec definition of length includes PEN
+        content_pad     = util.block32_pad_bytes(self.content)
+        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        return packed_bytes
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        content_len     = spec_len - 4
+        content_pad     = packed_bytes[8:]
+        content         = content_pad[:content_len]
+        return CustomBinaryNonCopyable( pen_val, content )
+
+
 
 
 

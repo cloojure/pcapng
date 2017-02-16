@@ -83,31 +83,26 @@ def test_CustomStringCopyable():
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringCopyable'
+def test_CustomBinaryCopyable():
+    s1 = 'Mary had a little lamb'
+    c1 = option.CustomBinaryCopyable( pen.BROCADE_PEN, s1 )
+    c1u = Option.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
+    assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryCopyable'
 
-# def test_CustomBinaryCopyable():
-#     s1 = 'Mary had a little lamb'
-#     c1 = option.CustomBinaryCopyable(s1)
-#     c1_unpacked = Option.unpack( c1.pack() )
-#     assert c1.value()           == s1
-#     assert c1_unpacked.value()  == s1
-#     assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'CustomBinaryCopyable'
-#
-#
-# def test_CustomStringNonCopyable():
-#     s1 = 'Mary had a little lamb'
-#     c1 = option.CustomStringNonCopyable(s1)
-#     c1_unpacked = Option.unpack( c1.pack() )
-#     assert c1.value()           == s1
-#     assert c1_unpacked.value()  == s1
-#     assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'CustomStringNonCopyable'
-#
-# def test_CustomBinaryNonCopyable():
-#     s1 = 'Mary had a little lamb'
-#     c1 = option.CustomBinaryNonCopyable(s1)
-#     c1_unpacked = Option.unpack( c1.pack() )
-#     assert c1.value()           == s1
-#     assert c1_unpacked.value()  == s1
-#     assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'CustomBinaryNonCopyable'
-
-
+def test_CustomStringNonCopyable():
+    s1 = 'Mary had a little lamb'
+    c1 = option.CustomStringNonCopyable( pen.BROCADE_PEN, s1 )
+    c1u = Option.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
+    assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringNonCopyable'
+def test_CustomBinaryNonCopyable():
+    s1 = 'Mary had a little lamb'
+    c1 = option.CustomBinaryNonCopyable( pen.BROCADE_PEN, s1 )
+    c1u = Option.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
+    assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryNonCopyable'
 

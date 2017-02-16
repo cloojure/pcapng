@@ -32,7 +32,7 @@ def test_section_header_block():
 def test_interface_desc_block():
     opts = [ Option( option.OPT_IDB_NAME          , "Carrier Pigeon" ),
              Option( option.OPT_IDB_DESCRIPTION   , "don't you wish" ),
-             Option( option.OPT_IDB_IPV4ADDR      , to_bytes([192, 168, 13, 7, 255, 255, 255, 0]) ),
+             Option(option.OPT_IDB_IPV4_ADDR, to_bytes([192, 168, 13, 7, 255, 255, 255, 0])),
              Option( option.OPT_IDB_OS            , "NitrOS" ) ]
     blk_str    = block.interface_desc_block_pack(opts)
     blk_data   = block.interface_desc_block_unpack(blk_str)

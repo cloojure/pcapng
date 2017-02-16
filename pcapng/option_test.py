@@ -142,3 +142,12 @@ def test_IdbDescription():
     c1u = IdbOption.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'IdbDescription'
+
+def test_IdbIpv4Addr():
+    addr_bytes    = [1,2,3,4]
+    netmask_bytes = [5,6,7,8]
+    c1 = option.IdbIpv4Addr(addr_bytes, netmask_bytes)
+    c1u = IdbOption.unpack( c1.pack() )
+    assert c1.addr_bytes    == c1u.addr_bytes    == addr_bytes
+    assert c1.netmask_bytes == c1u.netmask_bytes == netmask_bytes
+    assert util.class_str(c1) == util.class_str(c1u) == 'IdbIpv4Addr'

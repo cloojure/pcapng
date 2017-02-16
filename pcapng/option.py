@@ -37,17 +37,17 @@ OPT_SHB_USERAPPL  = 4
 # interface description block options
 OPT_IDB_NAME            =   2
 OPT_IDB_DESCRIPTION     =   3
-OPT_IDB_IPV4ADDR        =   4
-OPT_IDB_IPV6ADDR        =   5
-OPT_IDB_MACADDR         =   6
-OPT_IDB_EUIADDR         =   7
+OPT_IDB_IPV4_ADDR       =   4
+OPT_IDB_IPV6_ADDR       =   5
+OPT_IDB_MAC_ADDR        =   6
+OPT_IDB_EUI_ADDR        =   7
 OPT_IDB_SPEED           =   8
-OPT_IDB_TSRESOL         =   9
+OPT_IDB_TS_RESOL        =   9
 OPT_IDB_TZONE           =  10
 OPT_IDB_FILTER          =  11
 OPT_IDB_OS              =  12
-OPT_IDB_FCSLEN          =  13
-OPT_IDB_TSOFFSET        =  14
+OPT_IDB_FCS_LEN         =  13
+OPT_IDB_TS_OFFSET       =  14
 
 #todo need to do validation on data values & lengths
 # enhanced packet block options
@@ -67,10 +67,10 @@ GENERAL_OPTIONS = { OPT_COMMENT } | CUSTOM_OPTIONS
 SHB_OPTIONS = GENERAL_OPTIONS | { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
 
 IDB_OPTIONS = GENERAL_OPTIONS | {
-    OPT_IDB_NAME,       OPT_IDB_DESCRIPTION,    OPT_IDB_IPV4ADDR,   OPT_IDB_IPV6ADDR,
-    OPT_IDB_MACADDR,    OPT_IDB_EUIADDR,        OPT_IDB_SPEED,      OPT_IDB_TSRESOL,
-    OPT_IDB_TZONE,      OPT_IDB_FILTER,         OPT_IDB_OS,         OPT_IDB_FCSLEN,
-    OPT_IDB_TSOFFSET }
+    OPT_IDB_NAME,       OPT_IDB_DESCRIPTION,    OPT_IDB_IPV4_ADDR,   OPT_IDB_IPV6_ADDR,
+    OPT_IDB_MAC_ADDR,    OPT_IDB_EUI_ADDR,        OPT_IDB_SPEED,      OPT_IDB_TS_RESOL,
+    OPT_IDB_TZONE,      OPT_IDB_FILTER,         OPT_IDB_OS,         OPT_IDB_FCS_LEN,
+    OPT_IDB_TS_OFFSET }
 
 EPB_OPTIONS = GENERAL_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
 
@@ -165,6 +165,7 @@ class IdbOption(Option):
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
         if   opt_code == OPT_IDB_NAME:                  return IdbName.unpack( packed_bytes )
         elif opt_code == OPT_IDB_DESCRIPTION:           return IdbDescription.unpack( packed_bytes )
+        elif opt_code == OPT_IDB_IPV4_ADDR:             return IdbIpv4Addr.unpack( packed_bytes )
         else:
             print( 'unpack_idb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
             stripped_bytes = packed_bytes[4:]
@@ -311,6 +312,31 @@ class IdbDescription(IdbOption):
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return IdbDescription(content)
+
+class IdbIpv4Addr(IdbOption):
+    def __init__(self, addr_byte_lst, netmask_byte_lst):
+        addr_byte_lst       = list( addr_byte_lst )
+        netmask_byte_lst    = list( netmask_byte_lst )
+        util.assert_vec4_uint8( addr_byte_lst )
+        util.assert_vec4_uint8( netmask_byte_lst )
+        self.code           = OPT_IDB_IPV4_ADDR
+        self.addr_bytes     = addr_byte_lst
+        self.netmask_bytes  = netmask_byte_lst
+
+    def pack(self):   #todo needs test
+        """Encodes into a bytes block."""
+        packed_bytes = ( struct.pack('=HH', self.code, 8) + to_bytes(self.addr_bytes) + to_bytes(self.netmask_bytes))
+        return packed_bytes
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        assert len(packed_bytes) == 12      #todo check everywhere
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        assert opt_code == OPT_IDB_IPV4_ADDR    #todo check everywhere
+        assert content_len == 8    #todo check everywhere
+        addr_val    = bytearray( packed_bytes[4:8] )
+        netmask_val = bytearray( packed_bytes[8:12] )
+        return IdbIpv4Addr( addr_val, netmask_val )
 
 
 

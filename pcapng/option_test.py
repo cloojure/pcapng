@@ -85,5 +85,13 @@ def test_CustomStringCopyable():
     assert c1_unpacked.value()  == s1
     assert util.class_str(c1) == util.class_str(c1_unpacked)  == 'CustomStringCopyable'
 
+def test_CustomBinaryCopyable():
+    s1 = 'Mary had a little lamb'
+    c1 = option.CustomBinaryCopyable(s1)
+    c1_unpacked = Option.unpack( c1.pack() )
+    assert c1.value()           == s1
+    assert c1_unpacked.value()  == s1
+    assert util.class_str(c1) == util.class_str(c1_unpacked)  == 'CustomBinaryCopyable9'
+
 
 

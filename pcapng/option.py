@@ -7,9 +7,9 @@ http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercont
 """
 import struct
 
-import pcapng.pen
-import pcapng.util as util
-from   pcapng.util import to_bytes
+import pcapng.pen   as pen
+import pcapng.util  as util
+from   pcapng.util  import to_bytes
 
 #-----------------------------------------------------------------------------
 util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
@@ -125,47 +125,64 @@ class Option:
     def unpack(packed_bytes):
         """Factory method to generate an Option from its packed bytes."""
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-        content_pad = packed_bytes[4:]
-        content = content_pad[:content_len_orig]
-        if   opt_code == OPT_COMMENT:                   return Comment( content )
-        elif opt_code == CUSTOM_STRING_COPYABLE:        return CustomStringCopyable( content )
-        elif opt_code == CUSTOM_BINARY_COPYABLE:        return CustomBinaryCopyable( content )
-        elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable( content )
-        elif opt_code == CUSTOM_BINARY_NON_COPYABLE:    return CustomBinaryNonCopyable( content )
+        if   opt_code == OPT_COMMENT:                   return Comment.unpack( packed_bytes )
+        elif opt_code == CUSTOM_STRING_COPYABLE:        return CustomStringCopyable.unpack( packed_bytes )
+        elif opt_code == CUSTOM_BINARY_COPYABLE:        return CustomBinaryCopyable.unpack( packed_bytes )
+        elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable.unpack( packed_bytes )
+        elif opt_code == CUSTOM_BINARY_NON_COPYABLE:    return CustomBinaryNonCopyable.unpack( packed_bytes )
 
         else:
             print( 'unpack(): warning - unrecognized Option={}'.format( opt_code ))
-            return Option(opt_code, content, True)
+            return Option(opt_code, stripped_bytes, True)
 
 class Comment(Option):
     def __init__(self, comment_str):
         Option.__init__(self, OPT_COMMENT, comment_str)
-    def value(self):
-        return str(self.content)
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return Comment(content)
 
 class CustomStringCopyable(Option):
-    def __init__(self, custom_str):
-        Option.__init__(self, CUSTOM_STRING_COPYABLE, custom_str)
-    def value(self):
-        return str(self.content)
+    def __init__(self, pen_val, content):
+        pen.assert_valid_pen(pen_val)
+        self.code       = CUSTOM_STRING_COPYABLE
+        self.pen_val    = pen_val
+        self.content    = to_bytes(content)
+    def pack(self):
+        content_len     = len(self.content)
+        spec_len        = content_len + 4   # spec definition of length includes PEN
+        content_pad     = util.block32_pad_bytes(self.content)
+        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        return packed_bytes
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        content_len     = spec_len - 4
+        content_pad     = packed_bytes[8:]
+        content         = content_pad[:content_len]
+        return CustomStringCopyable( pen_val, content )
 
-class CustomBinaryCopyable(Option):
-    def __init__(self, content):
-        Option.__init__(self, CUSTOM_BINARY_COPYABLE, content)
-    def value(self):
-        return str(self.content)
 
-class CustomStringNonCopyable(Option):
-    def __init__(self, custom_str):
-        Option.__init__(self, CUSTOM_STRING_NON_COPYABLE, custom_str)
-    def value(self):
-        return str(self.content)
-
-class CustomBinaryNonCopyable(Option):
-    def __init__(self, content):
-        Option.__init__(self, CUSTOM_BINARY_NON_COPYABLE, content)
-    def value(self):
-        return str(self.content)
+# class CustomBinaryCopyable(Option):
+#     def __init__(self, pen_val, content):
+#         Option.__init__(self, CUSTOM_BINARY_COPYABLE, content)
+#     def value(self):
+#         return str(self.content)
+#
+# class CustomStringNonCopyable(Option):
+#     def __init__(self, pen_val, custom_str):
+#         Option.__init__(self, CUSTOM_STRING_NON_COPYABLE, custom_str)
+#     def value(self):
+#         return str(self.content)
+#
+# class CustomBinaryNonCopyable(Option):
+#     def __init__(self, pen_val, content):
+#         Option.__init__(self, CUSTOM_BINARY_NON_COPYABLE, content)
+#     def value(self):
+#         return str(self.content)
 
 
 

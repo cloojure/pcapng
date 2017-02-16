@@ -131,6 +131,8 @@ class Option:
         elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_BINARY_NON_COPYABLE:    return CustomBinaryNonCopyable.unpack( packed_bytes )
         elif opt_code == OPT_SHB_HARDWARE:              return ShbHardware.unpack( packed_bytes )
+        elif opt_code == OPT_SHB_OS:                    return ShbOs.unpack( packed_bytes )
+        elif opt_code == OPT_SHB_USERAPPL:              return ShbUserAppl.unpack( packed_bytes )
 
         else:
             print( 'unpack(): warning - unrecognized Option={}'.format( opt_code ))
@@ -235,6 +237,26 @@ class ShbHardware(Option):
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return ShbHardware(content)
+
+class ShbOs(Option):
+    def __init__(self, comment_str):
+        Option.__init__(self, OPT_SHB_OS, comment_str)
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return ShbOs(content)
+
+class ShbUserAppl(Option):
+    def __init__(self, comment_str):
+        Option.__init__(self, OPT_SHB_USERAPPL, comment_str)
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return ShbUserAppl(content)
 
 
 

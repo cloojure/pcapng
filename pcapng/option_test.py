@@ -114,3 +114,15 @@ def test_ShbHardware():
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'ShbHardware'
+def test_ShbOs():
+    s1 = 'x86 water heater'
+    c1 = option.ShbOs(s1)
+    c1u = Option.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert util.class_str(c1) == util.class_str(c1u) == 'ShbOs'
+def test_ShbUserAppl():
+    s1 = 'x86 water heater'
+    c1 = option.ShbUserAppl(s1)
+    c1u = Option.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert util.class_str(c1) == util.class_str(c1u) == 'ShbUserAppl'

@@ -79,22 +79,22 @@ ALL_OPTIONS = CUSTOM_OPTIONS | GENERAL_OPTIONS | SHB_OPTIONS | IDB_OPTIONS | EPB
 #todo check type on all fns
 
 #todo need to do validation on data values & lengths
-def assert_shb_option(option):
+def assert_shb_option(option):      #todo simplify to reflect class structure
     "Returns true if option code is valid for a segment header block"
     assert (option.code in SHB_OPTIONS)
 
 #todo need to do validation on data values & lengths
-def assert_ifc_desc_option(option):
+def assert_idb_option(option):      #todo simplify to reflect class structure
     "Returns true if option code is valid for a interface description block"
     assert (option.code in IDB_OPTIONS)
 
 #todo need to do validation on data values & lengths
-def assert_epb_option(option):
+def assert_epb_option(option):      #todo simplify to reflect class structure
     "Returns true if option code is valid for a enhanced packet block"
     assert (option.code in EPB_OPTIONS)
 
 #todo need to do validation on data values & lengths
-def assert_custom_block_option(option):
+def assert_custom_block_option(option):      #todo simplify to reflect class structure
     """Returns true if option code is valid for a custom block"""
     assert (option.code in CUSTOM_OPTIONS)
 

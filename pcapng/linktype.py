@@ -110,3 +110,6 @@ LINKTYPE_WATTSTOPPER_DLM                  = 263
 LINKTYPE_ISO_14443                        = 264
 LINKTYPE_RDS                              = 265
 LINKTYPE_USB_DARWIN                       = 266
+
+#todo need test valid linktype
+

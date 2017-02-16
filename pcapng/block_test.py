@@ -16,35 +16,34 @@ def test_section_header_block():
     opts = [ Option( option.OPT_SHB_HARDWARE  , "Dell" ),
              Option( option.OPT_SHB_OS        , "Ubuntu" ),
              Option( option.OPT_SHB_USERAPPL  , "IntelliJ Idea" ) ]
-    blk_bytes   = block.section_header_block_pack(opts)
-    blk_data    = block.section_header_block_unpack(blk_bytes)
-    util.assert_type_str( blk_bytes )
-    util.assert_type_dict( blk_data )
-    assert blk_data['block_type']           == 0x0A0D0D0A
-    assert blk_data['block_total_len']      == len( blk_bytes )
-    assert blk_data['block_total_len']      == blk_data['block_total_len_end']
-    assert blk_data['byte_order_magic']     == 0x1A2B3C4D
-    assert blk_data['major_version']        == 1
-    assert blk_data['minor_version']        == 0
-    assert blk_data['section_len']          == -1
-    assert blk_data['options_lst']          == opts
+    shb_obj     = block.SectionHeaderBlock(opts)
+    idb_bytes   = shb_obj.pack()
+    shb_info    = block.SectionHeaderBlock.unpack(idb_bytes)
+    util.assert_type_bytes( idb_bytes )
+    util.assert_type_dict(  shb_info )
+    assert shb_info[ 'block_type'       ] == 0x0A0D0D0A
+    assert shb_info[ 'block_total_len'  ] == shb_info['block_total_len_end'] == len( idb_bytes )
+    assert shb_info[ 'byte_order_magic' ] == 0x1A2B3C4D
+    assert shb_info[ 'major_version'    ] == 1
+    assert shb_info[ 'minor_version'    ] == 0
+    assert shb_info[ 'section_len'      ] == -1
+    assert shb_info[ 'options_lst'      ] == opts
 
 def test_interface_desc_block():
-    opts = [ Option( option.OPT_IDB_NAME          , "Carrier Pigeon" ),
-             Option( option.OPT_IDB_DESCRIPTION   , "don't you wish" ),
-             Option(option.OPT_IDB_IPV4_ADDR, to_bytes([192, 168, 13, 7, 255, 255, 255, 0])),
-             Option( option.OPT_IDB_OS            , "NitrOS" ) ]
-    blk_str    = block.interface_desc_block_pack(opts)
-    blk_data   = block.interface_desc_block_unpack(blk_str)
-    util.assert_type_str( blk_str )
-    util.assert_type_dict( blk_data )
-    assert blk_data['block_type']          == 0x00000001
-    assert blk_data['block_total_len']     == len(blk_str)
-    assert blk_data['block_total_len']     == blk_data['block_total_len_end']
-    assert blk_data['link_type']           == linktype.LINKTYPE_ETHERNET
-    assert blk_data['reserved']            == 0
-    assert blk_data['snaplen']             == 0
-    assert blk_data['options_lst']         == opts
+    opts = [ Option( option.OPT_IDB_NAME        , "Carrier Pigeon" ),
+             Option( option.OPT_IDB_DESCRIPTION , "don't you wish" ),
+             Option( option.OPT_IDB_IPV4_ADDR   , to_bytes([192, 168, 13, 7, 255, 255, 255, 0])),
+             Option( option.OPT_IDB_OS          , "NitrOS" ) ]
+    idb_obj     = block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, opts )
+    idb_bytes   = idb_obj.pack()
+    idb_info    = block.InterfaceDescBlock.unpack( idb_bytes )
+    util.assert_type_dict( idb_info )
+    assert idb_info[ 'block_type'       ] == 0x00000001
+    assert idb_info[ 'block_total_len'  ] == idb_info['block_total_len_end'] == len(idb_bytes)
+    assert idb_info[ 'link_type'        ] == linktype.LINKTYPE_ETHERNET
+    assert idb_info[ 'reserved'         ] == 0
+    assert idb_info[ 'snaplen'          ] == 0
+    assert idb_info[ 'options_lst'      ] == opts
 
 def test_simple_pkt_block():
     blk_str   = block.simple_pkt_block_pack('abc')

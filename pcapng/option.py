@@ -164,6 +164,7 @@ class CustomStringCopyable(Option):
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
         return CustomStringCopyable( pen_val, content )
+
 class CustomBinaryCopyable(Option):
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
@@ -184,8 +185,6 @@ class CustomBinaryCopyable(Option):
         content         = content_pad[:content_len]
         return CustomBinaryCopyable( pen_val, content )
 
-
-
 class CustomStringNonCopyable(Option):
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
@@ -205,6 +204,7 @@ class CustomStringNonCopyable(Option):
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
         return CustomStringNonCopyable( pen_val, content )
+
 class CustomBinaryNonCopyable(Option):
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)

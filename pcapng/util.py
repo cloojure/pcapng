@@ -54,7 +54,6 @@ def assert_int16(arg):                assert (-const.POW_2_15 <= arg < const.POW
 def assert_int32(arg):                assert (-const.POW_2_31 <= arg < const.POW_2_31)
 def assert_int64(arg):                assert (-const.POW_2_63 <= arg < const.POW_2_63)
 
-
 def assert_vec4_uint8( listy ):
     "Assert the argument is a length 4 list of uint8 values"
     print( '#140  type={}  len={}  value={} '.format( type(listy), len(listy), listy ))

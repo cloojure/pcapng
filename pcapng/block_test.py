@@ -46,17 +46,16 @@ def test_interface_desc_block():
     assert idb_info[ 'options_lst'      ] == opts
 
 def test_simple_pkt_block():
-    blk_str   = block.simple_pkt_block_pack('abc')
-    blk_data  = block.simple_pkt_block_unpack(blk_str)
-    util.assert_type_str( blk_str )
-    util.assert_type_dict( blk_data )
-    assert blk_data['block_type']           == 0x00000003
-    assert blk_data['block_total_len']      == 20
-    assert blk_data['block_total_len']      == blk_data['block_total_len_end']
-    assert blk_data['block_total_len']      == len(blk_str)
-    assert blk_data['block_total_len']      == 16 + blk_data['pkt_data_pad_len']
-    assert blk_data['original_pkt_len']     == 3
-    assert blk_data['pkt_data']             == 'abc'
+    spb_obj   = block.SimplePacketBlock('abc')
+    spb_bytes = spb_obj.pack('abc')
+    spb_info  = block.SimplePacketBlock.unpack( spb_bytes )
+    util.assert_type_dict( spb_info )
+    assert spb_info['block_type']        == 0x00000003
+    assert spb_info['block_total_len']   == 20
+    assert spb_info['block_total_len']   == spb_info['block_total_len_end'] == len(spb_bytes)
+    assert spb_info['block_total_len']   == 16 + spb_info['pkt_data_pad_len']
+    assert spb_info['original_pkt_len']  == 3
+    assert spb_info['pkt_data']          == 'abc'
 
 
 def test_custom_block():

@@ -50,7 +50,8 @@ CUSTOM_MRT_ISIS_BLOCK_OPT = Option(option.CUSTOM_STRING_COPYABLE, 'EMBEDDED_MRT_
 #todo maybe create a SectionBlock object with SHB, IDB, options, EPBs, SPBs, etc ?
 
 class SectionHeaderBlock:
-    block_fields_encoding = '=LLLHHq'   #todo need determine endian on read
+    block_head_encoding = '=LLLHHq'     #todo need determine endian on read
+    block_tail_encoding = '=L'          #todo need determine endian on read
 
     def __init__(self, options_lst=[]):
         util.assert_type_list(options_lst)
@@ -70,19 +71,20 @@ class SectionHeaderBlock:
                              8 +      # section length
                              len(options_bytes) +
                              4 )      # block total length
-        block_bytes = ( struct.pack( SectionHeaderBlock.block_fields_encoding, BLOCK_TYPE_SHB, block_total_len,
-                                     BYTE_ORDER_MAGIC, SHB_MAJOR_VERSION, SHB_MINOR_VERSION, section_len ) +
-                        options_bytes +
-                        struct.pack( '=l', block_total_len ))
-        return block_bytes
+        packed_bytes = ( struct.pack( self.block_head_encoding, BLOCK_TYPE_SHB, block_total_len,
+                                     BYTE_ORDER_MAGIC, SHB_MAJOR_VERSION, SHB_MINOR_VERSION, section_len) +
+                         options_bytes +
+                         struct.pack( self.block_tail_encoding, block_total_len ))
+        return packed_bytes
 
     @staticmethod
     def unpack(block_bytes):      #todo verify block type & all fields
         """Decodes a bytes block into a section header block, returning a dictionary."""
         util.assert_type_bytes(block_bytes)
         ( block_type, block_total_len, byte_order_magic,
-                major_version, minor_version, section_len ) = struct.unpack( SectionHeaderBlock.block_fields_encoding, block_bytes[:24] )
-        (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
+                major_version, minor_version, section_len ) = struct.unpack( SectionHeaderBlock.block_head_encoding,
+                                                                                block_bytes[:24] )
+        (block_total_len_end,) = struct.unpack( SectionHeaderBlock.block_tail_encoding, block_bytes[-4:])
         assert block_type       == BLOCK_TYPE_SHB
         assert byte_order_magic == BYTE_ORDER_MAGIC
         assert major_version    == SHB_MAJOR_VERSION
@@ -102,7 +104,8 @@ class SectionHeaderBlock:
         return shb_info
 
 class InterfaceDescBlock:
-    block_fields_encoding = '=LLHHL'
+    block_head_encoding = '=LLHHL'
+    block_tail_encoding = '=L'
 
     def __init__(self, link_type=linktype.LINKTYPE_ETHERNET, #todo temp testing default
                  options_lst=[]):
@@ -123,19 +126,19 @@ class InterfaceDescBlock:
                                4 +         # snaplen
                                len(options_bytes) +
                                4 )         # block total length
-        block_bytes = ( struct.pack( InterfaceDescBlock.block_fields_encoding, BLOCK_TYPE_IDB,
-                                     block_total_len, self.link_type, self.reserved, self.snaplen ) +
-                        options_bytes +
-                        struct.pack( '=L', block_total_len ))
-        return block_bytes
+        packed_bytes = ( struct.pack( self.block_head_encoding, BLOCK_TYPE_IDB,
+                                      block_total_len, self.link_type, self.reserved, self.snaplen) +
+                         options_bytes +
+                         struct.pack( self.block_tail_encoding, block_total_len ))
+        return packed_bytes
 
     @staticmethod
     def unpack(block_bytes):      #todo verify block type & all fields
         """Decodes a bytes block into an interface description block, returning a dictionary."""
         util.assert_type_bytes(block_bytes)
-        ( block_type, block_total_len, link_type, reserved, snaplen ) = struct.unpack( InterfaceDescBlock.block_fields_encoding,
+        ( block_type, block_total_len, link_type, reserved, snaplen ) = struct.unpack( InterfaceDescBlock.block_head_encoding,
                                                                                        block_bytes[:16] )
-        (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
+        (block_total_len_end,) = struct.unpack( InterfaceDescBlock.block_tail_encoding, block_bytes[-4:] )
         assert block_type == BLOCK_TYPE_IDB
         assert block_total_len == block_total_len_end == len(block_bytes)
         options_bytes = block_bytes[16:-4]
@@ -149,38 +152,45 @@ class InterfaceDescBlock:
                      'block_total_len_end'    : block_total_len_end }
         return idb_info
 
-def simple_pkt_block_pack(pkt_data):
-    """Encodes a simple packet block."""
-    pkt_data         = to_bytes(pkt_data)        #todo is list & tuple & str ok?
-    pkt_data_pad     = util.block32_pad_bytes(pkt_data)
-    original_pkt_len = len(pkt_data)
-    pkt_data_pad_len = len(pkt_data_pad)
-    block_total_len = ( 4 +      # block type
-                        4 +      # block total length
-                        4 +      # original packet length
-                        pkt_data_pad_len +
-                        4 )      # block total length
-    block_bytes = ( struct.pack( '=LLL', BLOCK_TYPE_SPB, block_total_len, original_pkt_len ) +
-                    pkt_data_pad +
-                    struct.pack( '=L', block_total_len ))
-    return block_bytes
+class SimplePacketBlock:
+    head_encoding = '=LLL'
+    tail_encoding = '=L'
 
-def simple_pkt_block_unpack(block_bytes):      #todo verify block type & all fields
-    """Decodes a bytes block into a simple packet block, returning a dictionary."""
-    util.assert_type_bytes(block_bytes)
-    (block_type, block_total_len, original_pkt_len) = struct.unpack( '=LLL', block_bytes[:12])
-    (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )
-    pkt_data_pad_len    = util.block32_ceil_num_bytes(original_pkt_len)
-    pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
-    assert block_type       == BLOCK_TYPE_SPB
-    assert block_total_len  == block_total_len_end
-    parsed =    { 'block_type'          : block_type,
-                  'block_total_len'     : block_total_len,
-                  'original_pkt_len'    : original_pkt_len,
-                  'pkt_data_pad_len'    : pkt_data_pad_len,
-                  'pkt_data'            : pkt_data,
-                  'block_total_len_end' : block_total_len_end }
-    return parsed
+    def __init__(self, pkt_data):
+        self.pkt_data = to_bytes(pkt_data)        #todo is list & tuple & str ok?
+
+    def pack(self, pkt_data):
+        """Encodes a simple packet block."""
+        pkt_data_pad     = util.block32_pad_bytes(self.pkt_data)
+        original_pkt_len = len(self.pkt_data)
+        pkt_data_pad_len = len(pkt_data_pad)
+        block_total_len = ( 4 +      # block type
+                            4 +      # block total length
+                            4 +      # original packet length
+                            pkt_data_pad_len +
+                            4 )      # block total length
+        block_bytes = (struct.pack(self.head_encoding, BLOCK_TYPE_SPB, block_total_len, original_pkt_len) +
+                       pkt_data_pad +
+                       struct.pack(self.tail_encoding, block_total_len))
+        return block_bytes
+
+    @staticmethod
+    def unpack(block_bytes):      #todo verify block type & all fields
+        """Decodes a bytes block into a simple packet block, returning a dictionary."""
+        util.assert_type_bytes(block_bytes)
+        (block_type, block_total_len, original_pkt_len) = struct.unpack( SimplePacketBlock.head_encoding, block_bytes[:12] )
+        (block_total_len_end,) = struct.unpack( SimplePacketBlock.tail_encoding, block_bytes[-4:] )
+        assert block_type       == BLOCK_TYPE_SPB
+        assert block_total_len  == block_total_len_end
+        pkt_data_pad_len    = util.block32_ceil_num_bytes(original_pkt_len)
+        pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
+        spb_info =  { 'block_type'          : block_type,
+                      'block_total_len'     : block_total_len,
+                      'original_pkt_len'    : original_pkt_len,
+                      'pkt_data_pad_len'    : pkt_data_pad_len,
+                      'pkt_data'            : pkt_data,
+                      'block_total_len_end' : block_total_len_end }
+        return spb_info
 
 def enhanced_pkt_block_pack(interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[]):
     """Encodes a simple packet block. Default value for pkt_data_orig_len is the length

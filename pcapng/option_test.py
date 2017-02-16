@@ -72,14 +72,14 @@ def test_options_codec():
 def test_Comment():
     s1 = 'Five Stars!'
     c1 = option.Comment(s1)
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_generic( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'Comment'
 
 def test_CustomStringCopyable():
     s1 = 'Mary had a little lamb'
     c1 = option.CustomStringCopyable( pen.BROCADE_PEN, s1 )
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_generic( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringCopyable'
@@ -87,7 +87,7 @@ def test_CustomStringCopyable():
 def test_CustomBinaryCopyable():
     s1 = 'Mary had a binary lamb'
     c1 = option.CustomBinaryCopyable( pen.BROCADE_PEN, s1 )
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_generic( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryCopyable'
@@ -95,7 +95,7 @@ def test_CustomBinaryCopyable():
 def test_CustomStringNonCopyable():
     s1 = 'Mary had a non-copyable little lamb'
     c1 = option.CustomStringNonCopyable( pen.BROCADE_PEN, s1 )
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_generic( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringNonCopyable'
@@ -103,7 +103,7 @@ def test_CustomStringNonCopyable():
 def test_CustomBinaryNonCopyable():
     s1 = 'Mary had a non-copyable binary lamb'
     c1 = option.CustomBinaryNonCopyable( pen.BROCADE_PEN, s1 )
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_generic( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryNonCopyable'
@@ -112,26 +112,26 @@ def test_CustomBinaryNonCopyable():
 def test_ShbHardware():
     s1 = 'x86 water heater'
     c1 = option.ShbHardware(s1)
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_shb( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'ShbHardware'
 def test_ShbOs():
     s1 = 'x86 water heater'
     c1 = option.ShbOs(s1)
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_shb( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'ShbOs'
 def test_ShbUserAppl():
     s1 = 'x86 water heater'
     c1 = option.ShbUserAppl(s1)
-    c1u = Option.unpack( c1.pack() )
+    c1u = Option.unpack_shb( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'ShbUserAppl'
 
 #-----------------------------------------------------------------------------
-# def test_IdbName():
-#     s1 = 'ifc downlow'
-#     c1 = option.IdbName(s1)
-#     c1u = Option.unpack( c1.pack() )
-#     assert c1.content == c1u.content == s1
-#     assert util.class_str(c1) == util.class_str(c1u) == 'IdbName9'
+def test_IdbName():
+    s1 = 'ifc downlow'
+    c1 = option.IdbName(s1)
+    c1u = Option.unpack_idb( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert util.class_str(c1) == util.class_str(c1u) == 'IdbName'

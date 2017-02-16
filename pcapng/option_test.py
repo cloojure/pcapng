@@ -108,6 +108,7 @@ def test_CustomBinaryNonCopyable():
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryNonCopyable'
 
+#-----------------------------------------------------------------------------
 def test_ShbHardware():
     s1 = 'x86 water heater'
     c1 = option.ShbHardware(s1)
@@ -126,3 +127,11 @@ def test_ShbUserAppl():
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.class_str(c1) == util.class_str(c1u) == 'ShbUserAppl'
+
+#-----------------------------------------------------------------------------
+# def test_IdbName():
+#     s1 = 'ifc downlow'
+#     c1 = option.IdbName(s1)
+#     c1u = Option.unpack( c1.pack() )
+#     assert c1.content == c1u.content == s1
+#     assert util.class_str(c1) == util.class_str(c1u) == 'IdbName9'

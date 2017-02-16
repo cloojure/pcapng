@@ -91,7 +91,7 @@ def test_CustomBinaryCopyable():
     c1_unpacked = Option.unpack( c1.pack() )
     assert c1.value()           == s1
     assert c1_unpacked.value()  == s1
-    assert util.class_str(c1) == util.class_str(c1_unpacked)  == 'CustomBinaryCopyable9'
+    assert util.class_str(c1) == util.class_str(c1_unpacked)  == 'CustomBinaryCopyable'
 
 
 

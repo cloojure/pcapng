@@ -83,6 +83,7 @@ def test_CustomStringCopyable():
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringCopyable'
+
 def test_CustomBinaryCopyable():
     s1 = 'Mary had a binary lamb'
     c1 = option.CustomBinaryCopyable( pen.BROCADE_PEN, s1 )
@@ -98,6 +99,7 @@ def test_CustomStringNonCopyable():
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringNonCopyable'
+
 def test_CustomBinaryNonCopyable():
     s1 = 'Mary had a non-copyable binary lamb'
     c1 = option.CustomBinaryNonCopyable( pen.BROCADE_PEN, s1 )
@@ -106,3 +108,9 @@ def test_CustomBinaryNonCopyable():
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
     assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryNonCopyable'
 
+def test_ShbHardware():
+    s1 = 'x86 water heater'
+    c1 = option.ShbHardware(s1)
+    c1u = Option.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert util.class_str(c1) == util.class_str(c1u) == 'ShbHardware9'

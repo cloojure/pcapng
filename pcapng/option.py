@@ -225,6 +225,15 @@ class CustomBinaryNonCopyable(Option):
         content         = content_pad[:content_len]
         return CustomBinaryNonCopyable( pen_val, content )
 
+class ShbHardware(Option):
+    def __init__(self, comment_str):
+        Option.__init__(self, OPT_SHB_HARDWARE, comment_str)
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return ShbHardware(content)
 
 
 

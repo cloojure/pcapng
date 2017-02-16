@@ -75,7 +75,7 @@ def test_Comment():
     c1_unpacked = Option.unpack( c1.pack() )
     assert c1.value()           == s1
     assert c1_unpacked.value()  == s1
-    assert util.class_str(c1_unpacked)  == 'Comment'
+    assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'Comment'
 
 def test_CustomStringCopyable():
     s1 = 'Mary had a little lamb'
@@ -83,7 +83,7 @@ def test_CustomStringCopyable():
     c1_unpacked = Option.unpack( c1.pack() )
     assert c1.value()           == s1
     assert c1_unpacked.value()  == s1
-    assert util.class_str(c1) == util.class_str(c1_unpacked)  == 'CustomStringCopyable'
+    assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'CustomStringCopyable'
 
 def test_CustomBinaryCopyable():
     s1 = 'Mary had a little lamb'
@@ -91,7 +91,24 @@ def test_CustomBinaryCopyable():
     c1_unpacked = Option.unpack( c1.pack() )
     assert c1.value()           == s1
     assert c1_unpacked.value()  == s1
-    assert util.class_str(c1) == util.class_str(c1_unpacked)  == 'CustomBinaryCopyable'
+    assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'CustomBinaryCopyable'
+
+
+def test_CustomStringNonCopyable():
+    s1 = 'Mary had a little lamb'
+    c1 = option.CustomStringNonCopyable(s1)
+    c1_unpacked = Option.unpack( c1.pack() )
+    assert c1.value()           == s1
+    assert c1_unpacked.value()  == s1
+    assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'CustomStringNonCopyable'
+
+def test_CustomBinaryNonCopyable():
+    s1 = 'Mary had a little lamb'
+    c1 = option.CustomBinaryNonCopyable(s1)
+    c1_unpacked = Option.unpack( c1.pack() )
+    assert c1.value()           == s1
+    assert c1_unpacked.value()  == s1
+    assert util.class_str(c1)   == util.class_str(c1_unpacked)  == 'CustomBinaryNonCopyable9'
 
 
 

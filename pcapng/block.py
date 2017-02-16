@@ -192,71 +192,79 @@ class SimplePacketBlock:
                       'block_total_len_end' : block_total_len_end }
         return spb_info
 
-def enhanced_pkt_block_pack(interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[]):
-    """Encodes a simple packet block. Default value for pkt_data_orig_len is the length
-    of the supplied pkt_data."""
-    #todo make all arg validation look like this (in order, at top)
-    util.assert_uint32( interface_id )  #todo verify args in all fns
-    pkt_data_captured = to_bytes( pkt_data_captured )        #todo is list & tuple & str ok?
-    if pkt_data_orig_len == None:
-        pkt_data_orig_len = len(pkt_data_captured)
-    else:
-        util.assert_uint32(pkt_data_orig_len)
-        assert len(pkt_data_captured) <= pkt_data_orig_len
-    util.assert_type_list(options_lst)   #todo check type on all fns
-    for opt in options_lst:
-        option.assert_shb_option(opt)
+class EnhancedPacketBlock:
+    head_encoding = '=LLLLLLL'
+    tail_encoding = '=L'
 
-    time_secs, time_usecs       = util.curr_utc_timetuple()
-    pkt_data_pad                = util.block32_pad_bytes(pkt_data_captured)
-    pkt_data_captured_len       = len(pkt_data_captured)
-    pkt_data_captured_pad_len   = len(pkt_data_pad)
-    options_bytes               = option.pack_all(options_lst)
+    def __init__(self, interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[]):
+        util.assert_uint32( interface_id )  #todo verify args in all fns
+        pkt_data_captured = to_bytes( pkt_data_captured )        #todo is list & tuple & str ok?
+        if pkt_data_orig_len == None:
+            pkt_data_orig_len = len(pkt_data_captured)
+        else:
+            util.assert_uint32(pkt_data_orig_len)
+            assert len(pkt_data_captured) <= pkt_data_orig_len
+        util.assert_type_list( options_lst )   #todo check type on all fns
+        for opt in options_lst: option.assert_epb_option(opt)
+        self.interface_id       = interface_id
+        self.pkt_data_captured  = pkt_data_captured
+        self.pkt_data_orig_len  = pkt_data_orig_len
+        self.options_lst        = options_lst
 
-    block_total_len = ( 4 +      # block type
-                        4 +      # block total length
-                        4 +      # interface id
-                        4 +      # timestamp - high
-                        4 +      # timestamp - low
-                        4 +      # captured packet length
-                        4 +      # original packet length
-                        pkt_data_captured_pad_len +
-                        len(options_bytes) +
-                        4 )      # block total length
-    block_bytes = (struct.pack( '=LLLLLLL', BLOCK_TYPE_EPB, block_total_len, interface_id,
-                                time_secs, time_usecs, pkt_data_captured_len, pkt_data_orig_len) +
-                   pkt_data_pad +
-                   options_bytes +
-                   struct.pack( '=L', block_total_len ))
-    return block_bytes
+    def pack(self):
+        """Encodes a simple packet block. Default value for pkt_data_orig_len is the length
+        of the supplied pkt_data."""
+        #todo make all arg validation look like this (in order, at top)
+        time_secs, time_usecs       = util.curr_utc_timetuple()
+        pkt_data_pad                = util.block32_pad_bytes(self.pkt_data_captured)
+        pkt_data_captured_len       = len(self.pkt_data_captured)
+        pkt_data_captured_pad_len   = len(pkt_data_pad)
+        options_bytes               = option.pack_all(self.options_lst)
+        block_total_len = ( 4 +      # block type
+                            4 +      # block total length
+                            4 +      # interface id
+                            4 +      # timestamp - high
+                            4 +      # timestamp - low
+                            4 +      # captured packet length
+                            4 +      # original packet length
+                            pkt_data_captured_pad_len +
+                            len(options_bytes) +
+                            4 )      # block total length
+        packed_bytes = (struct.pack( self.head_encoding, BLOCK_TYPE_EPB, block_total_len, self.interface_id,
+                                     time_secs, time_usecs, pkt_data_captured_len, self.pkt_data_orig_len) +
+                        pkt_data_pad +
+                        options_bytes +
+                        struct.pack( self.tail_encoding, block_total_len ))
+        return packed_bytes
 
-def enhanced_pkt_block_unpack(block_bytes):
-    """Decodes a bytes block into a simple packet block, returning a dictionary."""
-    util.assert_type_bytes(block_bytes)
-    (block_type, block_total_len, interface_id, time_secs, time_usecs,
-            pkt_data_captured_len, pkt_data_orig_len) = struct.unpack( '=LLLLLLL', block_bytes[:28])
-    (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:])
-    assert block_type           == BLOCK_TYPE_EPB      #todo verify block type & all fields, all fns
-    assert block_total_len      == block_total_len_end == len(block_bytes)
-    assert pkt_data_captured_len <= pkt_data_orig_len
+    @staticmethod
+    def unpack(packed_bytes):
+        """Decodes a bytes block into a simple packet block, returning a dictionary."""
+        util.assert_type_bytes(packed_bytes)
+        (block_type, block_total_len, interface_id, time_secs, time_usecs,
+                pkt_data_captured_len, pkt_data_orig_len) = struct.unpack( EnhancedPacketBlock.head_encoding, packed_bytes[:28] )
+        (block_total_len_end,) = struct.unpack( EnhancedPacketBlock.tail_encoding, packed_bytes[-4:])
+        assert block_type           == BLOCK_TYPE_EPB      #todo verify block type & all fields, all fns
+        assert block_total_len      == block_total_len_end == len(packed_bytes)
+        assert pkt_data_captured_len <= pkt_data_orig_len
 
-    pkt_data_captured_pad_len   = util.block32_ceil_num_bytes(pkt_data_captured_len)
-    block_bytes_stripped        = block_bytes[28:-4]
-    pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
-    options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
-    options_lst                 = option.unpack_all(options_bytes)
+        pkt_data_captured_pad_len   = util.block32_ceil_num_bytes(pkt_data_captured_len)
+        block_bytes_stripped        = packed_bytes[28:-4]
+        pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
+        options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
+        options_lst                 = option.unpack_all(options_bytes)
 
-    parsed =    { 'block_type'              : block_type,
-                  'block_total_len'         : block_total_len,
-                  'interface_id'            : interface_id,
-                  'time_secs'               : time_secs,
-                  'time_usecs'              : time_usecs,
-                  'pkt_data_captured_len'   : pkt_data_captured_len,
-                  'pkt_data_orig_len'       : pkt_data_orig_len,
-                  'pkt_data'                : pkt_data,
-                  'options_lst'             : options_lst,
-                  'block_total_len_end'     : block_total_len_end }
-    return parsed
+        epb_info =  { 'block_type'              : block_type,
+                      'block_total_len'         : block_total_len,
+                      'interface_id'            : interface_id,
+                      'time_secs'               : time_secs,
+                      'time_usecs'              : time_usecs,
+                      'pkt_data_captured_len'   : pkt_data_captured_len,
+                      'pkt_data_orig_len'       : pkt_data_orig_len,
+                      'pkt_data'                : pkt_data,
+                      'options_lst'             : options_lst,
+                      'block_total_len_end'     : block_total_len_end }
+        return epb_info
 
 # custom format really needs a content_length field!
 def custom_block_pack(block_type, pen, content, options_lst=[]):

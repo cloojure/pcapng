@@ -58,38 +58,39 @@ def test_simple_pkt_block():
     assert spb_info['pkt_data']          == 'abc'
 
 def test_enhanced_pkt_block():
-    def assert_enhanced_pkt_block_packing( interface_id, pkt_data, pkt_data_orig_len=None,
-                                           options_lst=[] ):
+    def assert_epb_codec( interface_id, pkt_data, pkt_data_orig_len=None, options_lst=[] ):
         pkt_data = to_bytes( pkt_data )
-        if pkt_data_orig_len == None:
+        if pkt_data_orig_len is None:
             pkt_data_orig_len = len(pkt_data)   #todo does not test None or invalid val
-        blk_dict = block.enhanced_pkt_block_unpack(
-            block.enhanced_pkt_block_pack( interface_id, pkt_data, pkt_data_orig_len, options_lst ))
-        assert blk_dict[ 'block_type'               ] == block.BLOCK_TYPE_EPB
-        assert blk_dict[ 'interface_id'             ] == interface_id
-        assert blk_dict[ 'pkt_data_captured_len'    ] == len(pkt_data)
-        assert blk_dict[ 'pkt_data_orig_len'        ] == pkt_data_orig_len
-        assert blk_dict[ 'pkt_data'                 ] == pkt_data
-        assert blk_dict[ 'options_lst'              ] == options_lst
+        epb_obj   = block.EnhancedPacketBlock( interface_id, pkt_data, pkt_data_orig_len, options_lst )
+        epb_bytes = epb_obj.pack()
+        epb_info  = block.EnhancedPacketBlock.unpack( epb_bytes )
+        assert epb_info[ 'block_type'               ] == block.BLOCK_TYPE_EPB
+        assert epb_info[ 'interface_id'             ] == interface_id
+        assert epb_info[ 'pkt_data_captured_len'    ] == len(pkt_data)
+        assert epb_info[ 'pkt_data_orig_len'        ] == pkt_data_orig_len
+        assert epb_info[ 'pkt_data'                 ] == pkt_data
+        assert epb_info[ 'options_lst'              ] == options_lst
 
     opts = [ Option(option.OPT_EPB_FLAGS,     [13,14,15,16] ),
              Option(option.OPT_EPB_HASH,      [ 0x45, 0x6E, 0xC2, 0x17,    0x7C, 0x10, 0x1E, 0x3C,
                                                 0x2E, 0x99, 0x6E, 0xC2,    0x9A, 0x3D, 0x50, 0x8E ] ),
              Option(option.OPT_EPB_DROPCOUNT, [13] ) ]
 
-    assert_enhanced_pkt_block_packing( 1, [] )
-    assert_enhanced_pkt_block_packing( 0, 'a' )
-    assert_enhanced_pkt_block_packing( 1, 'a', 5 )
-    assert_enhanced_pkt_block_packing( 2, 'go', 5 )
-    assert_enhanced_pkt_block_packing( 2, 'go', 5, opts )
-    assert_enhanced_pkt_block_packing( 3, 'ray' )
-    assert_enhanced_pkt_block_packing( 4, 'Doh!', 23, opts )
-    assert_enhanced_pkt_block_packing( 5, "Don't have a cow, man.", None, opts )
+    assert_epb_codec( 1, [] )
+    assert_epb_codec( 0, 'a' )
+    assert_epb_codec( 1, 'a', 5 )
+    assert_epb_codec( 2, 'go', 5 )
+    assert_epb_codec( 2, 'go', 5, opts )
+    assert_epb_codec( 3, 'ray' )
+    assert_epb_codec( 4, 'Doh!', 23, opts )
+    assert_epb_codec( 5, "Don't have a cow, man.", None, opts )
     for i in range(13):
-        assert_enhanced_pkt_block_packing( 42, range(i), None, opts )
+        assert_epb_codec( 42, range(i), None, opts )
 
-    with pytest.raises(AssertionError): assert_enhanced_pkt_block_packing( 5, "Don't have a cow, man.", 7 )
-    with pytest.raises(AssertionError): assert_enhanced_pkt_block_packing( 5, "Don't have a cow, man.", 7, opts )
+    with pytest.raises(AssertionError):
+        assert_epb_codec( 5, "Don't have a cow, man.", 7 )
+        assert_epb_codec( 5, "Don't have a cow, man.", 7, opts )
 
 def test_custom_block():
     def assert_custom_block_packing( data_bytes ):

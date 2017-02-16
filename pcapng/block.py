@@ -31,7 +31,7 @@ SHB_MINOR_VERSION   = 0
 CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
 CUSTOM_BLOCK_NONCOPYABLE = 0x40000BAD
 
-CUSTOM_MRT_ISIS_BLOCK_OPT = Option( option.OPT_CUSTOM_UTF8_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK' )
+CUSTOM_MRT_ISIS_BLOCK_OPT = Option(option.CUSTOM_STRING_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK')
 
 #todo read must find mandatory SHB at beginning
     #todo global byte-order starts off undefined; is reset by each SHB

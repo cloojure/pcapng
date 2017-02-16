@@ -20,10 +20,10 @@ OPT_COMMENT       =     1
 
 #todo need to do validation on data values & lengths
 # custom options
-OPT_CUSTOM_UTF8_COPYABLE        =  2988
-OPT_CUSTOM_BINARY_COPYABLE      =  2989
-OPT_CUSTOM_UTF8_NON_COPYABLE    = 19372
-OPT_CUSTOM_BINARY_NON_COPYABLE  = 19373
+CUSTOM_STRING_COPYABLE        =  2988
+CUSTOM_BINARY_COPYABLE      =  2989
+CUSTOM_STRING_NON_COPYABLE    = 19372
+CUSTOM_BINARY_NON_COPYABLE  = 19373
 
 #todo need to do validation on data values & lengths
 # section header block options
@@ -58,8 +58,8 @@ OPT_EPB_DROPCOUNT       =   4   #todo need validation fn & use it
 
 #todo maybe need func to verify valid any option codes?
 
-CUSTOM_OPTIONS = { OPT_CUSTOM_UTF8_COPYABLE,        OPT_CUSTOM_BINARY_COPYABLE,
-                   OPT_CUSTOM_UTF8_NON_COPYABLE,    OPT_CUSTOM_BINARY_NON_COPYABLE }
+CUSTOM_OPTIONS = {CUSTOM_STRING_COPYABLE, CUSTOM_BINARY_COPYABLE,
+                  CUSTOM_STRING_NON_COPYABLE, CUSTOM_BINARY_NON_COPYABLE}
 
 GENERAL_OPTIONS = { OPT_COMMENT } | CUSTOM_OPTIONS
 
@@ -127,8 +127,12 @@ class Option:
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len_orig]
-        if opt_code == OPT_COMMENT:
-            return Comment( content )
+        if   opt_code == OPT_COMMENT:                   return Comment( content )
+        elif opt_code == CUSTOM_STRING_COPYABLE:        return CustomStringCopyable( content )
+        elif opt_code == CUSTOM_BINARY_COPYABLE:        return CustomBinaryCopyable( content )
+        elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable( content )
+        elif opt_code == CUSTOM_BINARY_NON_COPYABLE:    return CustomBinaryNonCopyable( content )
+
         else:
             print( 'unpack(): warning - unrecognized Option={}'.format( opt_code ))
             return Option(opt_code, content, True)
@@ -138,6 +142,31 @@ class Comment(Option):
         Option.__init__(self, OPT_COMMENT, comment_str)
     def value(self):
         return str(self.content)
+
+class CustomStringCopyable(Option):
+    def __init__(self, custom_str):
+        Option.__init__(self, CUSTOM_STRING_COPYABLE, custom_str)
+    def value(self):
+        return str(self.content)
+
+class CustomBinaryCopyable(Option):
+    def __init__(self, content):
+        Option.__init__(self, CUSTOM_BINARY_COPYABLE, content)
+    def value(self):
+        return str(self.content)
+
+class CustomStringNonCopyable(Option):
+    def __init__(self, custom_str):
+        Option.__init__(self, CUSTOM_STRING_NON_COPYABLE, custom_str)
+    def value(self):
+        return str(self.content)
+
+class CustomBinaryNonCopyable(Option):
+    def __init__(self, content):
+        Option.__init__(self, CUSTOM_BINARY_NON_COPYABLE, content)
+    def value(self):
+        return str(self.content)
+
 
 
 #todo add options for all

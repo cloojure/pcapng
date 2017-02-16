@@ -61,10 +61,10 @@ def test_custom_option_value():
     cust_val_3 = option.custom_option_value_pack( pen.BROCADE_PEN, "don't copy me!" )
     cust_val_4 = option.custom_option_value_pack( pen.BROCADE_PEN, 'fin' )
     opts_lst = [
-        Option( 5, "five"           ), Option( option.OPT_CUSTOM_UTF8_COPYABLE      , cust_val_1 ),
-        Option( 6, "six"            ), Option( option.OPT_CUSTOM_BINARY_COPYABLE    , cust_val_2 ),
-        Option( 7, "seventy-seven"  ), Option( option.OPT_CUSTOM_UTF8_NON_COPYABLE  , cust_val_3 ),
-        Option( 8, "eight"          ), Option( option.OPT_CUSTOM_BINARY_NON_COPYABLE, cust_val_4 ),
+        Option( 5, "five"           ), Option(option.CUSTOM_STRING_COPYABLE, cust_val_1),
+        Option( 6, "six"            ), Option(option.CUSTOM_BINARY_COPYABLE, cust_val_2),
+        Option( 7, "seventy-seven"  ), Option(option.CUSTOM_STRING_NON_COPYABLE, cust_val_3),
+        Option( 8, "eight"          ), Option(option.CUSTOM_BINARY_NON_COPYABLE, cust_val_4),
         Option( 9, "9" ) ]
     result_lst = option.unpack_all( option.pack_all( opts_lst ))
     assert opts_lst == result_lst
@@ -76,6 +76,14 @@ def test_Comment():
     assert c1.value()           == s1
     assert c1_unpacked.value()  == s1
     assert util.class_str(c1_unpacked)  == 'Comment'
+
+def test_CustomStringCopyable():
+    s1 = 'Mary had a little lamb'
+    c1 = option.CustomStringCopyable(s1)
+    c1_unpacked = Option.unpack( c1.pack() )
+    assert c1.value()           == s1
+    assert c1_unpacked.value()  == s1
+    assert util.class_str(c1) == util.class_str(c1_unpacked)  == 'CustomStringCopyable'
 
 
 

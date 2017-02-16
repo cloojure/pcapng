@@ -147,21 +147,18 @@ def float64_unpack(packed_bytes):
     assert (type, length) == (FLOAT64, 8)
     return value
 
-
-
-
-def string_utf8_pack( value ):
-    value = to_bytes(value)
+#-----------------------------------------------------------------------------
+def string_utf8_pack( str_val ):
+    content = to_bytes( str_val )
     packed_bytes = util.block32_pad_bytes(
-        struct.pack( '=HH', STRING_UTF8, len(value) ) + value )
+        struct.pack( '=HH', STRING_UTF8, len(content) ) + content )
     return packed_bytes
-
 def string_utf8_unpack( packed_bytes ):
     util.assert_type_bytes(packed_bytes)
     (type, length) = struct.unpack( '=HH', packed_bytes[:4] )   #todo use endian flag
-    assert type == STRING_UTF8
-    assert 0 <= length
     content_pad = packed_bytes[4:]
+    assert type == STRING_UTF8
+    assert 0 <= length <= len(content_pad)
     content = str( content_pad[:length] )
     return content
 

@@ -162,6 +162,7 @@ def test_assert_rel_equal():
     util.assert_rel_equal( 1000, 1001, digits=2 )
     util.assert_rel_equal( 1000, 1001, digits=2.5 )
     with pytest.raises(AssertionError):
+        util.assert_rel_equal( 1000, 1001, digits=3.5 )
         util.assert_rel_equal( 1000, 1001, digits=4 )
         util.assert_rel_equal( 1000, 1001, digits=5 )
 

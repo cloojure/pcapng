@@ -2,7 +2,7 @@ import struct
 import sys
 import time
 import math
-import pcapng.const
+import pcapng.const as const
 
 #todo check type on all fns
 #todo verify have tests for all
@@ -53,14 +53,31 @@ def assert_type_list( arg ):
 def assert_type_dict( arg ):
     assert type( arg ) == dict
 
-def assert_uint8(arg):        # unsigned byte
-    assert (0 <= arg <= 255)
 
-def assert_int8(arg):          # signed byte
-    assert (-128 <= arg <= 127)
+def assert_uint8(arg):
+    assert (0 <= arg < const.POW_2_8)
 
-def assert_uint32(arg):        # unsigned byte
-    assert (0 <= arg < pcapng.const.POW_2_32)
+def assert_uint16(arg):
+    assert (0 <= arg < const.POW_2_16)
+
+def assert_uint32(arg):
+    assert (0 <= arg < const.POW_2_32)
+
+def assert_uint64(arg):
+    assert (0 <= arg < const.POW_2_64)
+
+
+def assert_int8(arg):
+    assert (-const.POW_2_7  <= arg < const.POW_2_7)
+
+def assert_int16(arg):
+    assert (-const.POW_2_15 <= arg < const.POW_2_15)
+
+def assert_int32(arg):
+    assert (-const.POW_2_31 <= arg < const.POW_2_31)
+
+def assert_int64(arg):
+    assert (-const.POW_2_63 <= arg < const.POW_2_63)
 
 #-----------------------------------------------------------------------------
 

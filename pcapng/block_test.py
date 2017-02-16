@@ -62,10 +62,10 @@ def test_simple_pkt_block():
 
 def test_custom_block():
     def assert_custom_block_packing( data_bytes ):
-        opts = [ Option( option.OPT_CUSTOM_UTF8_COPYABLE       , "O" ),
-                 Option( option.OPT_CUSTOM_BINARY_COPYABLE     , "Doh!" ),
-                 Option( option.OPT_CUSTOM_UTF8_NON_COPYABLE   , "Release the hounds!" ),
-                 Option( option.OPT_CUSTOM_BINARY_NON_COPYABLE , [1, 2, 3] ) ]
+        opts = [Option(option.CUSTOM_STRING_COPYABLE, "O"),
+                Option(option.CUSTOM_BINARY_COPYABLE, "Doh!"),
+                Option(option.CUSTOM_STRING_NON_COPYABLE, "Release the hounds!"),
+                Option(option.CUSTOM_BINARY_NON_COPYABLE, [1, 2, 3])]
         orig = to_bytes( data_bytes )
         unpacked = block.custom_block_unpack(
                    block.custom_block_pack(

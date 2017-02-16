@@ -130,6 +130,7 @@ class Option:
         elif opt_code == CUSTOM_BINARY_COPYABLE:        return CustomBinaryCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_BINARY_NON_COPYABLE:    return CustomBinaryNonCopyable.unpack( packed_bytes )
+        elif opt_code == OPT_SHB_HARDWARE:              return ShbHardware.unpack( packed_bytes )
 
         else:
             print( 'unpack(): warning - unrecognized Option={}'.format( opt_code ))

@@ -113,4 +113,4 @@ def test_ShbHardware():
     c1 = option.ShbHardware(s1)
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
-    assert util.class_str(c1) == util.class_str(c1u) == 'ShbHardware9'
+    assert util.class_str(c1) == util.class_str(c1u) == 'ShbHardware'

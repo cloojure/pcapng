@@ -123,7 +123,7 @@ class Option:
         return packed_bytes
 
     @staticmethod
-    def unpack_generic(packed_bytes):
+    def unpack(packed_bytes):
         """Factory method to generate an Generic or Custom Option from its packed bytes."""
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
         if   opt_code == OPT_COMMENT:                   return Comment.unpack( packed_bytes )
@@ -136,8 +136,13 @@ class Option:
             stripped_bytes = packed_bytes[4:]
             return Option( OPT_UNKNOWN, stripped_bytes, True )
 
+class ShbOption(Option):
+    def __init__(self, code, content, code_verify_disable=False):
+        """Creates an SHB Option with the specified option code & content."""
+        Option.__init__( self, code, content, code_verify_disable )
+
     @staticmethod
-    def unpack_shb(packed_bytes):
+    def unpack(packed_bytes):
         """Factory method to generate an Section Header Block Option from its packed bytes."""
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
         if   opt_code == OPT_SHB_HARDWARE:              return ShbHardware.unpack( packed_bytes )
@@ -146,10 +151,16 @@ class Option:
         else:
             print( 'unpack_shb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
             stripped_bytes = packed_bytes[4:]
-            return Option(OPT_UNKNOWN, stripped_bytes, True)
+            return ShbOption(OPT_UNKNOWN, stripped_bytes, True)
+
+
+class IdbOption(Option):
+    def __init__(self, code, content, code_verify_disable=False):
+        """Creates an IDB Option with the specified option code & content."""
+        Option.__init__( self, code, content, code_verify_disable )
 
     @staticmethod
-    def unpack_idb(packed_bytes):
+    def unpack(packed_bytes):
         """Factory method to generate an Interface Desc Block Option from its packed bytes."""
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
         if   opt_code == OPT_IDB_NAME:                  return IdbName.unpack( packed_bytes )
@@ -157,7 +168,7 @@ class Option:
         else:
             print( 'unpack_idb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
             stripped_bytes = packed_bytes[4:]
-            return Option(OPT_UNKNOWN, stripped_bytes, True)
+            return IdbOption( OPT_UNKNOWN, stripped_bytes, True )
 
 class Comment(Option):
     def __init__(self, content_str):
@@ -250,9 +261,9 @@ class CustomBinaryNonCopyable(Option):
         return CustomBinaryNonCopyable( pen_val, content )
 
 #-----------------------------------------------------------------------------
-class ShbHardware(Option):
+class ShbHardware(ShbOption):
     def __init__(self, content_str):
-        Option.__init__(self, OPT_SHB_HARDWARE, content_str)
+        ShbOption.__init__(self, OPT_SHB_HARDWARE, content_str)
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -260,9 +271,9 @@ class ShbHardware(Option):
         content = content_pad[:content_len]
         return ShbHardware(content)
 
-class ShbOs(Option):
+class ShbOs(ShbOption):
     def __init__(self, content_str):
-        Option.__init__(self, OPT_SHB_OS, content_str)
+        ShbOption.__init__(self, OPT_SHB_OS, content_str)
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -270,9 +281,9 @@ class ShbOs(Option):
         content = content_pad[:content_len]
         return ShbOs(content)
 
-class ShbUserAppl(Option):
+class ShbUserAppl(ShbOption):
     def __init__(self, content_str):
-        Option.__init__(self, OPT_SHB_USERAPPL, content_str)
+        ShbOption.__init__(self, OPT_SHB_USERAPPL, content_str)
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -281,9 +292,9 @@ class ShbUserAppl(Option):
         return ShbUserAppl(content)
 
 #-----------------------------------------------------------------------------
-class IdbName(Option):
+class IdbName(IdbOption):
     def __init__(self, content_str):
-        Option.__init__(self, OPT_IDB_NAME, content_str)
+        IdbOption.__init__(self, OPT_IDB_NAME, content_str)
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -291,9 +302,9 @@ class IdbName(Option):
         content = content_pad[:content_len]
         return IdbName(content)
 
-class IdbDescription(Option):
+class IdbDescription(IdbOption):
     def __init__(self, content_str):
-        Option.__init__(self, OPT_IDB_DESCRIPTION, content_str)
+        IdbOption.__init__(self, OPT_IDB_DESCRIPTION, content_str)
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])

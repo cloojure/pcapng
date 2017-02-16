@@ -38,47 +38,21 @@ def assert_python2():
 #-----------------------------------------------------------------------------
 #todo need tests for all
 
-def assert_type_bytearray( arg ):
-    assert type( arg ) == bytearray
+def assert_type_bytearray(arg):       assert type(arg) == bytearray
+def assert_type_bytes(arg):           assert type(arg) == bytes
+def assert_type_str(arg):             assert type(arg) == str
+def assert_type_list(arg):            assert type(arg) == list
+def assert_type_dict(arg):            assert type(arg) == dict
 
-def assert_type_bytes( arg ):
-    assert type( arg ) == bytes
+def assert_uint8(arg):                assert (0 <= arg < const.POW_2_8)
+def assert_uint16(arg):               assert (0 <= arg < const.POW_2_16)
+def assert_uint32(arg):               assert (0 <= arg < const.POW_2_32)
+def assert_uint64(arg):               assert (0 <= arg < const.POW_2_64)
 
-def assert_type_str( arg ):
-    assert type( arg ) == str
-
-def assert_type_list( arg ):
-    assert type( arg ) == list
-
-def assert_type_dict( arg ):
-    assert type( arg ) == dict
-
-
-def assert_uint8(arg):
-    print( '#150 arg=', arg, type(arg) )
-    assert (0 <= arg < const.POW_2_8)
-
-def assert_uint16(arg):
-    assert (0 <= arg < const.POW_2_16)
-
-def assert_uint32(arg):
-    assert (0 <= arg < const.POW_2_32)
-
-def assert_uint64(arg):
-    assert (0 <= arg < const.POW_2_64)
-
-
-def assert_int8(arg):
-    assert (-const.POW_2_7  <= arg < const.POW_2_7)
-
-def assert_int16(arg):
-    assert (-const.POW_2_15 <= arg < const.POW_2_15)
-
-def assert_int32(arg):
-    assert (-const.POW_2_31 <= arg < const.POW_2_31)
-
-def assert_int64(arg):
-    assert (-const.POW_2_63 <= arg < const.POW_2_63)
+def assert_int8(arg):                 assert (-const.POW_2_7  <= arg < const.POW_2_7)
+def assert_int16(arg):                assert (-const.POW_2_15 <= arg < const.POW_2_15)
+def assert_int32(arg):                assert (-const.POW_2_31 <= arg < const.POW_2_31)
+def assert_int64(arg):                assert (-const.POW_2_63 <= arg < const.POW_2_63)
 
 
 def assert_vec4_uint8( listy ):

@@ -118,21 +118,21 @@ def test_custom_block():
         assert_custom_block_codec( range(i) )
 
 def test_custom_mrt_isis_block():
-    def assert_custom_mrt_isis_block_packing( data_bytes ):
-        orig = to_bytes( data_bytes )
-        blk_dict = block.custom_mrt_isis_block_unpack(
-                   block.custom_mrt_isis_block_pack( orig ))
-        assert blk_dict[ 'mrt_type'     ] == mrt.ISIS
-        assert blk_dict[ 'mrt_subtype'  ] == 0
-        assert blk_dict[ 'content'      ] == orig
+    def assert_cmib_codec(content):
+        content_bytes = to_bytes(content)
+        cmib_obj = block.CustomMrtIsisBlock( content_bytes )
+        mrt_info = block.CustomMrtIsisBlock.unpack( cmib_obj.pack() )
+        assert mrt_info[ 'mrt_type'     ] == mrt.ISIS
+        assert mrt_info[ 'mrt_subtype'  ] == 0
+        assert mrt_info[ 'content'      ] == content_bytes
 
-    assert_custom_mrt_isis_block_packing( '' )
-    assert_custom_mrt_isis_block_packing( 'a' )
-    assert_custom_mrt_isis_block_packing( 'go' )
-    assert_custom_mrt_isis_block_packing( 'ray' )
-    assert_custom_mrt_isis_block_packing( 'Doh!' )
-    assert_custom_mrt_isis_block_packing( "Don't have a cow, man." )
+    assert_cmib_codec( '' )
+    assert_cmib_codec( 'a' )
+    assert_cmib_codec( 'go' )
+    assert_cmib_codec( 'ray' )
+    assert_cmib_codec( 'Doh!' )
+    assert_cmib_codec( "Don't have a cow, man." )
     for i in range(13):
-        assert_custom_mrt_isis_block_packing( range(i) )
+        assert_cmib_codec( range(i) )
 
 

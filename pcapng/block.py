@@ -311,20 +311,26 @@ class CustomBlock:
                        'options_lst'    : options_lst }
         return block_info
 
+class CustomMrtIsisBlock:
+    "Creates an ISIS MRT block and wraps it in a custom pcapng block"
+    cmib_options = [CUSTOM_MRT_ISIS_BLOCK_OPT]      # unique identifier for this block type
 
-def custom_mrt_isis_block_pack( pkt_data ):
-    "Packs ISIS MRT block into and wraps in a custom pcapnt block"
-    cust_blk = CustomBlock( CUSTOM_BLOCK_COPYABLE, pcapng.pen.BROCADE_PEN,
-                            mrt.mrt_isis_block_pack( pkt_data ), [CUSTOM_MRT_ISIS_BLOCK_OPT] )
-    return cust_blk.pack()
+    def __init__(self, pkt_data ):
+        self.pkt_data = to_bytes(pkt_data)
 
-def custom_mrt_isis_block_unpack( block_bytes ):
-    """Unpacks a mrt/isis block wrapped in a pcapng custom block."""
-    util.assert_type_bytes( block_bytes )
-    cb_info = CustomBlock.unpack( block_bytes )
-    assert cb_info[ 'block_type'   ] == CUSTOM_BLOCK_COPYABLE
-    assert cb_info[ 'pen'          ] == pcapng.pen.BROCADE_PEN
-    assert cb_info[ 'options_lst'  ] == [CUSTOM_MRT_ISIS_BLOCK_OPT]
-    parsed_mrt = mrt.mrt_isis_block_unpack( cb_info[ 'content' ] )
-    return parsed_mrt
+    def pack(self):
+        cust_blk = CustomBlock( CUSTOM_BLOCK_COPYABLE, pcapng.pen.BROCADE_PEN,
+                                mrt.mrt_isis_block_pack( self.pkt_data ), self.cmib_options )
+        return cust_blk.pack()
+
+    @staticmethod
+    def unpack(packed_bytes):
+        """Unpacks a mrt/isis block wrapped in a pcapng custom block."""
+        util.assert_type_bytes(packed_bytes)
+        cb_info = CustomBlock.unpack(packed_bytes)
+        assert cb_info[ 'block_type'   ] == CUSTOM_BLOCK_COPYABLE
+        assert cb_info[ 'pen'          ] == pcapng.pen.BROCADE_PEN
+        assert cb_info[ 'options_lst'  ] == CustomMrtIsisBlock.cmib_options
+        mrt_info = mrt.mrt_isis_block_unpack( cb_info[ 'content' ] )
+        return mrt_info
 

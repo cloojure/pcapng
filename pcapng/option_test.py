@@ -70,8 +70,8 @@ def test_options_codec():
 #     assert opts_lst == result_lst
 
 def test_Comment():
-    s1 = 'Five Stars!'
-    c1 = option.Comment(s1)
+    s1  = 'Five Stars!'
+    c1  = option.Comment(s1)
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.Comment'

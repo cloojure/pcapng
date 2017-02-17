@@ -21,7 +21,7 @@ OPT_UNKNOWN       =  9999   # non-standard
 
 #todo need to do validation on data values & lengths
 # custom options
-CUSTOM_STRING_COPYABLE        =  2988
+CUSTOM_STRING_COPYABLE        =  2988   #delete
 CUSTOM_BINARY_COPYABLE      =  2989
 CUSTOM_STRING_NON_COPYABLE    = 19372
 CUSTOM_BINARY_NON_COPYABLE  = 19373
@@ -98,6 +98,10 @@ def assert_custom_block_option(option):      #todo simplify to reflect class str
     """Returns true if option code is valid for a custom block"""
     assert (option.code in CUSTOM_OPTIONS)
 
+def unpack_opt_code( packed_bytes ):
+    (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
+    return opt_code
+
 #todo verify all fields
 class Option:
     def __init__(self, code, content, code_verify_disable=False):
@@ -125,10 +129,10 @@ class Option:
     @staticmethod
     def unpack(packed_bytes):
         """Factory method to generate an Generic or Custom Option from its packed bytes."""
-        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
+        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])   #todo move lower
         if   Comment.is_instance( packed_bytes ):       return Comment.unpack( packed_bytes )
+        elif CustomStringCopyable.is_instance( packed_bytes ):  return CustomStringCopyable.unpack( packed_bytes )
         #wip continue here
-        elif opt_code == CUSTOM_STRING_COPYABLE:        return CustomStringCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_BINARY_COPYABLE:        return CustomBinaryCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_BINARY_NON_COPYABLE:    return CustomBinaryNonCopyable.unpack( packed_bytes )
@@ -137,61 +141,29 @@ class Option:
             stripped_bytes = packed_bytes[4:]
             return Option( OPT_UNKNOWN, stripped_bytes, True )
 
-class ShbOption(Option):
-    def __init__(self, code, content, code_verify_disable=False):
-        """Creates an SHB Option with the specified option code & content."""
-        Option.__init__( self, code, content, code_verify_disable )
-
-    @staticmethod
-    def unpack(packed_bytes):
-        """Factory method to generate an Section Header Block Option from its packed bytes."""
-        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-        if   opt_code == OPT_SHB_HARDWARE:              return ShbHardware.unpack( packed_bytes )
-        elif opt_code == OPT_SHB_OS:                    return ShbOs.unpack( packed_bytes )
-        elif opt_code == OPT_SHB_USERAPPL:              return ShbUserAppl.unpack( packed_bytes )
-        else:
-            print( 'unpack_shb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
-            stripped_bytes = packed_bytes[4:]
-            return ShbOption(OPT_UNKNOWN, stripped_bytes, True)
-
-
-class IdbOption(Option):
-    def __init__(self, code, content, code_verify_disable=False):
-        """Creates an IDB Option with the specified option code & content."""
-        Option.__init__( self, code, content, code_verify_disable )
-
-    @staticmethod
-    def unpack(packed_bytes):
-        """Factory method to generate an Interface Desc Block Option from its packed bytes."""
-        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-        if   opt_code == OPT_IDB_NAME:                  return IdbName.unpack( packed_bytes )
-        elif opt_code == OPT_IDB_DESCRIPTION:           return IdbDescription.unpack( packed_bytes )
-        elif opt_code == OPT_IDB_IPV4_ADDR:             return IdbIpv4Addr.unpack( packed_bytes )
-        else:
-            print( 'unpack_idb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
-            stripped_bytes = packed_bytes[4:]
-            return IdbOption( OPT_UNKNOWN, stripped_bytes, True )
-
 class Comment(Option):
     SPEC_CODE = 1
     def __init__(self, content_str):
         Option.__init__(self, self.SPEC_CODE, content_str)
+
     @staticmethod
-    def is_instance( packed_bytes ):
-        (opt_code,) = struct.unpack('=H', packed_bytes[:2])
-        return (opt_code == Comment.SPEC_CODE)
+    def is_instance( packed_bytes ): return (Comment.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        print( '210 opt_code={} content_len={}'.format(opt_code, content_len))
         assert opt_code == Comment.SPEC_CODE     #todo copy check to all
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
+        print( '211 content_pad={} content={}'.format(content_pad, content))
         return Comment(content)
 
 class CustomStringCopyable(Option):
+    SPEC_CODE = 2988
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = CUSTOM_STRING_COPYABLE
+        self.code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
     def pack(self):
@@ -200,6 +172,10 @@ class CustomStringCopyable(Option):
         content_pad     = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (CustomStringCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
@@ -267,6 +243,42 @@ class CustomBinaryNonCopyable(Option):
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
         return CustomBinaryNonCopyable( pen_val, content )
+
+#-----------------------------------------------------------------------------
+class ShbOption(Option):
+    def __init__(self, code, content, code_verify_disable=False):
+        """Creates an SHB Option with the specified option code & content."""
+        Option.__init__( self, code, content, code_verify_disable )
+
+    @staticmethod
+    def unpack(packed_bytes):
+        """Factory method to generate an Section Header Block Option from its packed bytes."""
+        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
+        if   opt_code == OPT_SHB_HARDWARE:              return ShbHardware.unpack( packed_bytes )
+        elif opt_code == OPT_SHB_OS:                    return ShbOs.unpack( packed_bytes )
+        elif opt_code == OPT_SHB_USERAPPL:              return ShbUserAppl.unpack( packed_bytes )
+        else:
+            print( 'unpack_shb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
+            stripped_bytes = packed_bytes[4:]
+            return ShbOption(OPT_UNKNOWN, stripped_bytes, True)
+
+
+class IdbOption(Option):
+    def __init__(self, code, content, code_verify_disable=False):
+        """Creates an IDB Option with the specified option code & content."""
+        Option.__init__( self, code, content, code_verify_disable )
+
+    @staticmethod
+    def unpack(packed_bytes):
+        """Factory method to generate an Interface Desc Block Option from its packed bytes."""
+        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
+        if   opt_code == OPT_IDB_NAME:                  return IdbName.unpack( packed_bytes )
+        elif opt_code == OPT_IDB_DESCRIPTION:           return IdbDescription.unpack( packed_bytes )
+        elif opt_code == OPT_IDB_IPV4_ADDR:             return IdbIpv4Addr.unpack( packed_bytes )
+        else:
+            print( 'unpack_idb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
+            stripped_bytes = packed_bytes[4:]
+            return IdbOption( OPT_UNKNOWN, stripped_bytes, True )
 
 #-----------------------------------------------------------------------------
 class ShbHardware(ShbOption):

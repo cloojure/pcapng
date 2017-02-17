@@ -35,9 +35,9 @@ OPT_SHB_USERAPPL  = 4    #delete
 #todo need to do validation on data values & lengths
 #todo   make subclasses of Option
 # interface description block options
-OPT_IDB_NAME            =   2
-OPT_IDB_DESCRIPTION     =   3
-OPT_IDB_IPV4_ADDR       =   4
+OPT_IDB_NAME            =   2    #delete
+OPT_IDB_DESCRIPTION     =   3    #delete
+OPT_IDB_IPV4_ADDR       =   4    #delete
 OPT_IDB_IPV6_ADDR       =   5
 OPT_IDB_MAC_ADDR        =   6
 OPT_IDB_EUI_ADDR        =   7
@@ -332,18 +332,23 @@ class IdbOption(Option):
     @staticmethod
     def unpack(packed_bytes):
         """Factory method to generate an Interface Desc Block Option from its packed bytes."""
-        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-        if   opt_code == OPT_IDB_NAME:                  return IdbName.unpack( packed_bytes )
-        elif opt_code == OPT_IDB_DESCRIPTION:           return IdbDescription.unpack( packed_bytes )
-        elif opt_code == OPT_IDB_IPV4_ADDR:             return IdbIpv4Addr.unpack( packed_bytes )
+        if   IdbName.is_instance(         packed_bytes  ):  return IdbName.unpack( packed_bytes )
+        elif IdbDescription.is_instance(  packed_bytes  ):  return IdbDescription.unpack( packed_bytes )
+        elif IdbIpv4Addr.is_instance(     packed_bytes  ):  return IdbIpv4Addr.unpack( packed_bytes )
         else:
+            (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
             print( 'unpack_idb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
             stripped_bytes = packed_bytes[4:]
             return IdbOption( OPT_UNKNOWN, stripped_bytes, True )
 
 class IdbName(IdbOption):
+    SPEC_CODE = 2
     def __init__(self, content_str):
-        IdbOption.__init__(self, OPT_IDB_NAME, content_str)
+        IdbOption.__init__(self, self.SPEC_CODE, content_str)
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (IdbName.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -352,8 +357,13 @@ class IdbName(IdbOption):
         return IdbName(content)
 
 class IdbDescription(IdbOption):
+    SPEC_CODE = 3
     def __init__(self, content_str):
-        IdbOption.__init__(self, OPT_IDB_DESCRIPTION, content_str)
+        IdbOption.__init__(self, self.SPEC_CODE, content_str)
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (IdbDescription.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -362,14 +372,18 @@ class IdbDescription(IdbOption):
         return IdbDescription(content)
 
 class IdbIpv4Addr(IdbOption):
+    SPEC_CODE = 4
     def __init__(self, addr_byte_lst, netmask_byte_lst):
         addr_byte_lst       = list( addr_byte_lst )
         netmask_byte_lst    = list( netmask_byte_lst )
         util.assert_vec4_uint8( addr_byte_lst )
         util.assert_vec4_uint8( netmask_byte_lst )
-        self.code           = OPT_IDB_IPV4_ADDR
+        self.code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
         self.netmask_bytes  = netmask_byte_lst
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (IdbIpv4Addr.SPEC_CODE == unpack_opt_code( packed_bytes ))
 
     def pack(self):   #todo needs test
         """Encodes into a bytes block."""
@@ -380,7 +394,7 @@ class IdbIpv4Addr(IdbOption):
     def unpack( packed_bytes ):
         assert len(packed_bytes) == 12      #todo check everywhere
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        assert opt_code == OPT_IDB_IPV4_ADDR    #todo check everywhere
+        assert opt_code == IdbIpv4Addr.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
         addr_val    = bytearray( packed_bytes[4:8] )
         netmask_val = bytearray( packed_bytes[8:12] )

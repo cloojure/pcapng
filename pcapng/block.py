@@ -29,7 +29,7 @@ SHB_MINOR_VERSION   = 0
 
 # For PCAPNG custom blocks
 CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
-CUSTOM_BLOCK_NONCOPYABLE = 0x40000BAD
+CUSTOM_BLOCK_NON_COPYABLE = 0x40000BAD
 
 CUSTOM_MRT_ISIS_BLOCK_OPT = Option(option.CUSTOM_STRING_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK')
 
@@ -267,57 +267,64 @@ class EnhancedPacketBlock:
         return epb_info
 
 # custom format really needs a content_length field!
-def custom_block_pack(block_type, pen, content, options_lst=[]):
+class CustomBlock:
     """Creates an pcapng custom block."""
-    assert ( (block_type == CUSTOM_BLOCK_COPYABLE) or
-             (block_type == CUSTOM_BLOCK_NONCOPYABLE) )
-    pcapng.pen.assert_valid_pen( pen )
-    content = to_bytes(content)
-    for opt in options_lst:
-        option.assert_custom_block_option(opt)
+    head_encoding = '=LLL'
+    tail_encoding = '=L'
 
-    content_bytes = util.block32_bytes_pack( content )
-    options_bytes = option.pack_all(options_lst)
-    block_total_len = 16 + len(content_bytes) + len(options_bytes)
+    def __init__(self, block_type, pen_val, content, options_lst=[] ):
+        assert ((block_type == CUSTOM_BLOCK_COPYABLE) or
+                (block_type == CUSTOM_BLOCK_NON_COPYABLE))
+        pcapng.pen.assert_valid_pen( pen_val )
+        for opt in options_lst: option.assert_custom_block_option(opt)
+        self.block_type     = block_type
+        self.pen_val        = pen_val
+        self.content        = content
+        self.options_lst    = options_lst
 
-    packed_bytes = ( struct.pack('=LLL', block_type, block_total_len, pen ) +
-                     content_bytes +
-                     options_bytes +
-                     struct.pack('=L', block_total_len ))
-    return packed_bytes
+    def pack(self):
+        content_bytes = util.block32_bytes_pack( to_bytes( self.content ))
+        options_bytes = option.pack_all( self.options_lst )
+        block_total_len = 16 + len(content_bytes) + len(options_bytes)
 
-def custom_block_unpack(block_bytes):      #todo verify block type & all fields
-    """Parses an pcapng custom block."""
-    util.assert_type_bytes( block_bytes )
-    ( block_type, block_total_len, pen ) = struct.unpack( '=LLL', block_bytes[:12] )
-    (block_total_len_end,) = struct.unpack( '=L', block_bytes[-4:] )  #todo clean
-    assert ( (block_type == CUSTOM_BLOCK_COPYABLE) or
-             (block_type == CUSTOM_BLOCK_NONCOPYABLE) )
-    assert block_total_len == block_total_len_end == len(block_bytes)
+        packed_bytes = ( struct.pack( self.head_encoding, self.block_type, block_total_len, self.pen_val ) +
+                         content_bytes +
+                         options_bytes +
+                         struct.pack( self.tail_encoding, block_total_len ))
+        return packed_bytes
 
-    block_bytes_stripped = block_bytes[12:-4]
-    content_bytes, options_bytes = util.block32_bytes_unpack_rolling( block_bytes_stripped )
-    options_lst = option.unpack_all(options_bytes)
-    parsed = { 'block_type'     : block_type,
-               'pen'            : pen,
-               'content'        : content_bytes,
-               'options_lst'    : options_lst }
-    return parsed
+    @staticmethod
+    def unpack(packed_bytes):      #todo verify block type & all fields
+        """Parses an pcapng custom block."""
+        util.assert_type_bytes(packed_bytes)
+        ( block_type, block_total_len, pen_val ) = struct.unpack( CustomBlock.head_encoding, packed_bytes[:12])
+        (block_total_len_end,) = struct.unpack( CustomBlock.tail_encoding, packed_bytes[-4:] )
+        assert ((block_type == CUSTOM_BLOCK_COPYABLE) or
+                (block_type == CUSTOM_BLOCK_NON_COPYABLE))
+        assert block_total_len == block_total_len_end == len(packed_bytes)
+        block_bytes_stripped = packed_bytes[12:-4]
+        (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
+        options_lst = option.unpack_all(options_bytes)
+        block_info = { 'block_type'     : block_type,
+                       'pen'            : pen_val,
+                       'content'        : content_bytes,
+                       'options_lst'    : options_lst }
+        return block_info
+
 
 def custom_mrt_isis_block_pack( pkt_data ):
     "Packs ISIS MRT block into and wraps in a custom pcapnt block"
-    packed_bytes = custom_block_pack( CUSTOM_BLOCK_COPYABLE, pcapng.pen.BROCADE_PEN,
-                                      mrt.mrt_isis_block_pack( pkt_data ),
-                                      [CUSTOM_MRT_ISIS_BLOCK_OPT])
-    return packed_bytes
+    cust_blk = CustomBlock( CUSTOM_BLOCK_COPYABLE, pcapng.pen.BROCADE_PEN,
+                            mrt.mrt_isis_block_pack( pkt_data ), [CUSTOM_MRT_ISIS_BLOCK_OPT] )
+    return cust_blk.pack()
 
 def custom_mrt_isis_block_unpack( block_bytes ):
     """Unpacks a mrt/isis block wrapped in a pcapng custom block."""
     util.assert_type_bytes( block_bytes )
-    parsed_custom = custom_block_unpack( block_bytes )
-    assert parsed_custom[ 'block_type'     ] == CUSTOM_BLOCK_COPYABLE
-    assert parsed_custom[ 'pen'            ] == pcapng.pen.BROCADE_PEN
-    assert parsed_custom[ 'options_lst'    ] == [CUSTOM_MRT_ISIS_BLOCK_OPT]
-    parsed_mrt = mrt.mrt_isis_block_unpack( parsed_custom[ 'content' ] )
+    cb_info = CustomBlock.unpack( block_bytes )
+    assert cb_info[ 'block_type'   ] == CUSTOM_BLOCK_COPYABLE
+    assert cb_info[ 'pen'          ] == pcapng.pen.BROCADE_PEN
+    assert cb_info[ 'options_lst'  ] == [CUSTOM_MRT_ISIS_BLOCK_OPT]
+    parsed_mrt = mrt.mrt_isis_block_unpack( cb_info[ 'content' ] )
     return parsed_mrt
 

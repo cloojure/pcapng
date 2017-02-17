@@ -79,7 +79,7 @@ ALL_OPTIONS = CUSTOM_OPTIONS | GENERAL_OPTIONS | SHB_OPTIONS | IDB_OPTIONS | EPB
 #todo check type on all fns
 
 #todo need to do validation on data values & lengths
-def assert_shb_option(option):      #todo simplify to reflect class structure
+def assert_shb_option(option):      #todo simplify to reflect class structure (-> class def)
     "Returns true if option code is valid for a segment header block"
     assert (option.code in SHB_OPTIONS)
 

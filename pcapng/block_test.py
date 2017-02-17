@@ -93,28 +93,29 @@ def test_enhanced_pkt_block():
         assert_epb_codec( 5, "Don't have a cow, man.", 7, opts )
 
 def test_custom_block():
-    def assert_custom_block_packing( data_bytes ):
-        opts = [Option(option.CUSTOM_STRING_COPYABLE, "O"),
-                Option(option.CUSTOM_BINARY_COPYABLE, "Doh!"),
-                Option(option.CUSTOM_STRING_NON_COPYABLE, "Release the hounds!"),
-                Option(option.CUSTOM_BINARY_NON_COPYABLE, [1, 2, 3])]
-        orig = to_bytes( data_bytes )
-        unpacked = block.custom_block_unpack(
-                   block.custom_block_pack(
-                        block.CUSTOM_BLOCK_COPYABLE, pen.BROCADE_PEN, orig, opts ))
-        assert unpacked[ 'block_type'    ] == block.CUSTOM_BLOCK_COPYABLE
-        assert unpacked[ 'pen'           ] == pen.BROCADE_PEN
-        assert unpacked[ 'content'       ] == orig
-        assert unpacked[ 'options_lst'   ] == opts
+    def assert_custom_block_codec(content_bytes):
+        opts = [ Option( option.CUSTOM_STRING_COPYABLE, "O"),
+                 Option( option.CUSTOM_BINARY_COPYABLE, "Doh!"),
+                 Option( option.CUSTOM_STRING_NON_COPYABLE, "Release the hounds!"),
+                 Option( option.CUSTOM_BINARY_NON_COPYABLE, [1, 2, 3]) ]
+        orig = to_bytes(content_bytes)
 
-    assert_custom_block_packing( '' )
-    assert_custom_block_packing( 'a' )
-    assert_custom_block_packing( 'go' )
-    assert_custom_block_packing( 'ray' )
-    assert_custom_block_packing( 'Doh!' )
-    assert_custom_block_packing( 'How do you like me now?' )
+        cb_obj = block.CustomBlock( block.CUSTOM_BLOCK_COPYABLE, pen.BROCADE_PEN, orig, opts )
+        cb_bytes = cb_obj.pack()
+        cb_info = block.CustomBlock.unpack( cb_bytes )
+        assert cb_info[ 'block_type'    ] == block.CUSTOM_BLOCK_COPYABLE
+        assert cb_info[ 'pen'           ] == pen.BROCADE_PEN
+        assert cb_info[ 'content'       ] == orig
+        assert cb_info[ 'options_lst'   ] == opts
+
+    assert_custom_block_codec( '' )
+    assert_custom_block_codec( 'a' )
+    assert_custom_block_codec( 'go' )
+    assert_custom_block_codec( 'ray' )
+    assert_custom_block_codec( 'Doh!' )
+    assert_custom_block_codec( 'How do you like me now?' )
     for i in range(23):
-        assert_custom_block_packing( range(i) )
+        assert_custom_block_codec( range(i) )
 
 def test_custom_mrt_isis_block():
     def assert_custom_mrt_isis_block_packing( data_bytes ):

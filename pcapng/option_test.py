@@ -74,7 +74,7 @@ def test_Comment():
     c1 = option.Comment(s1)
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
-    assert util.class_str(c1) == util.class_str(c1u) == 'Comment'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.Comment'
 
 def test_CustomStringCopyable():
     s1 = 'Mary had a little lamb'
@@ -82,7 +82,7 @@ def test_CustomStringCopyable():
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
-    assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringCopyable'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.CustomStringCopyable'
 
 def test_CustomBinaryCopyable():
     s1 = 'Mary had a binary lamb'
@@ -90,7 +90,7 @@ def test_CustomBinaryCopyable():
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
-    assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryCopyable'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.CustomBinaryCopyable'
 
 def test_CustomStringNonCopyable():
     s1 = 'Mary had a non-copyable little lamb'
@@ -98,7 +98,7 @@ def test_CustomStringNonCopyable():
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
-    assert util.class_str(c1) == util.class_str(c1u) == 'CustomStringNonCopyable'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.CustomStringNonCopyable'
 
 def test_CustomBinaryNonCopyable():
     s1 = 'Mary had a non-copyable binary lamb'
@@ -106,7 +106,7 @@ def test_CustomBinaryNonCopyable():
     c1u = Option.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
     assert c1.pen_val == c1u.pen_val == pen.BROCADE_PEN
-    assert util.class_str(c1) == util.class_str(c1u) == 'CustomBinaryNonCopyable'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.CustomBinaryNonCopyable'
 
 #-----------------------------------------------------------------------------
 def test_ShbHardware():
@@ -114,19 +114,19 @@ def test_ShbHardware():
     c1 = option.ShbHardware(s1)
     c1u = ShbOption.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
-    assert util.class_str(c1) == util.class_str(c1u) == 'ShbHardware'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.ShbHardware'
 def test_ShbOs():
     s1 = 'x86 water heater'
     c1 = option.ShbOs(s1)
     c1u = ShbOption.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
-    assert util.class_str(c1) == util.class_str(c1u) == 'ShbOs'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.ShbOs'
 def test_ShbUserAppl():
     s1 = 'x86 water heater'
     c1 = option.ShbUserAppl(s1)
     c1u = ShbOption.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
-    assert util.class_str(c1) == util.class_str(c1u) == 'ShbUserAppl'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.ShbUserAppl'
 
 #-----------------------------------------------------------------------------
 def test_IdbName():
@@ -134,14 +134,14 @@ def test_IdbName():
     c1 = option.IdbName(s1)
     c1u = IdbOption.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
-    assert util.class_str(c1) == util.class_str(c1u) == 'IdbName'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.IdbName'
 
 def test_IdbDescription():
     s1 = 'ifc supercool'
     c1 = option.IdbDescription(s1)
     c1u = IdbOption.unpack( c1.pack() )
     assert c1.content == c1u.content == s1
-    assert util.class_str(c1) == util.class_str(c1u) == 'IdbDescription'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.IdbDescription'
 
 def test_IdbIpv4Addr():
     addr_bytes    = [1,2,3,4]
@@ -150,4 +150,4 @@ def test_IdbIpv4Addr():
     c1u = IdbOption.unpack( c1.pack() )
     assert c1.addr_bytes    == c1u.addr_bytes    == addr_bytes
     assert c1.netmask_bytes == c1u.netmask_bytes == netmask_bytes
-    assert util.class_str(c1) == util.class_str(c1u) == 'IdbIpv4Addr'
+    assert util.fullname(c1) == util.fullname(c1u) == 'pcapng.option.IdbIpv4Addr'

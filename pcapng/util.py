@@ -183,9 +183,11 @@ def select_keys( src_dict, keys_lst ):
         result[ key ] = src_dict[ key ]
     return result
 
-def class_str( obj ):
-    "Returns the class name of an object as a string"
-    return obj.__class__.__name__
+def fullname(obj):
+    "Returns a string with the fully-qualified class name of an object"
+    module_str  = obj.__class__.__module__
+    class_str   = obj.__class__.__name__
+    return '{}.{}'.format( module_str, class_str )
 
 
 #todo move to pcapng.bytes

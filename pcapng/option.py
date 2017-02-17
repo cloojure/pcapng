@@ -16,7 +16,7 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
 OPT_END_OF_OPT    =     0
-OPT_COMMENT       =     1
+OPT_COMMENT       =     1       #delete
 OPT_UNKNOWN       =  9999   # non-standard
 
 #todo need to do validation on data values & lengths
@@ -126,7 +126,8 @@ class Option:
     def unpack(packed_bytes):
         """Factory method to generate an Generic or Custom Option from its packed bytes."""
         (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-        if   opt_code == OPT_COMMENT:                   return Comment.unpack( packed_bytes )
+        if   Comment.is_instance( packed_bytes ):       return Comment.unpack( packed_bytes )
+        #wip continue here
         elif opt_code == CUSTOM_STRING_COPYABLE:        return CustomStringCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_BINARY_COPYABLE:        return CustomBinaryCopyable.unpack( packed_bytes )
         elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable.unpack( packed_bytes )
@@ -172,11 +173,17 @@ class IdbOption(Option):
             return IdbOption( OPT_UNKNOWN, stripped_bytes, True )
 
 class Comment(Option):
+    SPEC_CODE = 1
     def __init__(self, content_str):
-        Option.__init__(self, OPT_COMMENT, content_str)
+        Option.__init__(self, self.SPEC_CODE, content_str)
+    @staticmethod
+    def is_instance( packed_bytes ):
+        (opt_code,) = struct.unpack('=H', packed_bytes[:2])
+        return (opt_code == Comment.SPEC_CODE)
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        assert opt_code == Comment.SPEC_CODE     #todo copy check to all
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return Comment(content)

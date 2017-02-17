@@ -22,9 +22,9 @@ OPT_UNKNOWN       =  9999   # non-standard
 #todo need to do validation on data values & lengths
 # custom options
 CUSTOM_STRING_COPYABLE        =  2988   #delete
-CUSTOM_BINARY_COPYABLE      =  2989
-CUSTOM_STRING_NON_COPYABLE    = 19372
-CUSTOM_BINARY_NON_COPYABLE  = 19373
+CUSTOM_BINARY_COPYABLE      =  2989   #delete
+CUSTOM_STRING_NON_COPYABLE    = 19372   #delete
+CUSTOM_BINARY_NON_COPYABLE  = 19373   #delete
 
 #todo need to do validation on data values & lengths
 # section header block options
@@ -129,18 +129,18 @@ class Option:
     @staticmethod
     def unpack(packed_bytes):
         """Factory method to generate an Generic or Custom Option from its packed bytes."""
-        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])   #todo move lower
-        if   Comment.is_instance( packed_bytes ):       return Comment.unpack( packed_bytes )
-        elif CustomStringCopyable.is_instance( packed_bytes ):  return CustomStringCopyable.unpack( packed_bytes )
-        #wip continue here
-        elif opt_code == CUSTOM_BINARY_COPYABLE:        return CustomBinaryCopyable.unpack( packed_bytes )
-        elif opt_code == CUSTOM_STRING_NON_COPYABLE:    return CustomStringNonCopyable.unpack( packed_bytes )
-        elif opt_code == CUSTOM_BINARY_NON_COPYABLE:    return CustomBinaryNonCopyable.unpack( packed_bytes )
+        if   Comment.is_instance(                 packed_bytes ):  return Comment.unpack( packed_bytes )
+        elif CustomStringCopyable.is_instance(    packed_bytes ):  return CustomStringCopyable.unpack( packed_bytes )
+        elif CustomBinaryCopyable.is_instance(    packed_bytes ):  return CustomBinaryCopyable.unpack( packed_bytes )
+        elif CustomStringNonCopyable.is_instance( packed_bytes ):  return CustomStringNonCopyable.unpack( packed_bytes )
+        elif CustomBinaryNonCopyable.is_instance( packed_bytes ):  return CustomBinaryNonCopyable.unpack( packed_bytes )
         else:
+            (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
             print( 'unpack_generic(): warning - unrecognized Option={}'.format( opt_code )) #todo log
             stripped_bytes = packed_bytes[4:]
             return Option( OPT_UNKNOWN, stripped_bytes, True )
 
+#wip continue here
 class Comment(Option):
     SPEC_CODE = 1
     def __init__(self, content_str):
@@ -185,11 +185,17 @@ class CustomStringCopyable(Option):
         return CustomStringCopyable( pen_val, content )
 
 class CustomBinaryCopyable(Option):
+    SPEC_CODE = 2989
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
         self.code       = CUSTOM_BINARY_COPYABLE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (CustomBinaryCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
+
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
@@ -205,11 +211,16 @@ class CustomBinaryCopyable(Option):
         return CustomBinaryCopyable( pen_val, content )
 
 class CustomStringNonCopyable(Option):
+    SPEC_CODE = 19372
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
         self.code       = CUSTOM_STRING_NON_COPYABLE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (CustomStringNonCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
@@ -225,11 +236,16 @@ class CustomStringNonCopyable(Option):
         return CustomStringNonCopyable( pen_val, content )
 
 class CustomBinaryNonCopyable(Option):
+    SPEC_CODE = 19373
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
         self.code       = CUSTOM_BINARY_NON_COPYABLE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (CustomBinaryNonCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN

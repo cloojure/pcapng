@@ -28,9 +28,9 @@ CUSTOM_BINARY_NON_COPYABLE  = 19373   #delete
 
 #todo need to do validation on data values & lengths
 # section header block options
-OPT_SHB_HARDWARE  = 2
-OPT_SHB_OS        = 3
-OPT_SHB_USERAPPL  = 4
+OPT_SHB_HARDWARE  = 2    #delete
+OPT_SHB_OS        = 3    #delete
+OPT_SHB_USERAPPL  = 4    #delete
 
 #todo need to do validation on data values & lengths
 #todo   make subclasses of Option
@@ -269,16 +269,61 @@ class ShbOption(Option):
     @staticmethod
     def unpack(packed_bytes):
         """Factory method to generate an Section Header Block Option from its packed bytes."""
-        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-        if   opt_code == OPT_SHB_HARDWARE:              return ShbHardware.unpack( packed_bytes )
-        elif opt_code == OPT_SHB_OS:                    return ShbOs.unpack( packed_bytes )
-        elif opt_code == OPT_SHB_USERAPPL:              return ShbUserAppl.unpack( packed_bytes )
+        if   ShbHardware.is_instance( packed_bytes ): return ShbHardware.unpack( packed_bytes )
+        elif ShbOs.is_instance(       packed_bytes ): return ShbOs.unpack( packed_bytes )
+        elif ShbUserAppl.is_instance( packed_bytes ): return ShbUserAppl.unpack( packed_bytes )
         else:
+            (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
             print( 'unpack_shb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
             stripped_bytes = packed_bytes[4:]
             return ShbOption(OPT_UNKNOWN, stripped_bytes, True)
 
+class ShbHardware(ShbOption):
+    SPEC_CODE = 2
+    def __init__(self, content_str):
+        ShbOption.__init__(self, OPT_SHB_HARDWARE, content_str)
 
+    @staticmethod
+    def is_instance( packed_bytes ): return (ShbHardware.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return ShbHardware(content)
+
+class ShbOs(ShbOption):
+    SPEC_CODE = 3
+    def __init__(self, content_str):
+        ShbOption.__init__(self, OPT_SHB_OS, content_str)
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (ShbOs.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return ShbOs(content)
+
+class ShbUserAppl(ShbOption):
+    SPEC_CODE = 4
+    def __init__(self, content_str):
+        ShbOption.__init__(self, OPT_SHB_USERAPPL, content_str)
+
+    @staticmethod
+    def is_instance( packed_bytes ): return (ShbUserAppl.SPEC_CODE == unpack_opt_code( packed_bytes ))
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return ShbUserAppl(content)
+
+#-----------------------------------------------------------------------------
 class IdbOption(Option):
     def __init__(self, code, content, code_verify_disable=False):
         """Creates an IDB Option with the specified option code & content."""
@@ -296,38 +341,6 @@ class IdbOption(Option):
             stripped_bytes = packed_bytes[4:]
             return IdbOption( OPT_UNKNOWN, stripped_bytes, True )
 
-#-----------------------------------------------------------------------------
-class ShbHardware(ShbOption):
-    def __init__(self, content_str):
-        ShbOption.__init__(self, OPT_SHB_HARDWARE, content_str)
-    @staticmethod
-    def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        content_pad = packed_bytes[4:]
-        content = content_pad[:content_len]
-        return ShbHardware(content)
-
-class ShbOs(ShbOption):
-    def __init__(self, content_str):
-        ShbOption.__init__(self, OPT_SHB_OS, content_str)
-    @staticmethod
-    def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        content_pad = packed_bytes[4:]
-        content = content_pad[:content_len]
-        return ShbOs(content)
-
-class ShbUserAppl(ShbOption):
-    def __init__(self, content_str):
-        ShbOption.__init__(self, OPT_SHB_USERAPPL, content_str)
-    @staticmethod
-    def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        content_pad = packed_bytes[4:]
-        content = content_pad[:content_len]
-        return ShbUserAppl(content)
-
-#-----------------------------------------------------------------------------
 class IdbName(IdbOption):
     def __init__(self, content_str):
         IdbOption.__init__(self, OPT_IDB_NAME, content_str)

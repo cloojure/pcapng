@@ -41,6 +41,7 @@ def assert_python2():
 def assert_type_bytearray(arg):       assert type(arg) == bytearray
 def assert_type_bytes(arg):           assert type(arg) == bytes
 def assert_type_str(arg):             assert type(arg) == str
+def assert_type_set(arg):             assert type(arg) == set
 def assert_type_list(arg):            assert type(arg) == list
 def assert_type_dict(arg):            assert type(arg) == dict
 
@@ -111,6 +112,7 @@ def assert_rel_equal( x, y, digits=None ):
             x, y, digits, max_val, delta, ratio, cmpr ))
         assert False
 
+#todo ensure all have tests
 
 def to_bytes( arg ):
     """Converts arg to a 'bytes' object."""
@@ -121,6 +123,11 @@ def str_to_bytes( arg ):
     assert_type_str( arg )
     """Convert an ASCII string to 'bytes'. Works on both Python2 and Python3."""
     return to_bytes( map(ord,arg))
+
+def bytes_to_uint8_list( arg ):  #todo need test
+    """Converts a 'bytes' arg to a list of uint8"""
+    assert_type_bytes( arg )
+    return list( map(ord,arg))
 
 def int32_to_hexstr(arg):
     """Converts a 32-bit unsigned integer value to a hex string ."""
@@ -183,7 +190,7 @@ def select_keys( src_dict, keys_lst ):
         result[ key ] = src_dict[ key ]
     return result
 
-def fullname(obj):
+def classname(obj):
     "Returns a string with the fully-qualified class name of an object"
     module_str  = obj.__class__.__module__
     class_str   = obj.__class__.__name__

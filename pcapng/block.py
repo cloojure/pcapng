@@ -49,14 +49,36 @@ CUSTOM_MRT_ISIS_BLOCK_OPT = Option(option.CUSTOM_STRING_COPYABLE, 'EMBEDDED_MRT_
 
 #todo maybe create a SectionBlock object with SHB, IDB, options, EPBs, SPBs, etc ?
 
+
+CUSTOM_OPTION_CLASSNAMES = {
+   'pcapng.option.CustomStringCopyable',
+   'pcapng.option.CustomBinaryCopyable',
+   'pcapng.option.CustomStringNonCopyable',
+   'pcapng.option.CustomBinaryNonCopyable'
+}
+
+GENERAL_OPTION_CLASSNAMES = { 'pcapng.option.Comment' } | CUSTOM_OPTION_CLASSNAMES
+
+def validate_options( options_lst, valid_classnames ):
+    util.assert_type_list(options_lst)
+    util.assert_type_set(valid_classnames)
+    print( '230 valid_classnames=', valid_classnames)
+    for opt in options_lst:
+        opt_classname = util.classname(opt)
+        print( '231 opt_classname=', opt_classname)
+        assert (opt_classname in valid_classnames)
+
 class SectionHeaderBlock:
     block_head_encoding = '=LLLHHq'     #todo need determine endian on read
     block_tail_encoding = '=L'          #todo need determine endian on read
 
+    SHB_OPTION_CLASSNAMES = { 'pcapng.option.ShbHardware',
+                              'pcapng.option.ShbOs',
+                              'pcapng.option.ShbUserAppl' }
+    LEGAL_OPT_CLASSNAMES = GENERAL_OPTION_CLASSNAMES | SHB_OPTION_CLASSNAMES
+
     def __init__(self, options_lst=[]):
-        util.assert_type_list(options_lst)
-        for opt in options_lst:
-            option.assert_shb_option(opt)
+        validate_options(options_lst, self.LEGAL_OPT_CLASSNAMES)
         self.options_lst = options_lst
 
     def pack(self):    #todo data_len
@@ -78,12 +100,32 @@ class SectionHeaderBlock:
         return packed_bytes
 
     @staticmethod
+    def unpack_options(options_bytes):
+        result = []
+        option_segs_lst = option.segment_all(options_bytes)
+        for opt_bytes in option_segs_lst:
+            if   option.Comment.is_instance(                 opt_bytes ):  result.append( option.Comment.unpack( opt_bytes ))
+            elif option.CustomStringCopyable.is_instance(    opt_bytes ):  result.append( option.CustomStringCopyable.unpack( opt_bytes ))
+            elif option.CustomBinaryCopyable.is_instance(    opt_bytes ):  result.append( option.CustomBinaryCopyable.unpack( opt_bytes ))
+            elif option.CustomStringNonCopyable.is_instance( opt_bytes ):  result.append( option.CustomStringNonCopyable.unpack( opt_bytes ))
+            elif option.CustomBinaryNonCopyable.is_instance( opt_bytes ):  result.append( option.CustomBinaryNonCopyable.unpack( opt_bytes ))
+            elif option.ShbHardware.is_instance(             opt_bytes ):  result.append( option.ShbHardware.unpack( opt_bytes ))
+            elif option.ShbOs.is_instance(                   opt_bytes ):  result.append( option.ShbOs.unpack( opt_bytes ))
+            elif option.ShbUserAppl.is_instance(             opt_bytes ):  result.append( option.ShbUserAppl.unpack( opt_bytes ))
+            elif option.is_end_of_opt(                       opt_bytes ):  continue
+            else:
+                (opt_code, content_len_orig) = struct.unpack('=HH', opt_bytes[:4])
+                print( 'SHB: unpack_generic(): warning - unrecognized Option={}'.format( opt_code )) #todo log
+                stripped_bytes = opt_bytes[4:]
+                return Option( option.OPT_UNKNOWN, stripped_bytes, True )
+        return result
+
+    @staticmethod
     def unpack(block_bytes):      #todo verify block type & all fields
         """Decodes a bytes block into a section header block, returning a dictionary."""
         util.assert_type_bytes(block_bytes)
-        ( block_type, block_total_len, byte_order_magic,
-                major_version, minor_version, section_len ) = struct.unpack( SectionHeaderBlock.block_head_encoding,
-                                                                                block_bytes[:24] )
+        ( block_type, block_total_len, byte_order_magic, major_version, minor_version,
+                section_len ) = struct.unpack( SectionHeaderBlock.block_head_encoding, block_bytes[:24] )
         (block_total_len_end,) = struct.unpack( SectionHeaderBlock.block_tail_encoding, block_bytes[-4:])
         assert block_type       == BLOCK_TYPE_SHB
         assert byte_order_magic == BYTE_ORDER_MAGIC
@@ -92,7 +134,7 @@ class SectionHeaderBlock:
         assert block_total_len  == block_total_len_end == len(block_bytes)
         # section_len currently ignored
         options_bytes = block_bytes[24:-4]
-        options_lst  = option.unpack_all(options_bytes)  #todo verify only valid options
+        options_lst = SectionHeaderBlock.unpack_options( options_bytes )
         shb_info = { 'block_type'          : block_type,
                      'block_total_len'     : block_total_len,
                      'byte_order_magic'    : byte_order_magic,
@@ -107,11 +149,20 @@ class InterfaceDescBlock:
     block_head_encoding = '=LLHHL'
     block_tail_encoding = '=L'
 
+    IDB_OPTION_CLASSNAMES = {
+        'pcapng.option.IdbName',
+        'pcapng.option.IdbDescription',
+        'pcapng.option.IdbIpv4Addr'
+
+#todo add others
+    }
+    LEGAL_OPT_CLASSNAMES = GENERAL_OPTION_CLASSNAMES | IDB_OPTION_CLASSNAMES
+
     def __init__(self, link_type=linktype.LINKTYPE_ETHERNET, #todo temp testing default
                  options_lst=[]):
         #todo need test valid linktype
-        util.assert_type_list(options_lst)
-        for opt in options_lst: option.assert_idb_option(opt)
+        validate_options(options_lst, self.LEGAL_OPT_CLASSNAMES)
+        for opt in options_lst: option.assert_idb_option(opt)   #todo verify
         self.options_lst    = options_lst
         self.link_type      = link_type
         self.reserved       = 0    # spec req zeros

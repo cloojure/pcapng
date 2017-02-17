@@ -98,9 +98,13 @@ def assert_custom_block_option(option):      #todo simplify to reflect class str
     """Returns true if option code is valid for a custom block"""
     assert (option.code in CUSTOM_OPTIONS)
 
-def unpack_opt_code( packed_bytes ):
-    (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
+def unpack_opt_code(opt_bytes):
+    util.assert_type_bytes(opt_bytes)
+    (opt_code, content_len_orig) = struct.unpack('=HH', opt_bytes[:4])
     return opt_code
+
+def is_end_of_opt( opt_bytes ):
+    return opt_bytes == Option.END_OF_OPT_BYTES
 
 #todo verify all fields
 class Option:
@@ -147,7 +151,7 @@ class Comment(Option):
         Option.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (Comment.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def is_instance(opt_bytes): return (Comment.SPEC_CODE == unpack_opt_code(opt_bytes))
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -382,6 +386,8 @@ class IdbIpv4Addr(IdbOption):
         self.addr_bytes     = addr_byte_lst
         self.netmask_bytes  = netmask_byte_lst
 
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes', 'netmask_bytes'])
+
     @staticmethod
     def is_instance( packed_bytes ): return (IdbIpv4Addr.SPEC_CODE == unpack_opt_code( packed_bytes ))
 
@@ -396,8 +402,8 @@ class IdbIpv4Addr(IdbOption):
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         assert opt_code == IdbIpv4Addr.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
-        addr_val    = bytearray( packed_bytes[4:8] )
-        netmask_val = bytearray( packed_bytes[8:12] )
+        addr_val    = util.bytes_to_uint8_list( packed_bytes[4:8]  )
+        netmask_val = util.bytes_to_uint8_list( packed_bytes[8:12] )
         return IdbIpv4Addr( addr_val, netmask_val )
 
 
@@ -450,6 +456,38 @@ def unpack_all(raw_bytes):
             options.append( option )
             raw_bytes = raw_bytes_remaining
     return options
+
+#-----------------------------------------------------------------------------
+def segment_rolling(raw_bytes):
+    #todo verify all fields
+    """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
+    util.assert_type_bytes(raw_bytes)
+    assert 4 <= len(raw_bytes)
+    (opt_code, content_len_orig) = struct.unpack( '=HH', raw_bytes[:4])
+    content_len_pad = util.block32_ceil_num_bytes(content_len_orig)
+    first_block_len_pad = 4 + content_len_pad
+    assert first_block_len_pad <= len(raw_bytes)
+    opt_bytes             = raw_bytes[ :first_block_len_pad   ]
+    raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
+    return ( opt_bytes, raw_bytes_remaining )
+
+#todo add strict string reading conformance?
+# Section 3.5 of https://pcapng.github.io/pcapng states: "Software that reads these
+# files MUST NOT assume that strings are zero-terminated, and MUST treat a
+# zero-value octet as a string terminator."   We just use th length field to read in
+# strings, and don't terminate early if there is a zero-value byte.
+def segment_all(raw_bytes):
+    """Decodes a block of raw bytes into a list of segments."""
+    util.assert_type_bytes(raw_bytes)
+    util.assert_block32_length(raw_bytes)
+    segments = []
+    while ( 0 < len(raw_bytes) ):
+        ( segment, raw_bytes_remaining ) = segment_rolling(raw_bytes)
+        segments.append( segment )
+        raw_bytes = raw_bytes_remaining
+    return segments
+
+#-----------------------------------------------------------------------------
 
 #todo need to add custom options
 def custom_option_value_pack( pen, content=[] ):

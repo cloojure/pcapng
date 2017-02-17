@@ -4,7 +4,7 @@ import pcapng.block             as block
 import pcapng.linktype          as linktype
 import pcapng.mrt               as mrt
 import pcapng.option            as option
-from   pcapng.option            import Option
+from   pcapng.option            import Option       #delete
 import pcapng.pen               as pen
 import pcapng.util              as util
 from   pcapng.util              import to_bytes
@@ -13,9 +13,9 @@ from   pcapng.util              import to_bytes
 #todo add generative testing
 
 def test_section_header_block():
-    opts = [ Option( option.OPT_SHB_HARDWARE  , "Dell" ),
-             Option( option.OPT_SHB_OS        , "Ubuntu" ),
-             Option( option.OPT_SHB_USERAPPL  , "IntelliJ Idea" ) ]
+    opts = [ option.ShbHardware( "Dell" ),
+             option.ShbOs( "Ubuntu" ),
+             option.ShbUserAppl( "IntelliJ Idea" ) ]
     shb_obj     = block.SectionHeaderBlock(opts)
     idb_bytes   = shb_obj.pack()
     shb_info    = block.SectionHeaderBlock.unpack(idb_bytes)
@@ -30,10 +30,9 @@ def test_section_header_block():
     assert shb_info[ 'options_lst'      ] == opts
 
 def test_interface_desc_block():
-    opts = [ Option( option.OPT_IDB_NAME        , "Carrier Pigeon" ),
-             Option( option.OPT_IDB_DESCRIPTION , "don't you wish" ),
-             Option( option.OPT_IDB_IPV4_ADDR   , to_bytes([192, 168, 13, 7, 255, 255, 255, 0])),
-             Option( option.OPT_IDB_OS          , "NitrOS" ) ]
+    opts = [ option.IdbName( "Carrier Pigeon" ),
+             option.IdbDescription( "don't you wish" ),
+             option.IdbIpv4Addr( [192, 168, 13, 7], [255, 255, 255, 0] ) ]
     idb_obj     = block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, opts )
     idb_bytes   = idb_obj.pack()
     idb_info    = block.InterfaceDescBlock.unpack( idb_bytes )
@@ -43,6 +42,8 @@ def test_interface_desc_block():
     assert idb_info[ 'link_type'        ] == linktype.LINKTYPE_ETHERNET
     assert idb_info[ 'reserved'         ] == 0
     assert idb_info[ 'snaplen'          ] == 0
+    print( '251', idb_info[ 'options_lst' ] )
+    print( '252', opts )
     assert idb_info[ 'options_lst'      ] == opts
 
 def test_simple_pkt_block():

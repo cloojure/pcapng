@@ -132,24 +132,21 @@ class Option:
 
     @staticmethod
     def unpack_dispatch( dispatch_tbl, packed_bytes ):
+        print( 'unpack_dispatch() - enter')
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian
+        print( 'unpack_dispatch() - opt_code=', opt_code )
         dispatch_fn = dispatch_tbl[ opt_code ]
         if (dispatch_fn != None):
-            return dispatch_fn( packed_bytes )
+            result =  dispatch_fn( packed_bytes )
+            print( 'unpack_dispatch() - result=', result )
+            return result
         else:
             #todo exception?
             # raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
             #
-            print( 'SHB: unpack_generic(): warning - unrecognized Option={}'.format( opt_code )) #todo log
+            print( 'warning - Option.unpack_dispatch(): unrecognized Option={}'.format( opt_code )) #todo log
             stripped_bytes = opt_bytes[4:]
             return Option( option.OPT_UNKNOWN, stripped_bytes, True )
-
-    @staticmethod
-    def unpack(packed_bytes):   #todo delete?
-        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-        print( 'warning - generic Option.unpack() opt_code={}'.format( opt_code )) #todo log
-        stripped_bytes = packed_bytes[4:]
-        return Option( OPT_UNKNOWN, stripped_bytes, True )
 
 #wip continue here
 class Comment(Option):
@@ -359,6 +356,7 @@ class IdbDescription(IdbOption):
 class IdbIpv4Addr(IdbOption):
     SPEC_CODE = 4
     def __init__(self, addr_byte_lst, netmask_byte_lst):
+        print( 'IdbIpv4Addr.__init__() - enter')
         addr_byte_lst       = list( addr_byte_lst )
         netmask_byte_lst    = list( netmask_byte_lst )
         util.assert_vec4_uint8( addr_byte_lst )
@@ -366,6 +364,7 @@ class IdbIpv4Addr(IdbOption):
         self.code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
         self.netmask_bytes  = netmask_byte_lst
+        print( 'IdbIpv4Addr.__init__() - exit')
 
     def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes', 'netmask_bytes'])
 
@@ -379,13 +378,17 @@ class IdbIpv4Addr(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        print( 'IdbIpv4Addr.unpack() - enter')
         assert len(packed_bytes) == 12      #todo check everywhere
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         assert opt_code == IdbIpv4Addr.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
         addr_val    = util.bytes_to_uint8_list( packed_bytes[4:8]  )
         netmask_val = util.bytes_to_uint8_list( packed_bytes[8:12] )
-        return IdbIpv4Addr( addr_val, netmask_val )
+        result = IdbIpv4Addr( addr_val, netmask_val )
+        print( 'IdbIpv4Addr.unpack() - result=', result)
+        print( 'IdbIpv4Addr.unpack() - exit')
+        return result
 
 
 
@@ -404,6 +407,7 @@ def pack_all(opts_lst):  #todo needs test
     return cum_result
 
 def unpack_rolling(raw_bytes):
+    print( '560 unpack_rolling() - enter')
     #todo verify all fields
     """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
     util.assert_type_bytes(raw_bytes)
@@ -416,6 +420,7 @@ def unpack_rolling(raw_bytes):
     raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
     opt_content           = opt_bytes[ 4 : 4+content_len_orig ]
     option_read = Option( opt_code, opt_content, True )
+    print( '569 unpack_rolling() - enter')
     return ( option_read, raw_bytes_remaining )
 
 #todo add strict string reading conformance?
@@ -423,8 +428,10 @@ def unpack_rolling(raw_bytes):
     # files MUST NOT assume that strings are zero-terminated, and MUST treat a
     # zero-value octet as a string terminator."   We just use th length field to read in
     # strings, and don't terminate early if there is a zero-value byte.
+
 def unpack_all(raw_bytes):
     """Decodes a block of raw bytes into a list of options."""
+    print( '550 unpack_all() - enter')
     util.assert_type_bytes(raw_bytes)
     util.assert_block32_length(raw_bytes)
     print( 101, len(raw_bytes), raw_bytes)
@@ -436,6 +443,7 @@ def unpack_all(raw_bytes):
         else:
             options.append( option )
             raw_bytes = raw_bytes_remaining
+    print( '559 unpack_all() - enter')
     return options
 
 #-----------------------------------------------------------------------------

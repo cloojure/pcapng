@@ -118,7 +118,9 @@ class SectionHeaderBlock:
             if option.is_end_of_opt( opt_bytes ):
                 continue
             else:
-                result.append( Option.unpack_dispatch( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, opt_bytes ))
+                new_opt = Option.unpack_dispatch( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+                print( '311  new_opt=', new_opt)
+                result.append(new_opt)
         return result
 
     @staticmethod
@@ -197,13 +199,19 @@ class InterfaceDescBlock:
 
     @staticmethod
     def unpack_options(options_bytes):
+        print( '300 IDB.unpack_options() - enter')
         result = []
         option_segs_lst = option.segment_all(options_bytes)
         for opt_bytes in option_segs_lst:
+            print( '301 opt_bytes=', opt_bytes)
             if option.is_end_of_opt( opt_bytes ):
+                print( '302 is_end_of_opt()', opt_bytes)
                 continue
             else:
-                result.append( Option.unpack_dispatch( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, opt_bytes ))
+                new_opt = Option.unpack_dispatch( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+                print( '305  new_opt=', new_opt)
+                result.append(new_opt)
+        print( '309 IDB.unpack_options() - exit')
         return result
 
     @staticmethod
@@ -216,7 +224,7 @@ class InterfaceDescBlock:
         assert block_type == BLOCK_TYPE_IDB
         assert block_total_len == block_total_len_end == len(block_bytes)
         options_bytes = block_bytes[16:-4]
-        options_lst = option.unpack_all(options_bytes)  #todo verify only valid options
+        options_lst = InterfaceDescBlock.unpack_options(options_bytes)  #todo verify only valid options
         idb_info = { 'block_type'             : block_type,
                      'block_total_len'        : block_total_len,
                      'link_type'              : link_type,

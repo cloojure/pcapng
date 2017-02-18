@@ -166,6 +166,10 @@ def test_assert_rel_equal():
         util.assert_rel_equal( 1000, 1001, digits=4 )
         util.assert_rel_equal( 1000, 1001, digits=5 )
 
+def test_dict_merge():
+    assert { "a":1, 'b':2        } == util.dict_merge(       {'a':1}, {'b':2}            )
+    assert { "a":1, 'b':2, 'c':3 } == util.dict_merge_all( [ {'a':1}, {'b':2}, {'c':3} ] )
+
 #-----------------------------------------------------------------------------
 def test_xxx():
     xx1 = struct.pack(   '!hhl', 1, 2, 3 )  # h='short', l='long'

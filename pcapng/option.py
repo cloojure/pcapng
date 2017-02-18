@@ -131,27 +131,33 @@ class Option:
         return packed_bytes
 
     @staticmethod
-    def unpack(packed_bytes):
-        """Factory method to generate an Generic or Custom Option from its packed bytes."""
-        if   Comment.is_instance(                 packed_bytes ):  return Comment.unpack( packed_bytes )
-        elif CustomStringCopyable.is_instance(    packed_bytes ):  return CustomStringCopyable.unpack( packed_bytes )
-        elif CustomBinaryCopyable.is_instance(    packed_bytes ):  return CustomBinaryCopyable.unpack( packed_bytes )
-        elif CustomStringNonCopyable.is_instance( packed_bytes ):  return CustomStringNonCopyable.unpack( packed_bytes )
-        elif CustomBinaryNonCopyable.is_instance( packed_bytes ):  return CustomBinaryNonCopyable.unpack( packed_bytes )
+    def unpack_dispatch( dispatch_tbl, packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian
+        dispatch_fn = dispatch_tbl[ opt_code ]
+        if (dispatch_fn != None):
+            return dispatch_fn( packed_bytes )
         else:
-            (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-            print( 'unpack_generic(): warning - unrecognized Option={}'.format( opt_code )) #todo log
-            stripped_bytes = packed_bytes[4:]
-            return Option( OPT_UNKNOWN, stripped_bytes, True )
+            #todo exception?
+            # raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
+            #
+            print( 'SHB: unpack_generic(): warning - unrecognized Option={}'.format( opt_code )) #todo log
+            stripped_bytes = opt_bytes[4:]
+            return Option( option.OPT_UNKNOWN, stripped_bytes, True )
+
+    @staticmethod
+    def unpack(packed_bytes):   #todo delete?
+        (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
+        print( 'warning - generic Option.unpack() opt_code={}'.format( opt_code )) #todo log
+        stripped_bytes = packed_bytes[4:]
+        return Option( OPT_UNKNOWN, stripped_bytes, True )
 
 #wip continue here
 class Comment(Option):
     SPEC_CODE = 1
-    def __init__(self, content_str):
-        Option.__init__(self, self.SPEC_CODE, content_str)
+    def __init__(self, content_str):    Option.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
-    def is_instance(opt_bytes): return (Comment.SPEC_CODE == unpack_opt_code(opt_bytes))
+    def dispatch_entry(): return { Comment.SPEC_CODE : Comment.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -178,7 +184,7 @@ class CustomStringCopyable(Option):
         return packed_bytes
 
     @staticmethod
-    def is_instance( packed_bytes ): return (CustomStringCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { CustomStringCopyable.SPEC_CODE : CustomStringCopyable.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -197,8 +203,7 @@ class CustomBinaryCopyable(Option):
         self.content    = to_bytes(content)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (CustomBinaryCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
-
+    def dispatch_entry(): return { CustomBinaryCopyable.SPEC_CODE : CustomBinaryCopyable.unpack }
 
     def pack(self):
         content_len     = len(self.content)
@@ -223,7 +228,7 @@ class CustomStringNonCopyable(Option):
         self.content    = to_bytes(content)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (CustomStringNonCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { CustomStringNonCopyable.SPEC_CODE : CustomStringNonCopyable.unpack }
 
     def pack(self):
         content_len     = len(self.content)
@@ -248,7 +253,7 @@ class CustomBinaryNonCopyable(Option):
         self.content    = to_bytes(content)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (CustomBinaryNonCopyable.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { CustomBinaryNonCopyable.SPEC_CODE : CustomBinaryNonCopyable.unpack }
 
     def pack(self):
         content_len     = len(self.content)
@@ -270,25 +275,13 @@ class ShbOption(Option):
         """Creates an SHB Option with the specified option code & content."""
         Option.__init__( self, code, content, code_verify_disable )
 
-    @staticmethod
-    def unpack(packed_bytes):
-        """Factory method to generate an Section Header Block Option from its packed bytes."""
-        if   ShbHardware.is_instance( packed_bytes ): return ShbHardware.unpack( packed_bytes )
-        elif ShbOs.is_instance(       packed_bytes ): return ShbOs.unpack( packed_bytes )
-        elif ShbUserAppl.is_instance( packed_bytes ): return ShbUserAppl.unpack( packed_bytes )
-        else:
-            (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-            print( 'unpack_shb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
-            stripped_bytes = packed_bytes[4:]
-            return ShbOption(OPT_UNKNOWN, stripped_bytes, True)
-
 class ShbHardware(ShbOption):
     SPEC_CODE = 2
     def __init__(self, content_str):
         ShbOption.__init__(self, OPT_SHB_HARDWARE, content_str)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (ShbHardware.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { ShbHardware.SPEC_CODE : ShbHardware.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -303,7 +296,7 @@ class ShbOs(ShbOption):
         ShbOption.__init__(self, OPT_SHB_OS, content_str)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (ShbOs.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { ShbOs.SPEC_CODE : ShbOs.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -318,7 +311,7 @@ class ShbUserAppl(ShbOption):
         ShbOption.__init__(self, OPT_SHB_USERAPPL, content_str)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (ShbUserAppl.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { ShbUserAppl.SPEC_CODE : ShbUserAppl.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -333,25 +326,13 @@ class IdbOption(Option):
         """Creates an IDB Option with the specified option code & content."""
         Option.__init__( self, code, content, code_verify_disable )
 
-    @staticmethod
-    def unpack(packed_bytes):
-        """Factory method to generate an Interface Desc Block Option from its packed bytes."""
-        if   IdbName.is_instance(         packed_bytes  ):  return IdbName.unpack( packed_bytes )
-        elif IdbDescription.is_instance(  packed_bytes  ):  return IdbDescription.unpack( packed_bytes )
-        elif IdbIpv4Addr.is_instance(     packed_bytes  ):  return IdbIpv4Addr.unpack( packed_bytes )
-        else:
-            (opt_code, content_len_orig) = struct.unpack('=HH', packed_bytes[:4])
-            print( 'unpack_idb(): warning - unrecognized Option={}'.format( opt_code ))     #todo log
-            stripped_bytes = packed_bytes[4:]
-            return IdbOption( OPT_UNKNOWN, stripped_bytes, True )
-
 class IdbName(IdbOption):
     SPEC_CODE = 2
     def __init__(self, content_str):
         IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (IdbName.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { IdbName.SPEC_CODE : IdbName.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -366,7 +347,7 @@ class IdbDescription(IdbOption):
         IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
-    def is_instance( packed_bytes ): return (IdbDescription.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { IdbDescription.SPEC_CODE : IdbDescription.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
@@ -389,7 +370,7 @@ class IdbIpv4Addr(IdbOption):
     def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes', 'netmask_bytes'])
 
     @staticmethod
-    def is_instance( packed_bytes ): return (IdbIpv4Addr.SPEC_CODE == unpack_opt_code( packed_bytes ))
+    def dispatch_entry(): return { IdbIpv4Addr.SPEC_CODE : IdbIpv4Addr.unpack }
 
     def pack(self):   #todo needs test
         """Encodes into a bytes block."""

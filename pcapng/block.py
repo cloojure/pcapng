@@ -77,6 +77,17 @@ class SectionHeaderBlock:
                               'pcapng.option.ShbUserAppl' }
     LEGAL_OPT_CLASSNAMES = GENERAL_OPTION_CLASSNAMES | SHB_OPTION_CLASSNAMES
 
+    UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
+        option.Comment.dispatch_entry(),
+        option.CustomStringCopyable.dispatch_entry(),
+        option.CustomBinaryCopyable.dispatch_entry(),
+        option.CustomStringNonCopyable.dispatch_entry(),
+        option.CustomBinaryNonCopyable.dispatch_entry(),
+        option.ShbHardware.dispatch_entry(),
+        option.ShbOs.dispatch_entry(),
+        option.ShbUserAppl.dispatch_entry()
+    ] )
+
     def __init__(self, options_lst=[]):
         validate_options(options_lst, self.LEGAL_OPT_CLASSNAMES)
         self.options_lst = options_lst
@@ -104,20 +115,10 @@ class SectionHeaderBlock:
         result = []
         option_segs_lst = option.segment_all(options_bytes)
         for opt_bytes in option_segs_lst:
-            if   option.Comment.is_instance(                 opt_bytes ):  result.append( option.Comment.unpack( opt_bytes ))
-            elif option.CustomStringCopyable.is_instance(    opt_bytes ):  result.append( option.CustomStringCopyable.unpack( opt_bytes ))
-            elif option.CustomBinaryCopyable.is_instance(    opt_bytes ):  result.append( option.CustomBinaryCopyable.unpack( opt_bytes ))
-            elif option.CustomStringNonCopyable.is_instance( opt_bytes ):  result.append( option.CustomStringNonCopyable.unpack( opt_bytes ))
-            elif option.CustomBinaryNonCopyable.is_instance( opt_bytes ):  result.append( option.CustomBinaryNonCopyable.unpack( opt_bytes ))
-            elif option.ShbHardware.is_instance(             opt_bytes ):  result.append( option.ShbHardware.unpack( opt_bytes ))
-            elif option.ShbOs.is_instance(                   opt_bytes ):  result.append( option.ShbOs.unpack( opt_bytes ))
-            elif option.ShbUserAppl.is_instance(             opt_bytes ):  result.append( option.ShbUserAppl.unpack( opt_bytes ))
-            elif option.is_end_of_opt(                       opt_bytes ):  continue
+            if option.is_end_of_opt( opt_bytes ):
+                continue
             else:
-                (opt_code, content_len_orig) = struct.unpack('=HH', opt_bytes[:4])
-                print( 'SHB: unpack_generic(): warning - unrecognized Option={}'.format( opt_code )) #todo log
-                stripped_bytes = opt_bytes[4:]
-                return Option( option.OPT_UNKNOWN, stripped_bytes, True )
+                result.append( Option.unpack_dispatch( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, opt_bytes ))
         return result
 
     @staticmethod
@@ -158,6 +159,17 @@ class InterfaceDescBlock:
     }
     LEGAL_OPT_CLASSNAMES = GENERAL_OPTION_CLASSNAMES | IDB_OPTION_CLASSNAMES
 
+    UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
+        option.Comment.dispatch_entry(),
+        option.CustomStringCopyable.dispatch_entry(),
+        option.CustomBinaryCopyable.dispatch_entry(),
+        option.CustomStringNonCopyable.dispatch_entry(),
+        option.CustomBinaryNonCopyable.dispatch_entry(),
+        option.IdbName.dispatch_entry(),
+        option.IdbDescription.dispatch_entry(),
+        option.IdbIpv4Addr.dispatch_entry()
+    ] )
+
     def __init__(self, link_type=linktype.LINKTYPE_ETHERNET, #todo temp testing default
                  options_lst=[]):
         #todo need test valid linktype
@@ -182,6 +194,17 @@ class InterfaceDescBlock:
                          options_bytes +
                          struct.pack( self.block_tail_encoding, block_total_len ))
         return packed_bytes
+
+    @staticmethod
+    def unpack_options(options_bytes):
+        result = []
+        option_segs_lst = option.segment_all(options_bytes)
+        for opt_bytes in option_segs_lst:
+            if option.is_end_of_opt( opt_bytes ):
+                continue
+            else:
+                result.append( Option.unpack_dispatch( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, opt_bytes ))
+        return result
 
     @staticmethod
     def unpack(block_bytes):      #todo verify block type & all fields

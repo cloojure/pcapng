@@ -48,7 +48,7 @@ def test_interface_desc_block():
 
 def test_simple_pkt_block():
     spb_obj   = block.SimplePacketBlock('abc')
-    spb_bytes = spb_obj.pack('abc')
+    spb_bytes = spb_obj.pack('abc')     #todo fix this (no var)!
     spb_info  = block.SimplePacketBlock.unpack( spb_bytes )
     util.assert_type_dict( spb_info )
     assert spb_info['block_type']        == 0x00000003

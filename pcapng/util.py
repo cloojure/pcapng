@@ -196,6 +196,20 @@ def classname(obj):
     class_str   = obj.__class__.__name__
     return '{}.{}'.format( module_str, class_str )
 
+def dict_merge( a, b ):  #todo need test
+    assert_type_dict(a)
+    assert_type_dict(b)
+    result = {}
+    result.update(a)
+    result.update(b)
+    return result
+
+def dict_merge_all( dict_lst ):  #todo need test
+    assert_type_list(dict_lst)
+    result = {}
+    for curr_dict in dict_lst:
+        result.update(curr_dict)
+    return result
 
 #todo move to pcapng.bytes
 #-----------------------------------------------------------------------------

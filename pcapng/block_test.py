@@ -42,8 +42,10 @@ def test_interface_desc_block():
     assert idb_info[ 'link_type'        ] == linktype.LINKTYPE_ETHERNET
     assert idb_info[ 'reserved'         ] == 0
     assert idb_info[ 'snaplen'          ] == 0
-    print( '251', idb_info[ 'options_lst' ] )
-    print( '252', opts )
+    print( '251', opts )
+    print( '252', idb_info[ 'options_lst' ] )
+    for opt in idb_info[ 'options_lst'      ]:
+        print( '253', opt )
     assert idb_info[ 'options_lst'      ] == opts
 
 def test_simple_pkt_block():

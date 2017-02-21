@@ -147,7 +147,9 @@ def test_IdbIpv4Addr():
     addr_bytes    = [1,2,3,4]
     netmask_bytes = [5,6,7,8]
     c1  = option.IdbIpv4Addr(addr_bytes, netmask_bytes)
-    c1u = option.IdbIpv4Addr.unpack( c1.pack() )
+    packed_bytes = c1.pack()
+    c1u = option.IdbIpv4Addr.unpack( packed_bytes )
+    assert len( packed_bytes ) == 12    #todo add this test everywhere
     assert c1.addr_bytes    == c1u.addr_bytes    == addr_bytes
     assert c1.netmask_bytes == c1u.netmask_bytes == netmask_bytes
     assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbIpv4Addr'
@@ -157,7 +159,9 @@ def test_IdbIpv6Addr():
                       21, 22, 23, 24,    25, 26, 27, 28 ]
     prefix_len = 65
     c1  = option.IdbIpv6Addr( addr_bytes, prefix_len )
-    c1u = option.IdbIpv6Addr.unpack( c1.pack() )
+    packed_bytes = c1.pack()
+    c1u = option.IdbIpv6Addr.unpack( packed_bytes )
+    assert len( packed_bytes ) == 24
     assert c1.addr_bytes    == c1u.addr_bytes   == addr_bytes
     assert c1.prefix_len    == c1u.prefix_len   == prefix_len
     assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbIpv6Addr'
@@ -165,16 +169,29 @@ def test_IdbIpv6Addr():
 def test_IdbMacAddr():
     addr_bytes    = [ 11, 12, 13, 14, 15, 16 ]
     c1  = option.IdbMacAddr( addr_bytes )
-    c1u = option.IdbMacAddr.unpack( c1.pack() )
+    packed_bytes = c1.pack()
+    c1u = option.IdbMacAddr.unpack( packed_bytes )
+    assert len( packed_bytes ) == 12
     assert c1.addr_bytes        == c1u.addr_bytes       == addr_bytes
     assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbMacAddr'
 
 def test_IdbEuiAddr():
     addr_bytes    = [ 11, 12, 13, 14, 15, 16, 17, 18 ]
     c1  = option.IdbEuiAddr( addr_bytes )
-    c1u = option.IdbEuiAddr.unpack( c1.pack() )
+    packed_bytes = c1.pack()
+    c1u = option.IdbEuiAddr.unpack( packed_bytes )
+    assert len( packed_bytes ) == 12
     assert c1.addr_bytes        == c1u.addr_bytes       == addr_bytes
     assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbEuiAddr'
+
+def test_IdbSpeed():
+    speed = 123456789
+    c1  = option.IdbSpeed( speed )
+    packed_bytes = c1.pack()
+    c1u = option.IdbSpeed.unpack( packed_bytes )
+    assert len( packed_bytes ) == 12
+    assert c1.speed             == c1u.speed            == speed
+    assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbSpeed'
 
 
 

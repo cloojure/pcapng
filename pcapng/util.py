@@ -45,15 +45,15 @@ def assert_type_set(arg):             assert type(arg) == set
 def assert_type_list(arg):            assert type(arg) == list
 def assert_type_dict(arg):            assert type(arg) == dict
 
-def assert_uint8(arg):                assert (0 <= arg < const.POW_2_8)
-def assert_uint16(arg):               assert (0 <= arg < const.POW_2_16)
-def assert_uint32(arg):               assert (0 <= arg < const.POW_2_32)
-def assert_uint64(arg):               assert (0 <= arg < const.POW_2_64)
+def assert_uint8(arg):                assert (0 <= arg < const.POW_2_8),  'arg={}'.format(arg)
+def assert_uint16(arg):               assert (0 <= arg < const.POW_2_16), 'arg={}'.format(arg)
+def assert_uint32(arg):               assert (0 <= arg < const.POW_2_32), 'arg={}'.format(arg)
+def assert_uint64(arg):               assert (0 <= arg < const.POW_2_64), 'arg={}'.format(arg)
 
-def assert_int8(arg):                 assert (-const.POW_2_7  <= arg < const.POW_2_7)
-def assert_int16(arg):                assert (-const.POW_2_15 <= arg < const.POW_2_15)
-def assert_int32(arg):                assert (-const.POW_2_31 <= arg < const.POW_2_31)
-def assert_int64(arg):                assert (-const.POW_2_63 <= arg < const.POW_2_63)
+def assert_int8(arg):                 assert (-const.POW_2_7  <= arg < const.POW_2_7),  'arg={}'.format(arg)
+def assert_int16(arg):                assert (-const.POW_2_15 <= arg < const.POW_2_15), 'arg={}'.format(arg)
+def assert_int32(arg):                assert (-const.POW_2_31 <= arg < const.POW_2_31), 'arg={}'.format(arg)
+def assert_int64(arg):                assert (-const.POW_2_63 <= arg < const.POW_2_63), 'arg={}'.format(arg)
 
 def assert_uint8_list( listy ):
     "Assert the arg is a list of uint8 values"

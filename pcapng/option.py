@@ -477,7 +477,14 @@ def strip_header( packed_bytes ): #todo use for all unpack()
     util.assert_block32_length( packed_bytes )
     (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
     content_pad = packed_bytes[4:]
-    return (opt_code, content_len, content_pad)
+    content = content_pad[:content_len]
+    return (opt_code, content_len, content)
+
+#todo use everywhere
+def add_header(id_code, content_len, content):   #todo delete content var?
+    content_pad = util.block32_pad_bytes( content )
+    packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
+    return packed_bytes
 
 class IdbEuiAddr(IdbOption):
     SPEC_CODE = 7
@@ -492,30 +499,32 @@ class IdbEuiAddr(IdbOption):
 
     def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes'])
 
-    @staticmethod
-    def dispatch_entry(): return { IdbEuiAddr.SPEC_CODE : IdbEuiAddr.unpack }
-
     def pack(self):
         """Encodes into a bytes block."""
         content = to_bytes(self.addr_bytes)
         content_len = len(content)
         assert content_len == 8
-        packed_bytes = ( struct.pack('=HH', self.code, content_len) +
-                         content )
-            #todo -> add_header( opt_code, content_len, content_pad )
-        util.assert_block32_length( packed_bytes )  #todo add to all
+        packed_bytes = add_header( self.code, content_len, content )
         return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { IdbEuiAddr.SPEC_CODE : IdbEuiAddr.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
         util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 12      #todo check everywhere
-        (opt_code, content_len, content_pad) = strip_header( packed_bytes )
+        (opt_code, content_len, content) = strip_header( packed_bytes )
         assert opt_code == IdbEuiAddr.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
-        addr_val    = util.bytes_to_uint8_list( content_pad[:8] )
+        addr_val    = util.bytes_to_uint8_list( content )
         result      = IdbEuiAddr( addr_val )
         return result
+
+#todo add global statemachine/var for write (testing) and read (host dependent)
+#todo -> pack.uint64_pack()/_unpack() & similar everywhere
+def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
+def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
 
 class IdbSpeed(IdbOption):
     SPEC_CODE = 7
@@ -528,23 +537,22 @@ class IdbSpeed(IdbOption):
 
     def to_map(self): return util.select_keys(self.__dict__, ['code', 'speed'])
 
-    @staticmethod
-    def dispatch_entry(): return { IdbSpeed.SPEC_CODE : IdbSpeed.unpack }
-
     def pack(self):
         """Encodes into a bytes block."""
-        packed_bytes = struct.pack('=HH', self.code, content_len) + content
-        util.assert_block32_length( packed_bytes )  #todo add to all
+        content =  uint64_pack( self.speed )
+        content_len = 8     #todo content_len unneeded?
+        packed_bytes = add_header( self.code, content_len, content )
         return packed_bytes
 
     @staticmethod
+    def dispatch_entry(): return { IdbSpeed.SPEC_CODE : IdbSpeed.unpack }
+
+    @staticmethod
     def unpack( packed_bytes ):
-        util.assert_block32_length( packed_bytes )  #todo add to all
-        assert len(packed_bytes) == 12      #todo check everywhere
-        (opt_code, content_len, content_pad) = strip_header( packed_bytes )
+        (opt_code, content_len, content) = strip_header( packed_bytes )
         assert opt_code == IdbSpeed.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
-        speed   = util.bytes_to_uint8_list( content_pad[:8] )
+        speed   = uint64_unpack( content )
         result  = IdbSpeed( speed )
         return result
 

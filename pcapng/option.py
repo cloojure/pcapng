@@ -773,20 +773,33 @@ class EpbHash(EpbOption):
         result = EpbHash( content )
         return result
 
-class EpbUserAppl(EpbOption):
+class EpbDropCount(EpbOption):
     SPEC_CODE = 4
-    def __init__(self, content_str):
-        EpbOption.__init__(self, self.SPEC_CODE, content_str)
+    # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+
+    def __init__(self, dropcount):     #todo PCAPNG spec leaves interpretation of dropcount unspecified
+        self.code       = self.SPEC_CODE
+        self.dropcount  = dropcount
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'dropcount'])
+
+    def pack(self):
+        """Encodes into a bytes block."""
+        content = uint64_pack( self.dropcount )
+        content_len = 8     #todo content_len unneeded?
+        packed_bytes = add_header( self.code, content_len, content )
+        return packed_bytes
 
     @staticmethod
-    def dispatch_entry(): return { EpbUserAppl.SPEC_CODE : EpbUserAppl.unpack }
+    def dispatch_entry(): return { EpbDropCount.SPEC_CODE : EpbDropCount.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == EpbFlags.SPEC_CODE    #todo check everywhere
-        assert content_len == 4    #todo check everywhere
-        result = EpbFlags( content )
+        assert opt_code == EpbDropCount.SPEC_CODE    #todo check everywhere
+        assert content_len == 8    #todo check everywhere
+        dropcount = uint64_unpack( content )
+        result = EpbDropCount( dropcount )
         return result
 
 #-----------------------------------------------------------------------------

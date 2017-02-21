@@ -274,6 +274,14 @@ def test_EpbHash():
     assert c1.content         == c1u.content         == content
     assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.EpbHash'
 
+def test_EpbDropCount():
+    dropcount = 271
+    c1  = option.EpbDropCount(dropcount)
+    packed_bytes = c1.pack()
+    c1u = option.EpbDropCount.unpack( packed_bytes )
+    assert len( packed_bytes ) == 12    #todo add this test everywhere
+    assert c1.dropcount       == c1u.dropcount       == dropcount
+    assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.EpbDropCount'
 
 
 

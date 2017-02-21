@@ -30,9 +30,21 @@ def test_section_header_block():
     assert shb_info[ 'options_lst'      ] == opts
 
 def test_interface_desc_block():
-    opts = [ option.IdbName( "Carrier Pigeon" ),
-             option.IdbDescription( "don't you wish" ),
-             option.IdbIpv4Addr( [192, 168, 13, 7], [255, 255, 255, 0] ) ]
+    opts = [    option.IdbName( "Carrier Pigeon" ),
+                option.IdbDescription( "don't you wish" ),
+                option.IdbIpv4Addr(     [192, 168, 13, 7], [255, 255, 255, 0] ),
+                option.IdbIpv6Addr(     [ 11, 12, 13, 14,    15, 16, 17, 18,
+                                          21, 22, 23, 24,    25, 26, 27, 28 ], 65 ),
+                option.IdbMacAddr(      [ 11, 12, 13, 14, 15, 16 ] ),
+                option.IdbEuiAddr(      [ 11, 12, 13, 14, 15, 16, 17, 18 ] ),
+                option.IdbSpeed( 1234567 ),
+                option.IdbTsResol( 3, False ),
+                option.IdbTZone( 7 ),
+                option.IdbFilter( "Natural Brown #4" ),
+                option.IdbOs( 'Ubuntu Xenial 16.04.1 LTS' ),
+                option.IdbFcsLen( 97 ),
+                option.IdbTsOffset( 314159 )
+    ]
     idb_obj     = block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, opts )
     idb_bytes   = idb_obj.pack()
     idb_info    = block.InterfaceDescBlock.unpack( idb_bytes )

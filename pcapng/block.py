@@ -69,8 +69,7 @@ def validate_options( options_lst, valid_classnames ):
     print( '230 valid_classnames=', valid_classnames)
     for opt in options_lst:
         opt_classname = util.classname(opt)
-        print( '231 opt_classname=', opt_classname)
-        assert (opt_classname in valid_classnames)
+        assert (opt_classname in valid_classnames), 'opt_classname={}'.format(opt_classname)
 
 class SectionHeaderBlock:
     block_head_encoding = '=LLLHHq'     #todo need determine endian on read
@@ -156,15 +155,25 @@ class InterfaceDescBlock:
     block_head_encoding = '=LLHHL'
     block_tail_encoding = '=L'
 
+#todo unify these 2 lists
     IDB_OPTION_CLASSNAMES = {
         'pcapng.option.IdbName',
         'pcapng.option.IdbDescription',
-        'pcapng.option.IdbIpv4Addr'
-
-#todo add others
+        'pcapng.option.IdbIpv4Addr',
+        'pcapng.option.IdbIpv6Addr',
+        'pcapng.option.IdbMacAddr',
+        'pcapng.option.IdbEuiAddr',
+        'pcapng.option.IdbSpeed',
+        'pcapng.option.IdbTsResol',
+        'pcapng.option.IdbTZone',
+        'pcapng.option.IdbFilter',
+        'pcapng.option.IdbOs',
+        'pcapng.option.IdbFcsLen',
+        'pcapng.option.IdbTsOffset'
     }
     LEGAL_OPT_CLASSNAMES = GENERAL_OPTION_CLASSNAMES | IDB_OPTION_CLASSNAMES
 
+    #todo unify these 2 lists
     UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
         option.Comment.dispatch_entry(),
         option.CustomStringCopyable.dispatch_entry(),
@@ -173,7 +182,17 @@ class InterfaceDescBlock:
         option.CustomBinaryNonCopyable.dispatch_entry(),
         option.IdbName.dispatch_entry(),
         option.IdbDescription.dispatch_entry(),
-        option.IdbIpv4Addr.dispatch_entry()
+        option.IdbIpv4Addr.dispatch_entry(),
+        option.IdbIpv6Addr.dispatch_entry(),
+        option.IdbMacAddr.dispatch_entry(),
+        option.IdbEuiAddr.dispatch_entry(),
+        option.IdbSpeed.dispatch_entry(),
+        option.IdbTsResol.dispatch_entry(),
+        option.IdbTZone.dispatch_entry(),
+        option.IdbFilter.dispatch_entry(),
+        option.IdbOs.dispatch_entry(),
+        option.IdbFcsLen.dispatch_entry(),
+        option.IdbTsOffset.dispatch_entry(),
     ] )
 
     def __init__(self, link_type=linktype.LINKTYPE_ETHERNET, #todo temp testing default

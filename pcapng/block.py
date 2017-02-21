@@ -13,6 +13,10 @@ from   pcapng.util              import to_bytes
 #todo think about how to handle a block of packets
 #todo look at "docopt" usage -> cmdopts processing
 
+#todo add docstrings for all classes
+#todo add docstrings for all constructurs
+#todo add docstrings for all methods
+
 #-----------------------------------------------------------------------------
 util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------

@@ -11,39 +11,46 @@ import pcapng.pen   as pen
 import pcapng.util  as util
 from   pcapng.util  import to_bytes
 
+#todo add docstrings for all classes
+#todo add docstrings for all constructurs
+#todo add docstrings for all methods
+
 #-----------------------------------------------------------------------------
 util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+# option ID codes from PCAPNG spec
+
 OPT_END_OF_OPT    =     0
-OPT_COMMENT       =     1       #delete
+OPT_COMMENT       =     1   #delete -> class def
 OPT_UNKNOWN       =  9999   # non-standard
 
 #todo need to do validation on data values & lengths
 # custom options
-CUSTOM_STRING_COPYABLE        =  2988   #delete
-CUSTOM_BINARY_COPYABLE      =  2989   #delete
-CUSTOM_STRING_NON_COPYABLE    = 19372   #delete
-CUSTOM_BINARY_NON_COPYABLE  = 19373   #delete
+CUSTOM_STRING_COPYABLE      =  2988   #delete -> class def
+CUSTOM_BINARY_COPYABLE      =  2989   #delete -> class def
+CUSTOM_STRING_NON_COPYABLE  = 19372   #delete -> class def
+CUSTOM_BINARY_NON_COPYABLE  = 19373   #delete -> class def
 
 #todo need to do validation on data values & lengths
 # section header block options
-OPT_SHB_HARDWARE  = 2    #delete
-OPT_SHB_OS        = 3    #delete
-OPT_SHB_USERAPPL  = 4    #delete
+OPT_SHB_HARDWARE  = 2    #delete -> class def
+OPT_SHB_OS        = 3    #delete -> class def
+OPT_SHB_USERAPPL  = 4    #delete -> class def
 
 #todo need to do validation on data values & lengths
 #todo   make subclasses of Option
 # interface description block options
-OPT_IDB_NAME            =   2    #delete
-OPT_IDB_DESCRIPTION     =   3    #delete
-OPT_IDB_IPV4_ADDR       =   4    #delete
-OPT_IDB_IPV6_ADDR       =   5
-OPT_IDB_MAC_ADDR        =   6
-OPT_IDB_EUI_ADDR        =   7
-OPT_IDB_SPEED           =   8
-OPT_IDB_TS_RESOL        =   9
-OPT_IDB_TZONE           =  10
+OPT_IDB_NAME            =   2    #delete -> class def
+OPT_IDB_DESCRIPTION     =   3    #delete -> class def
+OPT_IDB_IPV4_ADDR       =   4    #delete -> class def
+OPT_IDB_IPV6_ADDR       =   5   #delete -> class def
+OPT_IDB_MAC_ADDR        =   6  #delete -> class def
+OPT_IDB_EUI_ADDR        =   7  #delete -> class def
+OPT_IDB_SPEED           =   8  #delete -> class def
+OPT_IDB_TS_RESOL        =   9  #delete -> class def
+OPT_IDB_TZONE           =  10  #delete -> class def
 OPT_IDB_FILTER          =  11
 OPT_IDB_OS              =  12
 OPT_IDB_FCS_LEN         =  13
@@ -477,6 +484,7 @@ def strip_header( packed_bytes ): #todo use for all unpack()
     util.assert_block32_length( packed_bytes )
     (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
     content_pad = packed_bytes[4:]
+    assert content_len <= len(content_pad)
     content = content_pad[:content_len]
     return (opt_code, content_len, content)
 
@@ -527,6 +535,9 @@ def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
 def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
 def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
 def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
+
+def float32_pack(   arg ):      return struct.pack(   '=f', arg )
+def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
 
 class IdbSpeed(IdbOption):
     SPEC_CODE = 8
@@ -605,6 +616,34 @@ class IdbTsResol(IdbOption):
         result  = IdbTsResol( ts_resol_power, is_power_2 )
         return result
 
+class IdbTZone(IdbOption):
+    SPEC_CODE = 10
+    # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+
+    def __init__(self, offset):     #todo PCAPNG spec leaves interpretation of offset unspecified
+        self.code   = self.SPEC_CODE
+        self.offset = offset
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'offset'])
+
+    def pack(self):
+        """Encodes into a bytes block."""
+        content = float32_pack( self.offset )
+        content_len = 4     #todo content_len unneeded?
+        packed_bytes = add_header( self.code, content_len, content )
+        return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { IdbTZone.SPEC_CODE : IdbTZone.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == IdbTZone.SPEC_CODE    #todo check everywhere
+        assert content_len == 4    #todo check everywhere
+        offset = float32_unpack( content )
+        result = IdbTZone( offset )
+        return result
 
 
 #todo add options for all

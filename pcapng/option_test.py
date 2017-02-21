@@ -218,6 +218,15 @@ def test_IdbTsResol():
     util.assert_rel_equal(  c1.get_ts_resolution_secs(), (1.0/32.0), digits=5 )
     util.assert_rel_equal( c1u.get_ts_resolution_secs(), (1.0/32.0), digits=5 )
 
+def test_IdbTZone():
+    offset = 7
+    c1  = option.IdbTZone( offset )
+    packed_bytes = c1.pack()
+    c1u = option.IdbTZone.unpack( packed_bytes )
+    assert len( packed_bytes ) == 8
+    assert c1.offset           == c1u.offset           == offset
+    assert util.classname(c1)  == util.classname(c1u)  == 'pcapng.option.IdbTZone'
+
 
 
 

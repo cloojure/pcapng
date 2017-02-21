@@ -523,12 +523,14 @@ class IdbEuiAddr(IdbOption):
 
 #todo add global statemachine/var for write (testing) and read (host dependent)
 #todo -> pack.uint64_pack()/_unpack() & similar everywhere
+def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
+def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
 def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
 def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
 
 class IdbSpeed(IdbOption):
-    SPEC_CODE = 7
-  # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+    SPEC_CODE = 8
+    # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, speed):
         util.assert_uint64(speed)
@@ -554,6 +556,53 @@ class IdbSpeed(IdbOption):
         assert content_len == 8    #todo check everywhere
         speed   = uint64_unpack( content )
         result  = IdbSpeed( speed )
+        return result
+
+class IdbTsResol(IdbOption):
+    SPEC_CODE = 9
+  # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+    POWER_2_BITMASK     = 0x80
+    POWER_10_BITMASK    = 0x00
+    EXPONENT_BITMASK    = 0x7F
+
+    def __init__(self, ts_resol_exponent, is_power_2=False):
+        assert 0 <= ts_resol_exponent <= 127    # 7 bits only + decimal/binary flag bit
+        self.code   = self.SPEC_CODE
+        self.ts_resol_power  = ts_resol_exponent
+        self.is_power_2  = is_power_2
+
+    def get_ts_resolution_secs(self):
+        if (self.is_power_2):
+            return pow(  2, -self.ts_resol_power )
+        else:
+            return pow( 10, -self.ts_resol_power )
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'ts_resol_power', 'is_power_2'])
+
+    def pack(self):
+        """Encodes into a bytes block."""
+        if (self.is_power_2):
+            bitmask = IdbTsResol.POWER_2_BITMASK
+        else:
+            bitmask = IdbTsResol.POWER_10_BITMASK
+        byte_val = bitmask | self.ts_resol_power
+        content =  uint8_pack( byte_val )
+        content_len = 1     #todo content_len unneeded?
+        packed_bytes = add_header( self.code, content_len, content )
+        return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { IdbTsResol.SPEC_CODE : IdbTsResol.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == IdbTsResol.SPEC_CODE    #todo check everywhere
+        assert content_len == 1    #todo check everywhere
+        byte_val   = uint8_unpack( content )
+        is_power_2 = bool( byte_val & IdbTsResol.POWER_2_BITMASK )
+        ts_resol_power = byte_val & IdbTsResol.EXPONENT_BITMASK
+        result  = IdbTsResol( ts_resol_power, is_power_2 )
         return result
 
 

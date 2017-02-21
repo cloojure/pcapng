@@ -193,5 +193,32 @@ def test_IdbSpeed():
     assert c1.speed             == c1u.speed            == speed
     assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbSpeed'
 
+def test_IdbTsResol():
+    power = 3;
+    is_power_2 = False
+    c1  = option.IdbTsResol( power, is_power_2 )
+    packed_bytes = c1.pack()
+    c1u = option.IdbTsResol.unpack( packed_bytes )
+    assert len( packed_bytes ) == 8
+    assert c1.ts_resol_power    == c1u.ts_resol_power   == power
+    assert c1.is_power_2        == c1u.is_power_2       == is_power_2
+    assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbTsResol'
+    util.assert_rel_equal(  c1.get_ts_resolution_secs(), 0.001, digits=5 )
+    util.assert_rel_equal( c1u.get_ts_resolution_secs(), 0.001, digits=5 )
+
+    power = 5;
+    is_power_2 = True
+    c1  = option.IdbTsResol( power, is_power_2 )
+    packed_bytes = c1.pack()
+    c1u = option.IdbTsResol.unpack( packed_bytes )
+    assert len( packed_bytes ) == 8
+    assert c1.ts_resol_power    == c1u.ts_resol_power   == power
+    assert c1.is_power_2        == c1u.is_power_2       == is_power_2
+    assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbTsResol'
+    util.assert_rel_equal(  c1.get_ts_resolution_secs(), (1.0/32.0), digits=5 )
+    util.assert_rel_equal( c1u.get_ts_resolution_secs(), (1.0/32.0), digits=5 )
+
+
+
 
 

@@ -536,6 +536,11 @@ def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
 def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
 def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
 
+def  int8_pack(    arg ):       return struct.pack(   '=b', arg )
+def  int8_unpack(  arg ):       return struct.unpack( '=b', arg )[0]
+def  int64_pack(   arg ):       return struct.pack(   '=q', arg )
+def  int64_unpack( arg ):       return struct.unpack( '=q', arg )[0]
+
 def float32_pack(   arg ):      return struct.pack(   '=f', arg )
 def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
 
@@ -645,7 +650,94 @@ class IdbTZone(IdbOption):
         result = IdbTZone( offset )
         return result
 
+class IdbFilter(IdbOption):   #todo spec says "TODO: Appendix XXX"
+    SPEC_CODE = 11
+    def __init__(self, content_str):
+        IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
+    @staticmethod
+    def dispatch_entry(): return { IdbFilter.SPEC_CODE : IdbFilter.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == IdbFilter.SPEC_CODE    #todo check everywhere
+        return IdbFilter(content)
+
+class IdbOs(IdbOption):
+    SPEC_CODE = 12
+    def __init__(self, content_str):
+        IdbOption.__init__(self, self.SPEC_CODE, content_str)
+
+    @staticmethod
+    def dispatch_entry(): return { IdbOs.SPEC_CODE : IdbOs.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == IdbOs.SPEC_CODE    #todo check everywhere
+        return IdbOs(content)
+
+class IdbFcsLen(IdbOption):
+    SPEC_CODE = 13
+    # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+
+    def __init__(self, fcs_len):
+        util.assert_uint8( fcs_len )
+        self.code       = self.SPEC_CODE
+        self.fcs_len    = fcs_len
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'fcs_len'])
+
+    def pack(self):
+        """Encodes into a bytes block."""
+        content =  uint8_pack( self.fcs_len )
+        content_len = 1     #todo content_len unneeded?
+        packed_bytes = add_header( self.code, content_len, content )
+        return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { IdbFcsLen.SPEC_CODE : IdbFcsLen.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == IdbFcsLen.SPEC_CODE    #todo check everywhere
+        assert content_len == 1    #todo check everywhere
+        fcs_len = uint8_unpack( content )
+        result  = IdbFcsLen( fcs_len )
+        return result
+
+class IdbTsOffset(IdbOption):   #todo maybe make this uint64 type?
+    SPEC_CODE = 14
+    # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+
+    def __init__(self, ts_offset):     #todo PCAPNG spec leaves interpretation of ts_offset unspecified
+        self.code       = self.SPEC_CODE
+        self.ts_offset  = ts_offset
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'ts_offset'])
+
+    def pack(self):
+        """Encodes into a bytes block."""
+        content = int64_pack( self.ts_offset )
+        content_len = 8     #todo content_len unneeded?
+        packed_bytes = add_header( self.code, content_len, content )
+        return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { IdbTsOffset.SPEC_CODE : IdbTsOffset.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == IdbTsOffset.SPEC_CODE    #todo check everywhere
+        assert content_len == 8    #todo check everywhere
+        ts_offset = int64_unpack( content )
+        result = IdbTsOffset( ts_offset )
+        return result
+
+#-----------------------------------------------------------------------------
 #todo add options for all
 
 #todo need way to pack generic options: integer, string, float, object

@@ -227,7 +227,34 @@ def test_IdbTZone():
     assert c1.offset           == c1u.offset           == offset
     assert util.classname(c1)  == util.classname(c1u)  == 'pcapng.option.IdbTZone'
 
+def test_IdbFilter():
+    s1 = 'Natural Brown #4'
+    c1  = option.IdbFilter(s1)
+    c1u = option.IdbFilter.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbFilter'
 
+def test_IdbOs():
+    s1 = 'Ubuntu Xenial 16.04.1 LTS'
+    c1  = option.IdbOs(s1)
+    c1u = option.IdbOs.unpack( c1.pack() )
+    assert c1.content == c1u.content == s1
+    assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbOs'
 
+def test_IdbFcsLen():
+    val_1 = 97
+    c1  = option.IdbFcsLen(val_1)
+    c1u = option.IdbFcsLen.unpack( c1.pack() )
+    assert c1.fcs_len == c1u.fcs_len == val_1
+    assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbFcsLen'
+
+def test_IdbTsOffset():
+    ts_offset = 1234567
+    c1  = option.IdbTsOffset( ts_offset )
+    packed_bytes = c1.pack()
+    c1u = option.IdbTsOffset.unpack( packed_bytes )
+    assert len( packed_bytes ) == 12
+    assert c1.ts_offset        == c1u.ts_offset        == ts_offset
+    assert util.classname(c1)  == util.classname(c1u)  == 'pcapng.option.IdbTsOffset'
 
 

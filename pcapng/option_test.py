@@ -266,3 +266,14 @@ def test_EpbFlags():
     assert len( packed_bytes ) == 8    #todo add this test everywhere
     assert c1.content         == c1u.content         == content
     assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.EpbFlags'
+
+def test_EpbHash():
+    content    = to_bytes( "<generic hash spec here>" )
+    c1  = option.EpbHash(content)
+    c1u = option.EpbHash.unpack( c1.pack() )
+    assert c1.content         == c1u.content         == content
+    assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.EpbHash'
+
+
+
+

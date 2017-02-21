@@ -758,20 +758,20 @@ class EpbFlags(EpbOption):
         result = EpbFlags( content )
         return result
 
-class EpbOs(EpbOption):
+class EpbHash(EpbOption):
     SPEC_CODE = 3
     def __init__(self, content_str):
         EpbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
-    def dispatch_entry(): return { EpbOs.SPEC_CODE : EpbOs.unpack }
+    def dispatch_entry(): return { EpbHash.SPEC_CODE : EpbHash.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        content_pad = packed_bytes[4:]
-        content = content_pad[:content_len]
-        return EpbOs(content)
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == EpbHash.SPEC_CODE    #todo check everywhere
+        result = EpbHash( content )
+        return result
 
 class EpbUserAppl(EpbOption):
     SPEC_CODE = 4
@@ -783,10 +783,11 @@ class EpbUserAppl(EpbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        content_pad = packed_bytes[4:]
-        content = content_pad[:content_len]
-        return EpbUserAppl(content)
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == EpbFlags.SPEC_CODE    #todo check everywhere
+        assert content_len == 4    #todo check everywhere
+        result = EpbFlags( content )
+        return result
 
 #-----------------------------------------------------------------------------
 #todo add options for all blocks/classes

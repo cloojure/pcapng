@@ -390,6 +390,47 @@ class IdbIpv4Addr(IdbOption):
         print( 'IdbIpv4Addr.unpack() - exit')
         return result
 
+class IdbIpv6Addr(IdbOption):
+    SPEC_CODE = 5
+    def __init__(self, addr_byte_lst, prefix_len):
+        print( 'IdbIpv6Addr.__init__() - enter')
+        print( 'addr_byte_lst={} prefix_len={}'.format( addr_byte_lst, prefix_len ))
+        addr_byte_lst       = list( addr_byte_lst )
+        util.assert_vec16_uint8( addr_byte_lst )
+        assert 0 <= prefix_len  <= 128
+        self.code           = self.SPEC_CODE
+        self.addr_bytes     = addr_byte_lst
+        self.prefix_len     = prefix_len
+        print( 'IdbIpv6Addr.__init__() - exit')
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes', 'prefix_len'])
+
+    @staticmethod
+    def dispatch_entry(): return { IdbIpv6Addr.SPEC_CODE : IdbIpv6Addr.unpack }
+
+    def pack(self):   #todo needs test
+        """Encodes into a bytes block."""
+        content = to_bytes(self.addr_bytes) + to_bytes( [self.prefix_len] )
+        content_len = len(content)
+        assert content_len == 17
+        content_pad = util.block32_pad_bytes( content )
+        packed_bytes = struct.pack('=HH', self.code, content_len) + content_pad
+        return packed_bytes
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        print( 'IdbIpv6Addr.unpack() - enter')      #todo remove dbg prints
+        assert len(packed_bytes) == 24      #todo check everywhere
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        assert opt_code == IdbIpv6Addr.SPEC_CODE    #todo check everywhere
+        assert content_len == 17    #todo check everywhere
+        addr_val        = util.bytes_to_uint8_list( packed_bytes[4:20]  )
+        (prefix_len,)   = util.bytes_to_uint8_list( packed_bytes[20:21] )
+        result = IdbIpv6Addr( addr_val, prefix_len )
+        print( 'IdbIpv6Addr.unpack() - result=', result)
+        print( 'IdbIpv6Addr.unpack() - exit')
+        return result
+
 
 
 #todo add options for all

@@ -63,6 +63,14 @@ def assert_vec4_uint8( listy ):
         print( '#141  val={}'.format( repr(val)))
         assert_uint8(val)
 
+def assert_vec16_uint8( listy ):
+    "Assert the argument is a length 16 list of uint8 values"
+#   print( '#140  type={}  len={}  value={} '.format( type(listy), len(listy), listy ))
+    assert len(listy) == 16
+    for val in listy:
+#       print( '#141  val={}'.format( repr(val)))
+        assert_uint8(val)
+
 #-----------------------------------------------------------------------------
 
 #todo make a pow2_range(), pow2_thru() fns (0 1 2 4 8 16 32 ...)

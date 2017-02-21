@@ -151,3 +151,13 @@ def test_IdbIpv4Addr():
     assert c1.addr_bytes    == c1u.addr_bytes    == addr_bytes
     assert c1.netmask_bytes == c1u.netmask_bytes == netmask_bytes
     assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbIpv4Addr'
+
+def test_IdbIpv6Addr():
+    addr_bytes    = [ 11, 12, 13, 14,    15, 16, 17, 18,
+                      21, 22, 23, 24,    25, 26, 27, 28 ]
+    prefix_len = 65
+    c1  = option.IdbIpv6Addr( addr_bytes, prefix_len )
+    c1u = option.IdbIpv6Addr.unpack( c1.pack() )
+    assert c1.addr_bytes    == c1u.addr_bytes   == addr_bytes
+    assert c1.prefix_len    == c1u.prefix_len   == prefix_len
+    assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbIpv6Addr'

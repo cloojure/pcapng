@@ -23,38 +23,37 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 # option ID codes from PCAPNG spec
 
 OPT_END_OF_OPT    =     0
-OPT_COMMENT       =     1   #delete -> class def
 OPT_UNKNOWN       =  9999   # non-standard
 
 #todo need to do validation on data values & lengths
 # custom options
-CUSTOM_STRING_COPYABLE      =  2988   #delete -> class def
-CUSTOM_BINARY_COPYABLE      =  2989   #delete -> class def
-CUSTOM_STRING_NON_COPYABLE  = 19372   #delete -> class def
-CUSTOM_BINARY_NON_COPYABLE  = 19373   #delete -> class def
+# CUSTOM_STRING_COPYABLE      =  2988   #delete -> class def
+# CUSTOM_BINARY_COPYABLE      =  2989   #delete -> class def
+# CUSTOM_STRING_NON_COPYABLE  = 19372   #delete -> class def
+# CUSTOM_BINARY_NON_COPYABLE  = 19373   #delete -> class def
 
 #todo need to do validation on data values & lengths
 # section header block options
-OPT_SHB_HARDWARE  = 2    #delete -> class def
-OPT_SHB_OS        = 3    #delete -> class def
-OPT_SHB_USERAPPL  = 4    #delete -> class def
+# OPT_SHB_HARDWARE  = 2    #delete -> class def
+# OPT_SHB_OS        = 3    #delete -> class def
+# OPT_SHB_USERAPPL  = 4    #delete -> class def
 
 #todo need to do validation on data values & lengths
 #todo   make subclasses of Option
 # interface description block options
-OPT_IDB_NAME            =   2    #delete -> class def
-OPT_IDB_DESCRIPTION     =   3    #delete -> class def
-OPT_IDB_IPV4_ADDR       =   4    #delete -> class def
-OPT_IDB_IPV6_ADDR       =   5   #delete -> class def
-OPT_IDB_MAC_ADDR        =   6  #delete -> class def
-OPT_IDB_EUI_ADDR        =   7  #delete -> class def
-OPT_IDB_SPEED           =   8  #delete -> class def
-OPT_IDB_TS_RESOL        =   9  #delete -> class def
-OPT_IDB_TZONE           =  10  #delete -> class def
-OPT_IDB_FILTER          =  11
-OPT_IDB_OS              =  12
-OPT_IDB_FCS_LEN         =  13
-OPT_IDB_TS_OFFSET       =  14
+# OPT_IDB_NAME            =   2    #delete -> class def
+# OPT_IDB_DESCRIPTION     =   3    #delete -> class def
+# OPT_IDB_IPV4_ADDR       =   4    #delete -> class def
+# OPT_IDB_IPV6_ADDR       =   5   #delete -> class def
+# OPT_IDB_MAC_ADDR        =   6  #delete -> class def
+# OPT_IDB_EUI_ADDR        =   7  #delete -> class def
+# OPT_IDB_SPEED           =   8  #delete -> class def
+# OPT_IDB_TS_RESOL        =   9  #delete -> class def
+# OPT_IDB_TZONE           =  10  #delete -> class def
+# OPT_IDB_FILTER          =  11
+# OPT_IDB_OS              =  12
+# OPT_IDB_FCS_LEN         =  13
+# OPT_IDB_TS_OFFSET       =  14
 
 #todo need to do validation on data values & lengths
 # enhanced packet block options
@@ -66,44 +65,26 @@ OPT_EPB_DROPCOUNT       =   4   #todo need validation fn & use it
 
 #todo maybe need func to verify valid any option codes?
 
-CUSTOM_OPTIONS = {CUSTOM_STRING_COPYABLE,       CUSTOM_BINARY_COPYABLE,
-                  CUSTOM_STRING_NON_COPYABLE,   CUSTOM_BINARY_NON_COPYABLE}
-
-GENERAL_OPTIONS = { OPT_COMMENT } | CUSTOM_OPTIONS
-
-SHB_OPTIONS = GENERAL_OPTIONS | { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
-
-IDB_OPTIONS = GENERAL_OPTIONS | {
-    OPT_IDB_NAME,       OPT_IDB_DESCRIPTION,    OPT_IDB_IPV4_ADDR,  OPT_IDB_IPV6_ADDR,
-    OPT_IDB_MAC_ADDR,   OPT_IDB_EUI_ADDR,       OPT_IDB_SPEED,      OPT_IDB_TS_RESOL,
-    OPT_IDB_TZONE,      OPT_IDB_FILTER,         OPT_IDB_OS,         OPT_IDB_FCS_LEN,
-    OPT_IDB_TS_OFFSET }
-
-EPB_OPTIONS = GENERAL_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
-
-ALL_OPTIONS = CUSTOM_OPTIONS | GENERAL_OPTIONS | SHB_OPTIONS | IDB_OPTIONS | EPB_OPTIONS
+# CUSTOM_OPTIONS = {CUSTOM_STRING_COPYABLE,       CUSTOM_BINARY_COPYABLE,
+#                   CUSTOM_STRING_NON_COPYABLE,   CUSTOM_BINARY_NON_COPYABLE}
+#
+# GENERAL_OPTIONS = { OPT_COMMENT } | CUSTOM_OPTIONS
+#
+# SHB_OPTIONS = GENERAL_OPTIONS | { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
+#
+# IDB_OPTIONS = GENERAL_OPTIONS | {
+#     OPT_IDB_NAME,       OPT_IDB_DESCRIPTION,    OPT_IDB_IPV4_ADDR,  OPT_IDB_IPV6_ADDR,
+#     OPT_IDB_MAC_ADDR,   OPT_IDB_EUI_ADDR,       OPT_IDB_SPEED,      OPT_IDB_TS_RESOL,
+#     OPT_IDB_TZONE,      OPT_IDB_FILTER,         OPT_IDB_OS,         OPT_IDB_FCS_LEN,
+#     OPT_IDB_TS_OFFSET }
+#
+# EPB_OPTIONS = GENERAL_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
+#
+# ALL_OPTIONS = CUSTOM_OPTIONS | GENERAL_OPTIONS | SHB_OPTIONS | IDB_OPTIONS | EPB_OPTIONS
 
 #todo check type on all fns
 
-#todo need to do validation on data values & lengths
-def assert_shb_option(option):      #todo simplify to reflect class structure (-> class def)
-    "Returns true if option code is valid for a segment header block"
-    assert (option.code in SHB_OPTIONS)
-
-#todo need to do validation on data values & lengths
-def assert_idb_option(option):      #todo simplify to reflect class structure
-    "Returns true if option code is valid for a interface description block"
-    assert (option.code in IDB_OPTIONS)
-
-#todo need to do validation on data values & lengths
-def assert_epb_option(option):      #todo simplify to reflect class structure
-    "Returns true if option code is valid for a enhanced packet block"
-    assert (option.code in EPB_OPTIONS)
-
-#todo need to do validation on data values & lengths
-def assert_custom_block_option(option):      #todo simplify to reflect class structure
-    """Returns true if option code is valid for a custom block"""
-    assert (option.code in CUSTOM_OPTIONS)
+# #todo need to do validation on data values & lengths
 
 def unpack_opt_code(opt_bytes):
     util.assert_type_bytes(opt_bytes)
@@ -115,10 +96,9 @@ def is_end_of_opt( opt_bytes ):
 
 #todo verify all fields
 class Option:
-    def __init__(self, code, content, code_verify_disable=False):
+    def __init__(self, code, content):
         """Creates an Option with the specified option code & content."""
-        if not code_verify_disable:
-            assert (code in ALL_OPTIONS)
+      # assert (code in ALL_OPTIONS)
         self.code       = code
         self.content    = to_bytes(content)
 
@@ -153,7 +133,7 @@ class Option:
             #
             print( 'warning - Option.unpack_dispatch(): unrecognized Option={}'.format( opt_code )) #todo log
             stripped_bytes = opt_bytes[4:]
-            return Option( option.OPT_UNKNOWN, stripped_bytes, True )
+            return Option( option.OPT_UNKNOWN, stripped_bytes )
 
 #wip continue here
 class Comment(Option):
@@ -173,7 +153,13 @@ class Comment(Option):
         print( '211 content_pad={} content={}'.format(content_pad, content))
         return Comment(content)
 
-class CustomStringCopyable(Option):
+#-----------------------------------------------------------------------------
+class CustomOption(Option):
+    def __init__(self, code, content):
+        """Creates an SHB Option with the specified option code & content."""
+        Option.__init__( self, code, content )
+
+class CustomStringCopyable(CustomOption):
     SPEC_CODE = 2988
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
@@ -198,11 +184,11 @@ class CustomStringCopyable(Option):
         content         = content_pad[:content_len]
         return CustomStringCopyable( pen_val, content )
 
-class CustomBinaryCopyable(Option):
+class CustomBinaryCopyable(CustomOption):
     SPEC_CODE = 2989
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = CUSTOM_BINARY_COPYABLE
+        self.code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
@@ -223,11 +209,11 @@ class CustomBinaryCopyable(Option):
         content         = content_pad[:content_len]
         return CustomBinaryCopyable( pen_val, content )
 
-class CustomStringNonCopyable(Option):
+class CustomStringNonCopyable(CustomOption):
     SPEC_CODE = 19372
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = CUSTOM_STRING_NON_COPYABLE
+        self.code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
@@ -248,11 +234,11 @@ class CustomStringNonCopyable(Option):
         content         = content_pad[:content_len]
         return CustomStringNonCopyable( pen_val, content )
 
-class CustomBinaryNonCopyable(Option):
+class CustomBinaryNonCopyable(CustomOption):
     SPEC_CODE = 19373
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = CUSTOM_BINARY_NON_COPYABLE
+        self.code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
@@ -277,12 +263,12 @@ class CustomBinaryNonCopyable(Option):
 class ShbOption(Option):
     def __init__(self, code, content, code_verify_disable=False):
         """Creates an SHB Option with the specified option code & content."""
-        Option.__init__( self, code, content, code_verify_disable )
+        Option.__init__( self, code, content )
 
 class ShbHardware(ShbOption):
     SPEC_CODE = 2
     def __init__(self, content_str):
-        ShbOption.__init__(self, OPT_SHB_HARDWARE, content_str)
+        ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
     def dispatch_entry(): return { ShbHardware.SPEC_CODE : ShbHardware.unpack }
@@ -297,7 +283,7 @@ class ShbHardware(ShbOption):
 class ShbOs(ShbOption):
     SPEC_CODE = 3
     def __init__(self, content_str):
-        ShbOption.__init__(self, OPT_SHB_OS, content_str)
+        ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
     def dispatch_entry(): return { ShbOs.SPEC_CODE : ShbOs.unpack }
@@ -312,7 +298,7 @@ class ShbOs(ShbOption):
 class ShbUserAppl(ShbOption):
     SPEC_CODE = 4
     def __init__(self, content_str):
-        ShbOption.__init__(self, OPT_SHB_USERAPPL, content_str)
+        ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
     def dispatch_entry(): return { ShbUserAppl.SPEC_CODE : ShbUserAppl.unpack }
@@ -328,7 +314,7 @@ class ShbUserAppl(ShbOption):
 class IdbOption(Option):
     def __init__(self, code, content, code_verify_disable=False):
         """Creates an IDB Option with the specified option code & content."""
-        Option.__init__( self, code, content, code_verify_disable )
+        Option.__init__( self, code, content )
 
 class IdbName(IdbOption):
     SPEC_CODE = 2
@@ -480,6 +466,7 @@ class IdbMacAddr(IdbOption):
         print( 'IdbMacAddr.unpack() - exit')
         return result
 
+#-----------------------------------------------------------------------------
 def strip_header( packed_bytes ): #todo use for all unpack()
     util.assert_block32_length( packed_bytes )
     (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -494,6 +481,7 @@ def add_header(id_code, content_len, content):   #todo delete content var?
     packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
     return packed_bytes
 
+#-----------------------------------------------------------------------------
 class IdbEuiAddr(IdbOption):
     SPEC_CODE = 7
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
@@ -529,6 +517,7 @@ class IdbEuiAddr(IdbOption):
         result      = IdbEuiAddr( addr_val )
         return result
 
+#-----------------------------------------------------------------------------
 #todo add global statemachine/var for write (testing) and read (host dependent)
 #todo -> pack.uint64_pack()/_unpack() & similar everywhere
 def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
@@ -544,6 +533,7 @@ def  int64_unpack( arg ):       return struct.unpack( '=q', arg )[0]
 def float32_pack(   arg ):      return struct.pack(   '=f', arg )
 def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
 
+#-----------------------------------------------------------------------------
 class IdbSpeed(IdbOption):
     SPEC_CODE = 8
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
@@ -738,7 +728,14 @@ class IdbTsOffset(IdbOption):   #todo maybe make this uint64 type?
         return result
 
 #-----------------------------------------------------------------------------
-#todo add options for all
+class EpbOption(Option):    #todo -> Abstract (or all base classes)
+    def __init__(self, code, content):
+        """Creates an EPB Option with the specified option code & content."""
+        Option.__init__( self, code, content )
+#todo finish EPB options
+
+#-----------------------------------------------------------------------------
+#todo add options for all blocks/classes
 
 #todo need way to pack generic options: integer, string, float, object
 
@@ -765,7 +762,7 @@ def unpack_rolling(raw_bytes):
     opt_bytes             = raw_bytes[ :first_block_len_pad   ]
     raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
     opt_content           = opt_bytes[ 4 : 4+content_len_orig ]
-    option_read = Option( opt_code, opt_content, True )
+    option_read = Option( opt_code, opt_content )
     print( '569 unpack_rolling() - enter')
     return ( option_read, raw_bytes_remaining )
 

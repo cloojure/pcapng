@@ -109,10 +109,10 @@ def test_enhanced_pkt_block():
 
 def test_custom_block():
     def assert_custom_block_codec(content_bytes):
-        opts = [ Option( option.CUSTOM_STRING_COPYABLE, "O"),
-                 Option( option.CUSTOM_BINARY_COPYABLE, "Doh!"),
-                 Option( option.CUSTOM_STRING_NON_COPYABLE, "Release the hounds!"),
-                 Option( option.CUSTOM_BINARY_NON_COPYABLE, [1, 2, 3]) ]
+        opts = [ option.CustomStringCopyable( pen.BROCADE_PEN, "O"),
+                 option.CustomBinaryCopyable( pen.BROCADE_PEN, "Doh!"),
+                 option.CustomStringNonCopyable( pen.BROCADE_PEN, "Release the hounds!"),
+                 option.CustomBinaryNonCopyable( pen.BROCADE_PEN, [1, 2, 3]) ]
         orig = to_bytes(content_bytes)
 
         cb_obj = block.CustomBlock( block.CUSTOM_BLOCK_COPYABLE, pen.BROCADE_PEN, orig, opts )

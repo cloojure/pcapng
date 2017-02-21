@@ -35,7 +35,7 @@ SHB_MINOR_VERSION   = 0
 CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
 CUSTOM_BLOCK_NON_COPYABLE = 0x40000BAD
 
-CUSTOM_MRT_ISIS_BLOCK_OPT = Option(option.CUSTOM_STRING_COPYABLE, 'EMBEDDED_MRT_ISIS_BLOCK')
+CUSTOM_MRT_ISIS_BLOCK_OPT = option.CustomStringCopyable( pcapng.pen.BROCADE_PEN, 'EMBEDDED_MRT_ISIS_BLOCK')
 
 #todo read must find mandatory SHB at beginning
     #todo global byte-order starts off undefined; is reset by each SHB
@@ -75,11 +75,6 @@ class SectionHeaderBlock:
     block_head_encoding = '=LLLHHq'     #todo need determine endian on read
     block_tail_encoding = '=L'          #todo need determine endian on read
 
-    SHB_OPTION_CLASSNAMES = { 'pcapng.option.ShbHardware',
-                              'pcapng.option.ShbOs',
-                              'pcapng.option.ShbUserAppl' }
-    LEGAL_OPT_CLASSNAMES = GENERAL_OPTION_CLASSNAMES | SHB_OPTION_CLASSNAMES
-
     UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
         option.Comment.dispatch_entry(),
         option.CustomStringCopyable.dispatch_entry(),
@@ -91,8 +86,16 @@ class SectionHeaderBlock:
         option.ShbUserAppl.dispatch_entry()
     ] )
 
+    @staticmethod
+    def is_shb_option(obj):
+        result = (  isinstance(obj, option.Comment) |
+                    isinstance(obj, option.CustomOption) |
+                    isinstance(obj, option.ShbOption) )
+        return result
+
     def __init__(self, options_lst=[]):
-        validate_options(options_lst, self.LEGAL_OPT_CLASSNAMES)
+        for opt in options_lst:
+            assert self.is_shb_option(opt)
         self.options_lst = options_lst
 
     def pack(self):    #todo data_len
@@ -155,24 +158,6 @@ class InterfaceDescBlock:
     block_head_encoding = '=LLHHL'
     block_tail_encoding = '=L'
 
-#todo unify these 2 lists
-    IDB_OPTION_CLASSNAMES = {
-        'pcapng.option.IdbName',
-        'pcapng.option.IdbDescription',
-        'pcapng.option.IdbIpv4Addr',
-        'pcapng.option.IdbIpv6Addr',
-        'pcapng.option.IdbMacAddr',
-        'pcapng.option.IdbEuiAddr',
-        'pcapng.option.IdbSpeed',
-        'pcapng.option.IdbTsResol',
-        'pcapng.option.IdbTZone',
-        'pcapng.option.IdbFilter',
-        'pcapng.option.IdbOs',
-        'pcapng.option.IdbFcsLen',
-        'pcapng.option.IdbTsOffset'
-    }
-    LEGAL_OPT_CLASSNAMES = GENERAL_OPTION_CLASSNAMES | IDB_OPTION_CLASSNAMES
-
     #todo unify these 2 lists
     UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
         option.Comment.dispatch_entry(),
@@ -195,11 +180,18 @@ class InterfaceDescBlock:
         option.IdbTsOffset.dispatch_entry(),
     ] )
 
+    @staticmethod
+    def is_idb_option(obj):
+        result = (  isinstance(obj, option.Comment) |
+                    isinstance(obj, option.CustomOption) |
+                    isinstance(obj, option.IdbOption) )
+        return result
+
     def __init__(self, link_type=linktype.LINKTYPE_ETHERNET, #todo temp testing default
                  options_lst=[]):
         #todo need test valid linktype
-        validate_options(options_lst, self.LEGAL_OPT_CLASSNAMES)
-        for opt in options_lst: option.assert_idb_option(opt)   #todo verify
+        for opt in options_lst:
+            assert self.is_idb_option(opt)
         self.options_lst    = options_lst
         self.link_type      = link_type
         self.reserved       = 0    # spec req zeros
@@ -301,6 +293,15 @@ class EnhancedPacketBlock:
     head_encoding = '=LLLLLLL'
     tail_encoding = '=L'
 
+    @staticmethod
+    def is_epb_option(obj):
+        result = (  isinstance(obj, option.Comment) |
+                    isinstance(obj, option.CustomOption) |
+                    isinstance(obj, option.EpbOption)
+        | isinstance(obj, option.Option)    #todo temp placeholder
+                 )
+        return result
+
     def __init__(self, interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[]):
         util.assert_uint32( interface_id )  #todo verify args in all fns
         pkt_data_captured = to_bytes( pkt_data_captured )        #todo is list & tuple & str ok?
@@ -310,7 +311,8 @@ class EnhancedPacketBlock:
             util.assert_uint32(pkt_data_orig_len)
             assert len(pkt_data_captured) <= pkt_data_orig_len
         util.assert_type_list( options_lst )   #todo check type on all fns
-        for opt in options_lst: option.assert_epb_option(opt)
+        for opt in options_lst:
+            assert self.is_epb_option(opt)
         self.interface_id       = interface_id
         self.pkt_data_captured  = pkt_data_captured
         self.pkt_data_orig_len  = pkt_data_orig_len
@@ -377,11 +379,19 @@ class CustomBlock:
     head_encoding = '=LLL'
     tail_encoding = '=L'
 
+    @staticmethod
+    def is_custom_block_option(obj):
+        result = (  isinstance(obj, option.Comment) |
+                    isinstance(obj, option.CustomOption) )
+        return result
+
     def __init__(self, block_type, pen_val, content, options_lst=[] ):
         assert ((block_type == CUSTOM_BLOCK_COPYABLE) or
                 (block_type == CUSTOM_BLOCK_NON_COPYABLE))
         pcapng.pen.assert_valid_pen( pen_val )
-        for opt in options_lst: option.assert_custom_block_option(opt)
+        for opt in options_lst:
+            assert self.is_custom_block_option(opt)
+
         self.block_type     = block_type
         self.pen_val        = pen_val
         self.content        = content

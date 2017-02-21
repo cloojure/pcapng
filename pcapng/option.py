@@ -481,7 +481,7 @@ def strip_header( packed_bytes ): #todo use for all unpack()
 
 class IdbEuiAddr(IdbOption):
     SPEC_CODE = 7
-  # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+    # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, addr_byte_lst):
         addr_byte_lst = list( addr_byte_lst )
@@ -500,7 +500,9 @@ class IdbEuiAddr(IdbOption):
         content = to_bytes(self.addr_bytes)
         content_len = len(content)
         assert content_len == 8
-        packed_bytes = struct.pack('=HH', self.code, content_len) + content
+        packed_bytes = ( struct.pack('=HH', self.code, content_len) +
+                         content )
+            #todo -> add_header( opt_code, content_len, content_pad )
         util.assert_block32_length( packed_bytes )  #todo add to all
         return packed_bytes
 
@@ -513,6 +515,37 @@ class IdbEuiAddr(IdbOption):
         assert content_len == 8    #todo check everywhere
         addr_val    = util.bytes_to_uint8_list( content_pad[:8] )
         result      = IdbEuiAddr( addr_val )
+        return result
+
+class IdbSpeed(IdbOption):
+    SPEC_CODE = 7
+  # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+
+    def __init__(self, speed):
+        util.assert_uint64(speed)
+        self.code   = self.SPEC_CODE
+        self.speed  = speed
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'speed'])
+
+    @staticmethod
+    def dispatch_entry(): return { IdbSpeed.SPEC_CODE : IdbSpeed.unpack }
+
+    def pack(self):
+        """Encodes into a bytes block."""
+        packed_bytes = struct.pack('=HH', self.code, content_len) + content
+        util.assert_block32_length( packed_bytes )  #todo add to all
+        return packed_bytes
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        util.assert_block32_length( packed_bytes )  #todo add to all
+        assert len(packed_bytes) == 12      #todo check everywhere
+        (opt_code, content_len, content_pad) = strip_header( packed_bytes )
+        assert opt_code == IdbSpeed.SPEC_CODE    #todo check everywhere
+        assert content_len == 8    #todo check everywhere
+        speed   = util.bytes_to_uint8_list( content_pad[:8] )
+        result  = IdbSpeed( speed )
         return result
 
 

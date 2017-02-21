@@ -241,7 +241,7 @@ class SimplePacketBlock:
     def __init__(self, pkt_data):
         self.pkt_data = to_bytes(pkt_data)        #todo is list & tuple & str ok?
 
-    def pack(self, pkt_data):
+    def pack(self):
         """Encodes a simple packet block."""
         pkt_data_pad     = util.block32_pad_bytes(self.pkt_data)
         original_pkt_len = len(self.pkt_data)
@@ -397,7 +397,7 @@ class CustomMrtIsisBlock:
     "Creates an ISIS MRT block and wraps it in a custom pcapng block"
     cmib_options = [CUSTOM_MRT_ISIS_BLOCK_OPT]      # unique identifier for this block type
 
-    def __init__(self, pkt_data ):
+    def __init__(self, pkt_data):
         self.pkt_data = to_bytes(pkt_data)
 
     def pack(self):

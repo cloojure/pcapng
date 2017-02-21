@@ -438,6 +438,7 @@ class IdbMacAddr(IdbOption):
     def __init__(self, addr_byte_lst):
         print( 'IdbMacAddr.__init__() - enter')
         addr_byte_lst       = list( addr_byte_lst )
+        assert len(addr_byte_lst) == 6
         util.assert_uint8_list( addr_byte_lst )
         self.code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
@@ -470,6 +471,48 @@ class IdbMacAddr(IdbOption):
         result      = IdbMacAddr( addr_val )
         print( 'IdbMacAddr.unpack() - result=', result)
         print( 'IdbMacAddr.unpack() - exit')
+        return result
+
+def strip_header( packed_bytes ): #todo use for all unpack()
+    util.assert_block32_length( packed_bytes )
+    (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+    content_pad = packed_bytes[4:]
+    return (opt_code, content_len, content_pad)
+
+class IdbEuiAddr(IdbOption):
+    SPEC_CODE = 7
+  # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
+
+    def __init__(self, addr_byte_lst):
+        addr_byte_lst = list( addr_byte_lst )
+        assert len(addr_byte_lst) == 8
+        util.assert_uint8_list( addr_byte_lst )
+        self.code           = self.SPEC_CODE
+        self.addr_bytes     = addr_byte_lst
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes'])
+
+    @staticmethod
+    def dispatch_entry(): return { IdbEuiAddr.SPEC_CODE : IdbEuiAddr.unpack }
+
+    def pack(self):
+        """Encodes into a bytes block."""
+        content = to_bytes(self.addr_bytes)
+        content_len = len(content)
+        assert content_len == 8
+        packed_bytes = struct.pack('=HH', self.code, content_len) + content
+        util.assert_block32_length( packed_bytes )  #todo add to all
+        return packed_bytes
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        util.assert_block32_length( packed_bytes )  #todo add to all
+        assert len(packed_bytes) == 12      #todo check everywhere
+        (opt_code, content_len, content_pad) = strip_header( packed_bytes )
+        assert opt_code == IdbEuiAddr.SPEC_CODE    #todo check everywhere
+        assert content_len == 8    #todo check everywhere
+        addr_val    = util.bytes_to_uint8_list( content_pad[:8] )
+        result      = IdbEuiAddr( addr_val )
         return result
 
 

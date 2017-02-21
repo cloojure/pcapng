@@ -168,3 +168,13 @@ def test_IdbMacAddr():
     c1u = option.IdbMacAddr.unpack( c1.pack() )
     assert c1.addr_bytes        == c1u.addr_bytes       == addr_bytes
     assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbMacAddr'
+
+def test_IdbEuiAddr():
+    addr_bytes    = [ 11, 12, 13, 14, 15, 16, 17, 18 ]
+    c1  = option.IdbEuiAddr( addr_bytes )
+    c1u = option.IdbEuiAddr.unpack( c1.pack() )
+    assert c1.addr_bytes        == c1u.addr_bytes       == addr_bytes
+    assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbEuiAddr'
+
+
+

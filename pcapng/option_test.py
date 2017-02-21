@@ -257,4 +257,12 @@ def test_IdbTsOffset():
     assert c1.ts_offset        == c1u.ts_offset        == ts_offset
     assert util.classname(c1)  == util.classname(c1u)  == 'pcapng.option.IdbTsOffset'
 
-
+#-----------------------------------------------------------------------------
+def test_EpbFlags():
+    content    = to_bytes([1,2,3,4])
+    c1  = option.EpbFlags(content)
+    packed_bytes = c1.pack()
+    c1u = option.EpbFlags.unpack( packed_bytes )
+    assert len( packed_bytes ) == 8    #todo add this test everywhere
+    assert c1.content         == c1u.content         == content
+    assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.EpbFlags'

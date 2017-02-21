@@ -739,7 +739,54 @@ class EpbOption(Option):    #todo -> Abstract (or all base classes)
     def __init__(self, code, content):
         """Creates an EPB Option with the specified option code & content."""
         Option.__init__( self, code, content )
-#todo finish EPB options
+
+class EpbFlags(EpbOption):
+    SPEC_CODE = 2
+    def __init__(self, content):
+        content = to_bytes(content)
+        assert len(content) == 4
+        EpbOption.__init__(self, self.SPEC_CODE, content)
+
+    @staticmethod
+    def dispatch_entry(): return { EpbFlags.SPEC_CODE : EpbFlags.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len, content) = strip_header( packed_bytes )
+        assert opt_code == EpbFlags.SPEC_CODE    #todo check everywhere
+        assert content_len == 4    #todo check everywhere
+        result = EpbFlags( content )
+        return result
+
+class EpbOs(EpbOption):
+    SPEC_CODE = 3
+    def __init__(self, content_str):
+        EpbOption.__init__(self, self.SPEC_CODE, content_str)
+
+    @staticmethod
+    def dispatch_entry(): return { EpbOs.SPEC_CODE : EpbOs.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return EpbOs(content)
+
+class EpbUserAppl(EpbOption):
+    SPEC_CODE = 4
+    def __init__(self, content_str):
+        EpbOption.__init__(self, self.SPEC_CODE, content_str)
+
+    @staticmethod
+    def dispatch_entry(): return { EpbUserAppl.SPEC_CODE : EpbUserAppl.unpack }
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        content_pad = packed_bytes[4:]
+        content = content_pad[:content_len]
+        return EpbUserAppl(content)
 
 #-----------------------------------------------------------------------------
 #todo add options for all blocks/classes

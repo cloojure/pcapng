@@ -379,6 +379,14 @@ class CustomBlock:
     head_encoding = '=LLL'
     tail_encoding = '=L'
 
+    UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
+        option.Comment.dispatch_entry(),
+        option.CustomStringCopyable.dispatch_entry(),
+        option.CustomBinaryCopyable.dispatch_entry(),
+        option.CustomStringNonCopyable.dispatch_entry(),
+        option.CustomBinaryNonCopyable.dispatch_entry()
+    ] )
+
     @staticmethod
     def is_custom_block_option(obj):
         result = (  isinstance(obj, option.Comment) |
@@ -397,6 +405,13 @@ class CustomBlock:
         self.content        = content
         self.options_lst    = options_lst
 
+#todo define these for all blocks
+    def to_map(self):           return util.select_keys(self.__dict__,
+                                    ['block_type', 'pen_val', 'content', 'options_lst'] )
+    def __repr__(self):         return str( self.to_map() )
+    def __eq__(self, other):    return self.to_map() == other.to_map()
+    def __ne__(self, other):    return (not __eq__(self,other))
+
     def pack(self):
         content_bytes = util.block32_bytes_pack( to_bytes( self.content ))
         options_bytes = option.pack_all( self.options_lst )
@@ -409,6 +424,19 @@ class CustomBlock:
         return packed_bytes
 
     @staticmethod
+    def unpack_options(options_bytes):
+        result = []
+        option_segs_lst = option.segment_all(options_bytes)
+        for opt_bytes in option_segs_lst:
+            if option.is_end_of_opt( opt_bytes ):
+                continue
+            else:
+                new_opt = Option.unpack_dispatch( CustomBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+                print( '351  new_opt=', new_opt)
+                result.append(new_opt)
+        return result
+
+    @staticmethod
     def unpack(packed_bytes):      #todo verify block type & all fields
         """Parses an pcapng custom block."""
         util.assert_type_bytes(packed_bytes)
@@ -419,7 +447,7 @@ class CustomBlock:
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
         (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
-        options_lst = option.unpack_all(options_bytes)
+        options_lst = CustomBlock.unpack_options( options_bytes )
         block_info = { 'block_type'     : block_type,
                        'pen'            : pen_val,
                        'content'        : content_bytes,

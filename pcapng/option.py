@@ -18,6 +18,37 @@ from   pcapng.util  import to_bytes
 #-----------------------------------------------------------------------------
 util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
+#todo add global statemachine/var for write (testing) and read (host dependent)
+#todo -> pack.uint64_pack()/_unpack() & similar everywhere
+def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
+def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
+def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
+def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
+
+def  int8_pack(    arg ):       return struct.pack(   '=b', arg )
+def  int8_unpack(  arg ):       return struct.unpack( '=b', arg )[0]
+def  int64_pack(   arg ):       return struct.pack(   '=q', arg )
+def  int64_unpack( arg ):       return struct.unpack( '=q', arg )[0]
+
+def float32_pack(   arg ):      return struct.pack(   '=f', arg )
+def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
+
+#-----------------------------------------------------------------------------
+def strip_header( packed_bytes ): #todo use for all unpack()
+    util.assert_block32_length( packed_bytes )
+    (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+    content_pad = packed_bytes[4:]
+    assert content_len <= len(content_pad)
+    content = content_pad[:content_len]
+    return (opt_code, content_len, content)
+
+#todo use everywhere
+def add_header(id_code, content_len, content):   #todo delete content var?
+    content_pad = util.block32_pad_bytes( content )
+    packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
+    return packed_bytes
+
+
 
 #-----------------------------------------------------------------------------
 # option ID codes from PCAPNG spec
@@ -159,6 +190,11 @@ class CustomOption(Option):
         """Creates an SHB Option with the specified option code & content."""
         Option.__init__( self, code, content )
 
+    def to_map(self):           return util.select_keys( self.__dict__, ['code', 'pen_val', 'content'] )
+    def __repr__(self):         return str( self.to_map() )
+    def __eq__(self, other):    return self.to_map() == other.to_map()
+    def __ne__(self, other):    return (not __eq__(self,other))
+
 class CustomStringCopyable(CustomOption):
     SPEC_CODE = 2988
     def __init__(self, pen_val, content):
@@ -166,6 +202,7 @@ class CustomStringCopyable(CustomOption):
         self.code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
+
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
@@ -192,15 +229,16 @@ class CustomBinaryCopyable(CustomOption):
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
-    @staticmethod
-    def dispatch_entry(): return { CustomBinaryCopyable.SPEC_CODE : CustomBinaryCopyable.unpack }
-
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { CustomBinaryCopyable.SPEC_CODE : CustomBinaryCopyable.unpack }
+
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
@@ -217,15 +255,16 @@ class CustomStringNonCopyable(CustomOption):
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
-    @staticmethod
-    def dispatch_entry(): return { CustomStringNonCopyable.SPEC_CODE : CustomStringNonCopyable.unpack }
-
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { CustomStringNonCopyable.SPEC_CODE : CustomStringNonCopyable.unpack }
+
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
@@ -242,15 +281,16 @@ class CustomBinaryNonCopyable(CustomOption):
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
-    @staticmethod
-    def dispatch_entry(): return { CustomBinaryNonCopyable.SPEC_CODE : CustomBinaryNonCopyable.unpack }
-
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
+
+    @staticmethod
+    def dispatch_entry(): return { CustomBinaryNonCopyable.SPEC_CODE : CustomBinaryNonCopyable.unpack }
+
     @staticmethod
     def unpack( packed_bytes ):
         (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
@@ -466,22 +506,6 @@ class IdbMacAddr(IdbOption):
         print( 'IdbMacAddr.unpack() - exit')
         return result
 
-#-----------------------------------------------------------------------------
-def strip_header( packed_bytes ): #todo use for all unpack()
-    util.assert_block32_length( packed_bytes )
-    (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-    content_pad = packed_bytes[4:]
-    assert content_len <= len(content_pad)
-    content = content_pad[:content_len]
-    return (opt_code, content_len, content)
-
-#todo use everywhere
-def add_header(id_code, content_len, content):   #todo delete content var?
-    content_pad = util.block32_pad_bytes( content )
-    packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
-    return packed_bytes
-
-#-----------------------------------------------------------------------------
 class IdbEuiAddr(IdbOption):
     SPEC_CODE = 7
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
@@ -517,23 +541,6 @@ class IdbEuiAddr(IdbOption):
         result      = IdbEuiAddr( addr_val )
         return result
 
-#-----------------------------------------------------------------------------
-#todo add global statemachine/var for write (testing) and read (host dependent)
-#todo -> pack.uint64_pack()/_unpack() & similar everywhere
-def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
-def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
-def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
-def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
-
-def  int8_pack(    arg ):       return struct.pack(   '=b', arg )
-def  int8_unpack(  arg ):       return struct.unpack( '=b', arg )[0]
-def  int64_pack(   arg ):       return struct.pack(   '=q', arg )
-def  int64_unpack( arg ):       return struct.unpack( '=q', arg )[0]
-
-def float32_pack(   arg ):      return struct.pack(   '=f', arg )
-def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
-
-#-----------------------------------------------------------------------------
 class IdbSpeed(IdbOption):
     SPEC_CODE = 8
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
@@ -763,7 +770,7 @@ def unpack_rolling(raw_bytes):
     raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
     opt_content           = opt_bytes[ 4 : 4+content_len_orig ]
     option_read = Option( opt_code, opt_content )
-    print( '569 unpack_rolling() - enter')
+    print( '569 unpack_rolling() - exit')
     return ( option_read, raw_bytes_remaining )
 
 #todo add strict string reading conformance?

@@ -11,7 +11,7 @@ from   pcapng.util      import to_bytes
 
 def test_option_codec():
     def assert_option_codec(opt_code, opt_value):
-        (opt,remaining_bytes) = option.unpack_rolling( Option(opt_code, opt_value, True).pack() )
+        (opt,remaining_bytes) = option.unpack_rolling( Option(opt_code, opt_value ).pack() )
         assert opt.code     == opt_code
         assert opt.content  == to_bytes(opt_value)
 

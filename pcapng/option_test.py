@@ -161,3 +161,10 @@ def test_IdbIpv6Addr():
     assert c1.addr_bytes    == c1u.addr_bytes   == addr_bytes
     assert c1.prefix_len    == c1u.prefix_len   == prefix_len
     assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.IdbIpv6Addr'
+
+def test_IdbMacAddr():
+    addr_bytes    = [ 11, 12, 13, 14, 15, 16 ]
+    c1  = option.IdbMacAddr( addr_bytes )
+    c1u = option.IdbMacAddr.unpack( c1.pack() )
+    assert c1.addr_bytes        == c1u.addr_bytes       == addr_bytes
+    assert util.classname(c1)   == util.classname(c1u)  == 'pcapng.option.IdbMacAddr'

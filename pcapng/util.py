@@ -55,21 +55,22 @@ def assert_int16(arg):                assert (-const.POW_2_15 <= arg < const.POW
 def assert_int32(arg):                assert (-const.POW_2_31 <= arg < const.POW_2_31)
 def assert_int64(arg):                assert (-const.POW_2_63 <= arg < const.POW_2_63)
 
+def assert_uint8_list( listy ):
+    "Assert the arg is a list of uint8 values"
+    for val in listy:
+        assert_uint8(val)
+
 def assert_vec4_uint8( listy ):
     "Assert the argument is a length 4 list of uint8 values"
     print( '#140  type={}  len={}  value={} '.format( type(listy), len(listy), listy ))
     assert len(listy) == 4
-    for val in listy:
-        print( '#141  val={}'.format( repr(val)))
-        assert_uint8(val)
+    assert_uint8_list( listy )
 
 def assert_vec16_uint8( listy ):
     "Assert the argument is a length 16 list of uint8 values"
 #   print( '#140  type={}  len={}  value={} '.format( type(listy), len(listy), listy ))
     assert len(listy) == 16
-    for val in listy:
-#       print( '#141  val={}'.format( repr(val)))
-        assert_uint8(val)
+    assert_uint8_list( listy )
 
 #-----------------------------------------------------------------------------
 

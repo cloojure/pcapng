@@ -415,11 +415,13 @@ class IdbIpv6Addr(IdbOption):
         assert content_len == 17
         content_pad = util.block32_pad_bytes( content )
         packed_bytes = struct.pack('=HH', self.code, content_len) + content_pad
+        util.assert_block32_length( packed_bytes )  #todo add to all
         return packed_bytes
 
     @staticmethod
     def unpack( packed_bytes ):
         print( 'IdbIpv6Addr.unpack() - enter')      #todo remove dbg prints
+        util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 24      #todo check everywhere
         (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         assert opt_code == IdbIpv6Addr.SPEC_CODE    #todo check everywhere
@@ -429,6 +431,45 @@ class IdbIpv6Addr(IdbOption):
         result = IdbIpv6Addr( addr_val, prefix_len )
         print( 'IdbIpv6Addr.unpack() - result=', result)
         print( 'IdbIpv6Addr.unpack() - exit')
+        return result
+
+class IdbMacAddr(IdbOption):
+    SPEC_CODE = 6
+    def __init__(self, addr_byte_lst):
+        print( 'IdbMacAddr.__init__() - enter')
+        addr_byte_lst       = list( addr_byte_lst )
+        util.assert_uint8_list( addr_byte_lst )
+        self.code           = self.SPEC_CODE
+        self.addr_bytes     = addr_byte_lst
+        print( 'IdbMacAddr.__init__() - exit')
+
+    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes'])
+
+    @staticmethod
+    def dispatch_entry(): return { IdbMacAddr.SPEC_CODE : IdbMacAddr.unpack }
+
+    def pack(self):   #todo needs test
+        """Encodes into a bytes block."""
+        content = to_bytes(self.addr_bytes)
+        content_len = len(content)
+        assert content_len == 6
+        content_pad = util.block32_pad_bytes( content )
+        packed_bytes = struct.pack('=HH', self.code, content_len) + content_pad
+        util.assert_block32_length( packed_bytes )  #todo add to all
+        return packed_bytes
+
+    @staticmethod
+    def unpack( packed_bytes ):
+        print( 'IdbMacAddr.unpack() - enter')      #todo remove dbg prints
+        util.assert_block32_length( packed_bytes )  #todo add to all
+        assert len(packed_bytes) == 12      #todo check everywhere
+        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        assert opt_code == IdbMacAddr.SPEC_CODE    #todo check everywhere
+        assert content_len == 6    #todo check everywhere
+        addr_val    = util.bytes_to_uint8_list( packed_bytes[4:10]  )
+        result      = IdbMacAddr( addr_val )
+        print( 'IdbMacAddr.unpack() - result=', result)
+        print( 'IdbMacAddr.unpack() - exit')
         return result
 
 

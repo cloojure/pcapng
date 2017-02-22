@@ -22,17 +22,11 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
 BYTE_ORDER_MAGIC    = 0x1A2B3C4D
-
-BLOCK_TYPE_EPB      = 0x00000006
-BLOCK_TYPE_SHB      = 0x0A0D0D0A
-BLOCK_TYPE_IDB      = 0x00000001
-BLOCK_TYPE_SPB      = 0x00000003
-
 SHB_MAJOR_VERSION   = 1
 SHB_MINOR_VERSION   = 0
 
 # For PCAPNG custom blocks
-CUSTOM_BLOCK_COPYABLE    = 0x00000BAD
+CUSTOM_BLOCK_COPYABLE     = 0x00000BAD
 CUSTOM_BLOCK_NON_COPYABLE = 0x40000BAD
 
 CUSTOM_MRT_ISIS_BLOCK_OPT = option.CustomStringCopyable( pcapng.pen.BROCADE_PEN, 'EMBEDDED_MRT_ISIS_BLOCK')
@@ -49,19 +43,7 @@ CUSTOM_MRT_ISIS_BLOCK_OPT = option.CustomStringCopyable( pcapng.pen.BROCADE_PEN,
 
 #-----------------------------------------------------------------------------
 
-#todo options_lst => options
-
 #todo maybe create a SectionBlock object with SHB, IDB, options, EPBs, SPBs, etc ?
-
-
-CUSTOM_OPTION_CLASSNAMES = {
-   'pcapng.option.CustomStringCopyable',
-   'pcapng.option.CustomBinaryCopyable',
-   'pcapng.option.CustomStringNonCopyable',
-   'pcapng.option.CustomBinaryNonCopyable'
-}
-
-GENERAL_OPTION_CLASSNAMES = { 'pcapng.option.Comment' } | CUSTOM_OPTION_CLASSNAMES
 
 def validate_options( options_lst, valid_classnames ):
     util.assert_type_list(options_lst)
@@ -72,6 +54,7 @@ def validate_options( options_lst, valid_classnames ):
         assert (opt_classname in valid_classnames), 'opt_classname={}'.format(opt_classname)
 
 class SectionHeaderBlock:
+    SPEC_CODE = 0x0A0D0D0A
     block_head_encoding = '=LLLHHq'     #todo need determine endian on read
     block_tail_encoding = '=L'          #todo need determine endian on read
 
@@ -98,6 +81,9 @@ class SectionHeaderBlock:
             assert self.is_shb_option(opt)
         self.options_lst = options_lst
 
+    @staticmethod
+    def dispatch_entry(): return { SectionHeaderBlock.SPEC_CODE : SectionHeaderBlock.unpack }
+
     def pack(self):    #todo data_len
         """Encodes a section header block, including the specified options."""
         options_bytes     = option.pack_all(self.options_lst)
@@ -110,7 +96,7 @@ class SectionHeaderBlock:
                              8 +      # section length
                              len(options_bytes) +
                              4 )      # block total length
-        packed_bytes = ( struct.pack( self.block_head_encoding, BLOCK_TYPE_SHB, block_total_len,
+        packed_bytes = ( struct.pack( self.block_head_encoding, self.SPEC_CODE, block_total_len,
                                      BYTE_ORDER_MAGIC, SHB_MAJOR_VERSION, SHB_MINOR_VERSION, section_len) +
                          options_bytes +
                          struct.pack( self.block_tail_encoding, block_total_len ))
@@ -136,7 +122,7 @@ class SectionHeaderBlock:
         ( block_type, block_total_len, byte_order_magic, major_version, minor_version,
                 section_len ) = struct.unpack( SectionHeaderBlock.block_head_encoding, block_bytes[:24] )
         (block_total_len_end,) = struct.unpack( SectionHeaderBlock.block_tail_encoding, block_bytes[-4:])
-        assert block_type       == BLOCK_TYPE_SHB
+        assert block_type       == SectionHeaderBlock.SPEC_CODE
         assert byte_order_magic == BYTE_ORDER_MAGIC
         assert major_version    == SHB_MAJOR_VERSION
         assert minor_version    == SHB_MINOR_VERSION
@@ -155,6 +141,7 @@ class SectionHeaderBlock:
         return shb_info
 
 class InterfaceDescBlock:
+    SPEC_CODE = 0x01
     block_head_encoding = '=LLHHL'
     block_tail_encoding = '=L'
 
@@ -196,6 +183,9 @@ class InterfaceDescBlock:
         self.reserved       = 0    # spec req zeros
         self.snaplen        = 0    # 0 => no limit
 
+    @staticmethod
+    def dispatch_entry(): return { InterfaceDescBlock.SPEC_CODE : InterfaceDescBlock.unpack }
+
     def pack(self):
         """Encodes an interface description block, including the specified options."""
         options_bytes   = option.pack_all( self.options_lst )
@@ -205,7 +195,7 @@ class InterfaceDescBlock:
                                4 +         # snaplen
                                len(options_bytes) +
                                4 )         # block total length
-        packed_bytes = ( struct.pack( self.block_head_encoding, BLOCK_TYPE_IDB,
+        packed_bytes = ( struct.pack( self.block_head_encoding, self.SPEC_CODE,
                                       block_total_len, self.link_type, self.reserved, self.snaplen) +
                          options_bytes +
                          struct.pack( self.block_tail_encoding, block_total_len ))
@@ -235,7 +225,7 @@ class InterfaceDescBlock:
         ( block_type, block_total_len, link_type, reserved, snaplen ) = struct.unpack( InterfaceDescBlock.block_head_encoding,
                                                                                        block_bytes[:16] )
         (block_total_len_end,) = struct.unpack( InterfaceDescBlock.block_tail_encoding, block_bytes[-4:] )
-        assert block_type == BLOCK_TYPE_IDB
+        assert block_type == InterfaceDescBlock.SPEC_CODE
         assert block_total_len == block_total_len_end == len(block_bytes)
         options_bytes = block_bytes[16:-4]
         options_lst = InterfaceDescBlock.unpack_options(options_bytes)  #todo verify only valid options
@@ -249,11 +239,15 @@ class InterfaceDescBlock:
         return idb_info
 
 class SimplePacketBlock:
+    SPEC_CODE = 0x03
     head_encoding = '=LLL'
     tail_encoding = '=L'
 
     def __init__(self, pkt_data):
         self.pkt_data = to_bytes(pkt_data)        #todo is list & tuple & str ok?
+
+    @staticmethod
+    def dispatch_entry(): return { SimplePacketBlock.SPEC_CODE : SimplePacketBlock.unpack }
 
     def pack(self):
         """Encodes a simple packet block."""
@@ -265,7 +259,7 @@ class SimplePacketBlock:
                             4 +      # original packet length
                             pkt_data_pad_len +
                             4 )      # block total length
-        block_bytes = (struct.pack(self.head_encoding, BLOCK_TYPE_SPB, block_total_len, original_pkt_len) +
+        block_bytes = (struct.pack(self.head_encoding, self.SPEC_CODE, block_total_len, original_pkt_len) +
                        pkt_data_pad +
                        struct.pack(self.tail_encoding, block_total_len))
         return block_bytes
@@ -276,7 +270,7 @@ class SimplePacketBlock:
         util.assert_type_bytes(block_bytes)
         (block_type, block_total_len, original_pkt_len) = struct.unpack( SimplePacketBlock.head_encoding, block_bytes[:12] )
         (block_total_len_end,) = struct.unpack( SimplePacketBlock.tail_encoding, block_bytes[-4:] )
-        assert block_type       == BLOCK_TYPE_SPB
+        assert block_type       == SimplePacketBlock.SPEC_CODE
         assert block_total_len  == block_total_len_end
         pkt_data_pad_len    = util.block32_ceil_num_bytes(original_pkt_len)
         pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
@@ -289,6 +283,7 @@ class SimplePacketBlock:
         return spb_info
 
 class EnhancedPacketBlock:
+    SPEC_CODE = 0x06
     head_encoding = '=LLLLLLL'
     tail_encoding = '=L'
 
@@ -326,6 +321,9 @@ class EnhancedPacketBlock:
         self.pkt_data_orig_len  = pkt_data_orig_len
         self.options_lst        = options_lst
 
+    @staticmethod
+    def dispatch_entry(): return { EnhancedPacketBlock.SPEC_CODE : EnhancedPacketBlock.unpack }
+
     def pack(self):
         """Encodes a simple packet block. Default value for pkt_data_orig_len is the length
         of the supplied pkt_data."""
@@ -345,7 +343,7 @@ class EnhancedPacketBlock:
                             pkt_data_captured_pad_len +
                             len(options_bytes) +
                             4 )      # block total length
-        packed_bytes = (struct.pack( self.head_encoding, BLOCK_TYPE_EPB, block_total_len, self.interface_id,
+        packed_bytes = (struct.pack( self.head_encoding, self.SPEC_CODE, block_total_len, self.interface_id,
                                      time_secs, time_usecs, pkt_data_captured_len, self.pkt_data_orig_len) +
                         pkt_data_pad +
                         options_bytes +
@@ -371,7 +369,7 @@ class EnhancedPacketBlock:
         (block_type, block_total_len, interface_id, time_secs, time_usecs,
                 pkt_data_captured_len, pkt_data_orig_len) = struct.unpack( EnhancedPacketBlock.head_encoding, packed_bytes[:28] )
         (block_total_len_end,) = struct.unpack( EnhancedPacketBlock.tail_encoding, packed_bytes[-4:])
-        assert block_type           == BLOCK_TYPE_EPB      #todo verify block type & all fields, all fns
+        assert block_type           == EnhancedPacketBlock.SPEC_CODE      #todo verify block type & all fields, all fns
         assert block_total_len      == block_total_len_end == len(packed_bytes)
         assert pkt_data_captured_len <= pkt_data_orig_len
 
@@ -395,6 +393,7 @@ class EnhancedPacketBlock:
         return epb_info
 
 # custom format really needs a content_length field!
+#todo make subclasses like options:  CustomBlockCopyable CustomBlockNonCopyable
 class CustomBlock:
     """Creates an pcapng custom block."""
     head_encoding = '=LLL'
@@ -426,7 +425,10 @@ class CustomBlock:
         self.content        = content
         self.options_lst    = options_lst
 
-#todo define these for all blocks
+    @staticmethod
+    def dispatch_entry(): return { CustomBlock.SPEC_CODE : CustomBlock.unpack }
+
+    #todo define these for all blocks
     def to_map(self):           return util.select_keys(self.__dict__,
                                     ['block_type', 'pen_val', 'content', 'options_lst'] )
     def __repr__(self):         return str( self.to_map() )
@@ -481,6 +483,9 @@ class CustomMrtIsisBlock:
 
     def __init__(self, pkt_data):
         self.pkt_data = to_bytes(pkt_data)
+
+    @staticmethod
+    def dispatch_entry(): return { CustomMrtIsisBlock.SPEC_CODE : CustomMrtIsisBlock.unpack }
 
     def pack(self):
         cust_blk = CustomBlock( CUSTOM_BLOCK_COPYABLE, pcapng.pen.BROCADE_PEN,

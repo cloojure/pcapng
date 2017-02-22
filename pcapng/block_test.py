@@ -79,7 +79,7 @@ def test_enhanced_pkt_block():
         epb_obj   = block.EnhancedPacketBlock( interface_id, pkt_data, pkt_data_orig_len, options_lst )
         epb_bytes = epb_obj.pack()
         epb_info  = block.EnhancedPacketBlock.unpack( epb_bytes )
-        assert epb_info[ 'block_type'               ] == block.BLOCK_TYPE_EPB
+        assert epb_info[ 'block_type'               ] == block.EnhancedPacketBlock.SPEC_CODE
         assert epb_info[ 'interface_id'             ] == interface_id
         assert epb_info[ 'pkt_data_captured_len'    ] == len(pkt_data)
         assert epb_info[ 'pkt_data_orig_len'        ] == pkt_data_orig_len

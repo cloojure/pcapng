@@ -158,7 +158,6 @@ class InterfaceDescBlock:
     block_head_encoding = '=LLHHL'
     block_tail_encoding = '=L'
 
-    #todo unify these 2 lists
     UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
         option.Comment.dispatch_entry(),
         option.CustomStringCopyable.dispatch_entry(),
@@ -293,19 +292,28 @@ class EnhancedPacketBlock:
     head_encoding = '=LLLLLLL'
     tail_encoding = '=L'
 
+    UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
+        option.Comment.dispatch_entry(),
+        option.CustomStringCopyable.dispatch_entry(),
+        option.CustomBinaryCopyable.dispatch_entry(),
+        option.CustomStringNonCopyable.dispatch_entry(),
+        option.CustomBinaryNonCopyable.dispatch_entry(),
+        option.EpbFlags.dispatch_entry(),
+        option.EpbHash.dispatch_entry(),
+        option.EpbDropCount.dispatch_entry()
+    ] )
+
     @staticmethod
     def is_epb_option(obj):
         result = (  isinstance(obj, option.Comment) |
                     isinstance(obj, option.CustomOption) |
-                    isinstance(obj, option.EpbOption)
-        | isinstance(obj, option.Option)    #todo temp placeholder
-                 )
+                    isinstance(obj, option.EpbOption) )
         return result
 
     def __init__(self, interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[]):
         util.assert_uint32( interface_id )  #todo verify args in all fns
         pkt_data_captured = to_bytes( pkt_data_captured )        #todo is list & tuple & str ok?
-        if pkt_data_orig_len == None:
+        if pkt_data_orig_len is None:
             pkt_data_orig_len = len(pkt_data_captured)
         else:
             util.assert_uint32(pkt_data_orig_len)
@@ -345,6 +353,18 @@ class EnhancedPacketBlock:
         return packed_bytes
 
     @staticmethod
+    def unpack_options(options_bytes):
+        result = []
+        option_segs_lst = option.segment_all(options_bytes)
+        for opt_bytes in option_segs_lst:
+            if option.is_end_of_opt( opt_bytes ):
+                continue
+            else:
+                new_opt = Option.unpack_dispatch( EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+                result.append(new_opt)
+        return result
+
+    @staticmethod
     def unpack(packed_bytes):
         """Decodes a bytes block into a simple packet block, returning a dictionary."""
         util.assert_type_bytes(packed_bytes)
@@ -360,6 +380,7 @@ class EnhancedPacketBlock:
         pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
         options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
         options_lst                 = option.unpack_all(options_bytes)
+        options_lst                 = EnhancedPacketBlock.unpack_options( options_bytes )
 
         epb_info =  { 'block_type'              : block_type,
                       'block_total_len'         : block_total_len,

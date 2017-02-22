@@ -87,10 +87,9 @@ def test_enhanced_pkt_block():
         assert epb_info[ 'pkt_data'                 ] == pkt_data
         assert epb_info[ 'options_lst'              ] == options_lst
 
-    opts = [ Option(option.OPT_EPB_FLAGS,     [13,14,15,16] ),
-             Option(option.OPT_EPB_HASH,      [ 0x45, 0x6E, 0xC2, 0x17,    0x7C, 0x10, 0x1E, 0x3C,
-                                                0x2E, 0x99, 0x6E, 0xC2,    0x9A, 0x3D, 0x50, 0x8E ] ),
-             Option(option.OPT_EPB_DROPCOUNT, [13] ) ]
+    opts = [ option.EpbFlags(       [13,14,15,16] ),
+             option.EpbHash(        'just about any hash spec can go here' ),
+             option.EpbDropCount(   13 ) ]
 
     assert_epb_codec( 1, [] )
     assert_epb_codec( 0, 'a' )

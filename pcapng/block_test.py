@@ -15,34 +15,30 @@ def test_section_header_block():
     opts = [ option.ShbHardware( "Dell" ),
              option.ShbOs( "Ubuntu" ),
              option.ShbUserAppl( "IntelliJ Idea" ) ]
-    shb_obj     = block.SectionHeaderBlock(opts)
-    idb_bytes   = shb_obj.pack()
-    shb_info    = block.SectionHeaderBlock.unpack(idb_bytes)
+    shb_obj             = block.SectionHeaderBlock(opts)
+    idb_bytes           = shb_obj.pack()
+    shb_obj_unpacked    = block.SectionHeaderBlock.unpack(idb_bytes)
     util.assert_type_bytes( idb_bytes )
-    util.assert_type_dict(  shb_info )
-    assert shb_info[ 'block_type'       ] == 0x0A0D0D0A
-    assert shb_info[ 'block_total_len'  ] == shb_info['block_total_len_end'] == len( idb_bytes )
-    assert shb_info[ 'byte_order_magic' ] == 0x1A2B3C4D
-    assert shb_info[ 'major_version'    ] == 1
-    assert shb_info[ 'minor_version'    ] == 0
-    assert shb_info[ 'section_len'      ] == -1
-    assert shb_info[ 'options_lst'      ] == opts
+    assert util.classname( shb_obj_unpacked ) == 'pcapng.block.SectionHeaderBlock'
+    print( '710', shb_obj )
+    print( '711', shb_obj_unpacked )
+    assert shb_obj == shb_obj_unpacked
 
 def test_interface_desc_block():
-    opts = [    option.IdbName( "Carrier Pigeon" ),
-                option.IdbDescription( "don't you wish" ),
-                option.IdbIpv4Addr(     [192, 168, 13, 7], [255, 255, 255, 0] ),
-                option.IdbIpv6Addr(     [ 11, 12, 13, 14,    15, 16, 17, 18,
-                                          21, 22, 23, 24,    25, 26, 27, 28 ], 65 ),
-                option.IdbMacAddr(      [ 11, 12, 13, 14, 15, 16 ] ),
-                option.IdbEuiAddr(      [ 11, 12, 13, 14, 15, 16, 17, 18 ] ),
-                option.IdbSpeed( 1234567 ),
-                option.IdbTsResol( 3, False ),
-                option.IdbTZone( 7 ),
-                option.IdbFilter( "Natural Brown #4" ),
-                option.IdbOs( 'Ubuntu Xenial 16.04.1 LTS' ),
-                option.IdbFcsLen( 97 ),
-                option.IdbTsOffset( 314159 )
+    opts = [option.IdbName( "Carrier Pigeon" ),
+            option.IdbDescription( "don't you wish" ),
+            option.IdbIpv4Addr(     [ 192, 168, 13,  7 ], [ 255, 255, 255,  0  ] ),
+            option.IdbIpv6Addr(     [  11,  12, 13, 14,      15,  16,  17, 18,
+                                       21,  22, 23, 24,      25,  26,  27, 28  ], 65 ),
+            option.IdbMacAddr(      [  11,  12, 13, 14,      15,  16           ] ),
+            option.IdbEuiAddr(      [  11,  12, 13, 14,      15,  16,  17, 18  ] ),
+            option.IdbSpeed( 1234567 ),
+            option.IdbTsResol( 3, False ),
+            option.IdbTZone( 7 ),
+            option.IdbFilter( "Natural Brown #4" ),
+            option.IdbOs( 'Ubuntu Xenial 16.04.1 LTS' ),
+            option.IdbFcsLen( 97 ),
+            option.IdbTsOffset( 314159 )
     ]
     idb_obj     = block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, opts )
     idb_bytes   = idb_obj.pack()

@@ -1,7 +1,10 @@
 #todo add brocade copyright / license
 #todo add header docstring to all
 
+from __future__ import print_function
+
 import struct
+import sys
 import pcapng
 import pcapng.linktype          as linktype
 import pcapng.mrt               as mrt
@@ -23,8 +26,6 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
 
 BYTE_ORDER_MAGIC    = 0x1A2B3C4D
-SHB_MAJOR_VERSION   = 1
-SHB_MINOR_VERSION   = 0
 
 CUSTOM_MRT_ISIS_BLOCK_OPT = option.CustomStringCopyable( pcapng.pen.BROCADE_PEN, 'EMBEDDED_MRT_ISIS_BLOCK')
 
@@ -65,6 +66,8 @@ class Block:
 
 class SectionHeaderBlock:
     SPEC_CODE = 0x0A0D0D0A
+    MAJOR_VERSION   = 1
+    MINOR_VERSION   = 0
     block_head_encoding = '=LLLHHq'     #todo need determine endian on read
     block_tail_encoding = '=L'          #todo need determine endian on read
 
@@ -91,6 +94,17 @@ class SectionHeaderBlock:
             assert self.is_shb_option(opt)
         self.options_lst = options_lst
 
+    def to_map(self):
+        base_map = {    'SPEC_CODE':            self.SPEC_CODE,
+                        'SHB_MAJOR_VERSION':    self.MAJOR_VERSION,
+                        'SHB_MINOR_VERSION':    self.MINOR_VERSION, }
+        result = util.dict_merge( base_map, util.select_keys(self.__dict__, ['options_lst']) )
+        return result
+
+    def __repr__(self):         return str( self.to_map() )
+    def __eq__(self, other):    return self.to_map() == other.to_map()
+    def __ne__(self, other):    return (not __eq__(self,other))
+
     @staticmethod
     def dispatch_entry(): return { SectionHeaderBlock.SPEC_CODE : SectionHeaderBlock.unpack }
 
@@ -107,7 +121,7 @@ class SectionHeaderBlock:
                              len(options_bytes) +
                              4 )      # block total length
         packed_bytes = ( struct.pack( self.block_head_encoding, self.SPEC_CODE, block_total_len,
-                                     BYTE_ORDER_MAGIC, SHB_MAJOR_VERSION, SHB_MINOR_VERSION, section_len) +
+                                     BYTE_ORDER_MAGIC, self.MAJOR_VERSION, self.MINOR_VERSION, section_len) +
                          options_bytes +
                          struct.pack( self.block_tail_encoding, block_total_len ))
         return packed_bytes
@@ -134,21 +148,14 @@ class SectionHeaderBlock:
         (block_total_len_end,) = struct.unpack( SectionHeaderBlock.block_tail_encoding, block_bytes[-4:])
         assert block_type       == SectionHeaderBlock.SPEC_CODE
         assert byte_order_magic == BYTE_ORDER_MAGIC
-        assert major_version    == SHB_MAJOR_VERSION
-        assert minor_version    == SHB_MINOR_VERSION
+        assert major_version    == SectionHeaderBlock.MAJOR_VERSION
+        assert minor_version    == SectionHeaderBlock.MINOR_VERSION
         assert block_total_len  == block_total_len_end == len(block_bytes)
         # section_len currently ignored
         options_bytes = block_bytes[24:-4]
         options_lst = SectionHeaderBlock.unpack_options( options_bytes )
-        shb_info = { 'block_type'          : block_type,
-                     'block_total_len'     : block_total_len,
-                     'byte_order_magic'    : byte_order_magic,
-                     'major_version'       : major_version,
-                     'minor_version'       : minor_version,
-                     'section_len'         : section_len,
-                     'options_lst'         : options_lst,
-                     'block_total_len_end' : block_total_len_end }
-        return shb_info
+        result_obj = SectionHeaderBlock(options_lst)
+        return result_obj
 
 class InterfaceDescBlock:
     SPEC_CODE = 0x01

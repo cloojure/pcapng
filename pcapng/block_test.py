@@ -105,7 +105,7 @@ def test_enhanced_pkt_block():
         assert_epb_codec( 5, "Don't have a cow, man.", 7 )
         assert_epb_codec( 5, "Don't have a cow, man.", 7, opts )
 
-def test_custom_block():
+def test_custom_block_copyable():
     def assert_custom_block_codec(content_bytes):
         opts = [ option.CustomStringCopyable( pen.BROCADE_PEN, "O"),
                  option.CustomBinaryCopyable( pen.BROCADE_PEN, "Doh!"),
@@ -113,13 +113,23 @@ def test_custom_block():
                  option.CustomBinaryNonCopyable( pen.BROCADE_PEN, [1, 2, 3]) ]
         orig = to_bytes(content_bytes)
 
-        cb_obj = block.CustomBlock( block.CUSTOM_BLOCK_COPYABLE, pen.BROCADE_PEN, orig, opts )
+        cb_obj = block.CustomBlockCopyable( pen.BROCADE_PEN, orig, opts )
         cb_bytes = cb_obj.pack()
-        cb_info = block.CustomBlock.unpack( cb_bytes )
-        assert cb_info[ 'block_type'    ] == block.CUSTOM_BLOCK_COPYABLE
+        cb_info = block.CustomBlockCopyable.unpack( cb_bytes )
+        assert cb_info[ 'block_type'    ] == block.CustomBlockCopyable.SPEC_CODE
         assert cb_info[ 'pen'           ] == pen.BROCADE_PEN
         assert cb_info[ 'content'       ] == orig
         assert cb_info[ 'options_lst'   ] == opts
+
+        cb_obj = block.CustomBlockNonCopyable( pen.BROCADE_PEN, orig, opts )
+        cb_bytes = cb_obj.pack()
+        cb_info = block.CustomBlockNonCopyable.unpack( cb_bytes )
+        assert cb_info[ 'block_type'    ] == block.CustomBlockNonCopyable.SPEC_CODE
+        assert cb_info[ 'pen'           ] == pen.BROCADE_PEN
+        assert cb_info[ 'content'       ] == orig
+        assert cb_info[ 'options_lst'   ] == opts
+
+
 
     assert_custom_block_codec( '' )
     assert_custom_block_codec( 'a' )
@@ -144,8 +154,40 @@ def test_custom_mrt_isis_block():
     assert_cmib_codec( 'go' )
     assert_cmib_codec( 'ray' )
     assert_cmib_codec( 'Doh!' )
-    assert_cmib_codec( "Don't have a cow, man." )
+    assert_cmib_codec( 'I Dream of Jeannie' )
     for i in range(13):
         assert_cmib_codec( range(i) )
 
+#-----------------------------------------------------------------------------
+
+def test_blocks_lst():
+    if False:       #todo debug $$
+        blk_lst = [
+            block.SectionHeaderBlock( [ option.ShbHardware( "Dell" ),
+                                        option.ShbOs( "Ubuntu" ),
+                                        option.ShbUserAppl( "IntelliJ Idea" ) ] ),
+            block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET,
+                                      [ option.IdbName( "Carrier Pigeon" ),
+                                        option.IdbDescription( "don't you wish" ),
+                                        option.IdbIpv4Addr(     [192, 168, 13, 7], [255, 255, 255, 0] ),
+                                        option.IdbOs( 'Ubuntu Xenial 16.04.1 LTS' ) ] ),
+            block.SimplePacketBlock('abc'),
+            block.EnhancedPacketBlock( 5, "Don't have a cow, man."  ),
+            block.CustomBlockCopyable( pen.BROCADE_PEN, 'How do you like me now?' ),
+        ]
+        packed_bytes = block.pack_all( blk_lst )
+        util.assert_block32_length( packed_bytes )
+        blk_lst_unpacked = block.unpack_blocks( packed_bytes )
+        print( 'lengths:  {}  {}'.format( len(blk_lst), len(blk_lst_unpacked)))
+        for i in range( len(blk_lst)):
+            blk_orig = blk_lst[i]
+            blk_unpk = blk_lst_unpacked[i]
+            print
+            print('-------------------------------------------------------')
+            print( 'blk_orig', blk_orig)
+            print
+            print( 'blk_unpk', blk_unpk)
+
+        assert False
+      # assert blk_lst == blk_lst_unpacked
 

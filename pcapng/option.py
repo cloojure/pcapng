@@ -787,7 +787,7 @@ def pack_all(opts_lst):  #todo needs test
     #todo verify all fields
     """Encodes an options from a dictionary into a bytes block."""
     util.assert_type_list(opts_lst)
-    cum_result = ""
+    cum_result = ''
     for opt in opts_lst:
         cum_result += opt.pack()
     cum_result += Option.END_OF_OPT_BYTES
@@ -834,7 +834,7 @@ def unpack_all(raw_bytes):
     return options
 
 #-----------------------------------------------------------------------------
-def segment_rolling(raw_bytes):
+def segment_rolling(raw_bytes):     #todo inline below
     #todo verify all fields
     """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
     util.assert_type_bytes(raw_bytes)

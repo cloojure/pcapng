@@ -48,8 +48,6 @@ def add_header(id_code, content_len, content):   #todo delete content var?
     packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
     return packed_bytes
 
-
-
 #-----------------------------------------------------------------------------
 # option ID codes from PCAPNG spec
 
@@ -88,9 +86,9 @@ OPT_UNKNOWN       =  9999   # non-standard
 
 #todo need to do validation on data values & lengths
 # enhanced packet block options
-OPT_EPB_FLAGS           =   2   #todo need validation fn & use it
-OPT_EPB_HASH            =   3   #todo need validation fn & use it
-OPT_EPB_DROPCOUNT       =   4   #todo need validation fn & use it
+# OPT_EPB_FLAGS           =   2   #todo need validation fn & use it
+# OPT_EPB_HASH            =   3   #todo need validation fn & use it
+# OPT_EPB_DROPCOUNT       =   4   #todo need validation fn & use it
 
 #todo verify all fields
 

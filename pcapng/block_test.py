@@ -4,7 +4,6 @@ import pcapng.block             as block
 import pcapng.linktype          as linktype
 import pcapng.mrt               as mrt
 import pcapng.option            as option
-from   pcapng.option            import Option       #delete
 import pcapng.pen               as pen
 import pcapng.util              as util
 from   pcapng.util              import to_bytes

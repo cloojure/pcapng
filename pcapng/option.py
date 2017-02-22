@@ -94,31 +94,9 @@ OPT_UNKNOWN       =  9999   # non-standard
 
 #todo maybe need func to verify valid any option codes?
 
-# CUSTOM_OPTIONS = {CUSTOM_STRING_COPYABLE,       CUSTOM_BINARY_COPYABLE,
-#                   CUSTOM_STRING_NON_COPYABLE,   CUSTOM_BINARY_NON_COPYABLE}
-#
-# GENERAL_OPTIONS = { OPT_COMMENT } | CUSTOM_OPTIONS
-#
-# SHB_OPTIONS = GENERAL_OPTIONS | { OPT_SHB_HARDWARE, OPT_SHB_OS, OPT_SHB_USERAPPL }
-#
-# IDB_OPTIONS = GENERAL_OPTIONS | {
-#     OPT_IDB_NAME,       OPT_IDB_DESCRIPTION,    OPT_IDB_IPV4_ADDR,  OPT_IDB_IPV6_ADDR,
-#     OPT_IDB_MAC_ADDR,   OPT_IDB_EUI_ADDR,       OPT_IDB_SPEED,      OPT_IDB_TS_RESOL,
-#     OPT_IDB_TZONE,      OPT_IDB_FILTER,         OPT_IDB_OS,         OPT_IDB_FCS_LEN,
-#     OPT_IDB_TS_OFFSET }
-#
-# EPB_OPTIONS = GENERAL_OPTIONS | { OPT_EPB_FLAGS, OPT_EPB_HASH, OPT_EPB_DROPCOUNT }
-#
-# ALL_OPTIONS = CUSTOM_OPTIONS | GENERAL_OPTIONS | SHB_OPTIONS | IDB_OPTIONS | EPB_OPTIONS
-
 #todo check type on all fns
 
-# #todo need to do validation on data values & lengths
-
-def unpack_opt_code(opt_bytes):
-    util.assert_type_bytes(opt_bytes)
-    (opt_code, content_len_orig) = struct.unpack('=HH', opt_bytes[:4])
-    return opt_code
+#todo need to do validation on data values & lengths
 
 def is_end_of_opt( opt_bytes ):
     return opt_bytes == Option.END_OF_OPT_BYTES

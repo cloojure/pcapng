@@ -79,26 +79,9 @@ def unpack_options_generic( dispatch_table, options_bytes ):
 
 def unpack_options_shb(options_bytes):
     return unpack_options_generic( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, options_bytes )
-    result = []
-    option_segs_lst = option.segment_all(options_bytes)
-    for opt_bytes in option_segs_lst:
-        if option.is_end_of_opt( opt_bytes ):
-            continue
-        else:
-            new_opt = Option.unpack_dispatch( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-            result.append(new_opt)
-    return result
 
 def unpack_options_idb(options_bytes):
-    result = []
-    option_segs_lst = option.segment_all(options_bytes)
-    for opt_bytes in option_segs_lst:
-        if option.is_end_of_opt( opt_bytes ):
-            continue
-        else:
-            new_opt = Option.unpack_dispatch( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-            result.append(new_opt)
-    return result
+    return unpack_options_generic( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, options_bytes )
 
 def unpack_options_epb(options_bytes):
     result = []

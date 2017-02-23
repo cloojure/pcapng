@@ -197,6 +197,7 @@ class CustomStringCopyable(CustomOption):
     def pack(self):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
+        print( '140 CSC.pack()    content={} content_len={} spec_len={} '.format( self.content, content_len, spec_len ))
         content_pad     = util.block32_pad_bytes(self.content)
         packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
@@ -210,6 +211,7 @@ class CustomStringCopyable(CustomOption):
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
+        print( '140 CSC.unpack()  content={} content_len={} spec_len={} '.format( content, content_len, spec_len ))
         return CustomStringCopyable( pen_val, content )
 
 class CustomBinaryCopyable(CustomOption):

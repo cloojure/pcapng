@@ -66,6 +66,66 @@ def strip_header( packed_bytes ): #todo use for all unpack()
     stripped_bytes = packed_bytes[8:]
     return (blk_type, blk_total_len, stripped_bytes)
 
+def unpack_options_generic( dispatch_table, options_bytes ):
+    result = []
+    option_segs_lst = option.segment_all(options_bytes)
+    for opt_bytes in option_segs_lst:
+        if option.is_end_of_opt( opt_bytes ):
+            continue
+        else:
+            new_opt = Option.unpack_dispatch( dispatch_table, opt_bytes )
+            result.append(new_opt)
+    return result
+
+def unpack_options_shb(options_bytes):
+    return unpack_options_generic( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, options_bytes )
+    result = []
+    option_segs_lst = option.segment_all(options_bytes)
+    for opt_bytes in option_segs_lst:
+        if option.is_end_of_opt( opt_bytes ):
+            continue
+        else:
+            new_opt = Option.unpack_dispatch( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+            result.append(new_opt)
+    return result
+
+def unpack_options_idb(options_bytes):
+    result = []
+    option_segs_lst = option.segment_all(options_bytes)
+    for opt_bytes in option_segs_lst:
+        if option.is_end_of_opt( opt_bytes ):
+            continue
+        else:
+            new_opt = Option.unpack_dispatch( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+            result.append(new_opt)
+    return result
+
+def unpack_options_epb(options_bytes):
+    result = []
+    option_segs_lst = option.segment_all(options_bytes)
+    for opt_bytes in option_segs_lst:
+        if option.is_end_of_opt( opt_bytes ):
+            continue
+        else:
+            new_opt = Option.unpack_dispatch( EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+            result.append(new_opt)
+    return result
+
+def unpack_options_cb(options_bytes):
+    result = []
+    option_segs_lst = option.segment_all(options_bytes)
+    for opt_bytes in option_segs_lst:
+        if option.is_end_of_opt( opt_bytes ):
+            continue
+        else:
+            new_opt = Option.unpack_dispatch( CustomBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
+            print( '351  new_opt=', new_opt)
+            result.append(new_opt)
+    return result
+
+
+
+
 class Block:
     BLOCK_UNKNOWN = 9999
 
@@ -140,19 +200,6 @@ class SectionHeaderBlock:
         return packed_bytes
 
     @staticmethod
-    def unpack_options(options_bytes):
-        result = []
-        option_segs_lst = option.segment_all(options_bytes)
-        for opt_bytes in option_segs_lst:
-            if option.is_end_of_opt( opt_bytes ):
-                continue
-            else:
-                new_opt = Option.unpack_dispatch( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-                print( '311  new_opt=', new_opt)
-                result.append(new_opt)
-        return result
-
-    @staticmethod
     def unpack(block_bytes):      #todo verify block type & all fields
         """Decodes a bytes block into a section header block, returning a dictionary."""
         util.assert_type_bytes(block_bytes)
@@ -166,7 +213,7 @@ class SectionHeaderBlock:
         assert block_total_len  == block_total_len_end == len(block_bytes)
         # section_len currently ignored
         options_bytes = block_bytes[24:-4]
-        options_lst = SectionHeaderBlock.unpack_options( options_bytes )
+        options_lst = unpack_options_shb(options_bytes)
         result_obj = SectionHeaderBlock(options_lst)
         return result_obj
 
@@ -239,23 +286,6 @@ class InterfaceDescBlock:
         return packed_bytes
 
     @staticmethod
-    def unpack_options(options_bytes):
-        print( '300 IDB.unpack_options() - enter')
-        result = []
-        option_segs_lst = option.segment_all(options_bytes)
-        for opt_bytes in option_segs_lst:
-            print( '301 opt_bytes=', opt_bytes)
-            if option.is_end_of_opt( opt_bytes ):
-                print( '302 is_end_of_opt()', opt_bytes)
-                continue
-            else:
-                new_opt = Option.unpack_dispatch( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-                print( '305  new_opt=', new_opt)
-                result.append(new_opt)
-        print( '309 IDB.unpack_options() - exit')
-        return result
-
-    @staticmethod
     def unpack(block_bytes):      #todo verify block type & all fields
         """Decodes a bytes block into an interface description block, returning a dictionary."""
         util.assert_type_bytes(block_bytes)
@@ -267,7 +297,7 @@ class InterfaceDescBlock:
         assert reserved         == 0
         assert snaplen          == 0
         options_bytes = block_bytes[16:-4]
-        options_lst = InterfaceDescBlock.unpack_options(options_bytes)  #todo verify only valid options
+        options_lst = unpack_options_idb(options_bytes)  #todo verify only valid options
         result_obj = InterfaceDescBlock( link_type, options_lst )
         return result_obj
 
@@ -400,18 +430,6 @@ class EnhancedPacketBlock:
         return packed_bytes
 
     @staticmethod
-    def unpack_options(options_bytes):
-        result = []
-        option_segs_lst = option.segment_all(options_bytes)
-        for opt_bytes in option_segs_lst:
-            if option.is_end_of_opt( opt_bytes ):
-                continue
-            else:
-                new_opt = Option.unpack_dispatch( EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-                result.append(new_opt)
-        return result
-
-    @staticmethod
     def unpack(packed_bytes):
         """Decodes a bytes block into a simple packet block, returning a dictionary."""
         util.assert_type_bytes(packed_bytes)
@@ -426,7 +444,7 @@ class EnhancedPacketBlock:
         block_bytes_stripped        = packed_bytes[28:-4]
         pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
         options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
-        options_lst                 = EnhancedPacketBlock.unpack_options( options_bytes )
+        options_lst                 = unpack_options_epb(options_bytes)
         result_obj                  = EnhancedPacketBlock(  interface_id, pkt_data, pkt_data_orig_len, options_lst,
                                                             timestamp=(time_secs, time_usecs) )
         return result_obj
@@ -479,19 +497,6 @@ class CustomBlock:
                          struct.pack( self.tail_encoding, block_total_len ))
         return packed_bytes
 
-    @staticmethod
-    def unpack_options(options_bytes):
-        result = []
-        option_segs_lst = option.segment_all(options_bytes)
-        for opt_bytes in option_segs_lst:
-            if option.is_end_of_opt( opt_bytes ):
-                continue
-            else:
-                new_opt = Option.unpack_dispatch( CustomBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-                print( '351  new_opt=', new_opt)
-                result.append(new_opt)
-        return result
-
 #todo make subclasses like options:  CustomBlockCopyable CustomBlockNonCopyable
 class CustomBlockCopyable(CustomBlock):
     SPEC_CODE = 0x00000BAD
@@ -512,7 +517,7 @@ class CustomBlockCopyable(CustomBlock):
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
         (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
-        options_lst = CustomBlock.unpack_options( options_bytes )
+        options_lst = unpack_options_cb(options_bytes)
         result_obj = CustomBlockCopyable( pen_val, content_bytes, options_lst )
         return result_obj
 
@@ -535,7 +540,7 @@ class CustomBlockNonCopyable(CustomBlock):
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
         (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
-        options_lst = CustomBlock.unpack_options( options_bytes )
+        options_lst = unpack_options_cb(options_bytes)
         result_obj = CustomBlockNonCopyable( pen_val, content_bytes, options_lst )
         return result_obj
 

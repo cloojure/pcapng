@@ -55,34 +55,46 @@ def test_options_codec():
                              Option(5,'a'),
                              Option(6,'Doh!') ] )
 
-# def test_custom_option_value():
-#     #todo include standalone value pack/unpack
-#     #todo include pack/unpack  mixed with regular options
-#     def assert_custom_option_value_codec( pen, content ):
-#         value_dict_result = option.custom_option_value_unpack(
-#             option.custom_option_value_pack( pen, content ))
-#         assert value_dict_result[ 'pen'         ] == pen
-#         assert value_dict_result[ 'content_pad' ] == util.block32_pad_bytes( content )
-#             #todo use block32_bytes_pack/unpack() to avoid padding on output?
-#     assert_custom_option_value_codec( pen.BROCADE_PEN, '' )
-#     assert_custom_option_value_codec( pen.BROCADE_PEN, 'a' )
-#     assert_custom_option_value_codec( pen.BROCADE_PEN, 'go' )
-#     assert_custom_option_value_codec( pen.BROCADE_PEN, 'ray' )
-#     assert_custom_option_value_codec( pen.BROCADE_PEN, 'Doh!' )
-#     assert_custom_option_value_codec( pen.BROCADE_PEN, 'How do you like me now?' )
-#
-#     cust_val_1 = option.custom_option_value_pack( pen.BROCADE_PEN, "yo" )
-#     cust_val_2 = option.custom_option_value_pack( pen.BROCADE_PEN, "Mary had a little lamb" )
-#     cust_val_3 = option.custom_option_value_pack( pen.BROCADE_PEN, "don't copy me!" )
-#     cust_val_4 = option.custom_option_value_pack( pen.BROCADE_PEN, 'fin' )
-#     opts_lst = [
-#         Option( 5, "five"           ), Option(option.CUSTOM_STRING_COPYABLE, cust_val_1),
-#         Option( 6, "six"            ), Option(option.CUSTOM_BINARY_COPYABLE, cust_val_2),
-#         Option( 7, "seventy-seven"  ), Option(option.CUSTOM_STRING_NON_COPYABLE, cust_val_3),
-#         Option( 8, "eight"          ), Option(option.CUSTOM_BINARY_NON_COPYABLE, cust_val_4),
-#         Option( 9, "9" ) ]
-#     result_lst = option.unpack_all( option.pack_all( opts_lst ))
-#     assert opts_lst == result_lst
+def test_custom_option_value():
+    #todo include standalone value pack/unpack
+    #todo include pack/unpack  mixed with regular options
+    def assert_custom_option_value_codec( pen, content ):
+        csc             = option.CustomStringCopyable( pen, content )
+        csc_unpacked    = option.CustomStringCopyable.unpack(    csc.pack()  )
+        assert csc_unpacked == csc
+
+        cbc             = option.CustomBinaryCopyable( pen, content )
+        cbc_unpacked    = option.CustomBinaryCopyable.unpack(    cbc.pack()  )
+        assert cbc_unpacked == cbc
+
+        csnc            = option.CustomStringNonCopyable( pen, content )
+        csnc_unpacked   = option.CustomStringNonCopyable.unpack( csnc.pack() )
+        assert csnc_unpacked == csnc
+
+        cbnc            = option.CustomBinaryNonCopyable( pen, content )
+        cbnc_unpacked   = option.CustomBinaryNonCopyable.unpack( cbnc.pack() )
+        assert cbnc_unpacked == cbnc
+
+
+    assert_custom_option_value_codec( pen.BROCADE_PEN, '' )
+    assert_custom_option_value_codec( pen.BROCADE_PEN, 'a' )
+    assert_custom_option_value_codec( pen.BROCADE_PEN, 'go' )
+    assert_custom_option_value_codec( pen.BROCADE_PEN, 'ray' )
+    assert_custom_option_value_codec( pen.BROCADE_PEN, 'Doh!' )
+    assert_custom_option_value_codec( pen.BROCADE_PEN, 'How do you like me now?' )
+
+    # opts_lst = [
+    #     option.Comment( "five"          ), option.CustomStringCopyable(    pen.BROCADE_PEN, "yo"),
+    #     option.Comment( "six"           ), option.CustomBinaryCopyable(    pen.BROCADE_PEN, 'Many had a little lamb'),
+    #     option.Comment( "seventy-seven" ), option.CustomStringNonCopyable( pen.BROCADE_PEN, "don't copy me"),
+    #     option.Comment( "eight"         ), option.CustomBinaryNonCopyable( pen.BROCADE_PEN, 'fin'),
+    #     option.Comment( "Agent 009"     ) ]
+    # opts_lst_unpacked = option.unpack_all( option.pack_all( opts_lst ))
+    # for i in range( len( opts_lst )):
+    #     print
+    #     print( 'opt:  {}'.format( opts_lst[i] ))
+    #     print( 'optu: {}'.format( opts_lst_unpacked[i] ))
+    # assert opts_lst == opts_lst_unpacked
 
 def test_Comment():
     s1  = 'Five Stars!'

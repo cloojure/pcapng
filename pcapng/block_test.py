@@ -49,14 +49,9 @@ def test_interface_desc_block():
 def test_simple_pkt_block():
     spb_obj   = block.SimplePacketBlock('abc')
     spb_bytes = spb_obj.pack()     #todo fix this (no var)!
-    spb_info  = block.SimplePacketBlock.unpack( spb_bytes )
-    util.assert_type_dict( spb_info )
-    assert spb_info['block_type']        == 0x00000003
-    assert spb_info['block_total_len']   == 20
-    assert spb_info['block_total_len']   == spb_info['block_total_len_end'] == len(spb_bytes)
-    assert spb_info['block_total_len']   == 16 + spb_info['pkt_data_pad_len']
-    assert spb_info['original_pkt_len']  == 3
-    assert spb_info['pkt_data']          == 'abc'
+    spb_obj_unpacked  = block.SimplePacketBlock.unpack( spb_bytes )
+    assert spb_obj_unpacked             == spb_obj
+    assert spb_obj_unpacked.pkt_data    == 'abc'
 
 def test_enhanced_pkt_block():
     def assert_epb_codec( interface_id, pkt_data, pkt_data_orig_len=None, options_lst=[] ):
@@ -65,13 +60,9 @@ def test_enhanced_pkt_block():
             pkt_data_orig_len = len(pkt_data)   #todo does not test None or invalid val
         epb_obj   = block.EnhancedPacketBlock( interface_id, pkt_data, pkt_data_orig_len, options_lst )
         epb_bytes = epb_obj.pack()
-        epb_info  = block.EnhancedPacketBlock.unpack( epb_bytes )
-        assert epb_info[ 'block_type'               ] == block.EnhancedPacketBlock.SPEC_CODE
-        assert epb_info[ 'interface_id'             ] == interface_id
-        assert epb_info[ 'pkt_data_captured_len'    ] == len(pkt_data)
-        assert epb_info[ 'pkt_data_orig_len'        ] == pkt_data_orig_len
-        assert epb_info[ 'pkt_data'                 ] == pkt_data
-        assert epb_info[ 'options_lst'              ] == options_lst
+        epb_obj_unpacked = block.EnhancedPacketBlock.unpack( epb_bytes )
+        assert util.classname( epb_obj_unpacked ) == 'pcapng.block.EnhancedPacketBlock'
+        assert epb_obj_unpacked == epb_obj
 
     opts = [ option.EpbFlags(       [13,14,15,16] ),
              option.EpbHash(        'just about any hash spec can go here' ),
@@ -100,23 +91,18 @@ def test_custom_block_copyable():
                  option.CustomBinaryNonCopyable( pen.BROCADE_PEN, [1, 2, 3]) ]
         orig = to_bytes(content_bytes)
 
-        cb_obj = block.CustomBlockCopyable( pen.BROCADE_PEN, orig, opts )
-        cb_bytes = cb_obj.pack()
-        cb_info = block.CustomBlockCopyable.unpack( cb_bytes )
-        assert cb_info[ 'block_type'    ] == block.CustomBlockCopyable.SPEC_CODE
-        assert cb_info[ 'pen'           ] == pen.BROCADE_PEN
-        assert cb_info[ 'content'       ] == orig
-        assert cb_info[ 'options_lst'   ] == opts
+        cbc_obj = block.CustomBlockCopyable( pen.BROCADE_PEN, orig, opts )
+        cbc_bytes = cbc_obj.pack()
+        cbc_obj_unpack = block.CustomBlockCopyable.unpack( cbc_bytes )
+        assert cbc_obj_unpack == cbc_obj
 
-        cb_obj = block.CustomBlockNonCopyable( pen.BROCADE_PEN, orig, opts )
-        cb_bytes = cb_obj.pack()
-        cb_info = block.CustomBlockNonCopyable.unpack( cb_bytes )
-        assert cb_info[ 'block_type'    ] == block.CustomBlockNonCopyable.SPEC_CODE
-        assert cb_info[ 'pen'           ] == pen.BROCADE_PEN
-        assert cb_info[ 'content'       ] == orig
-        assert cb_info[ 'options_lst'   ] == opts
-
-
+        cbnc_obj = block.CustomBlockNonCopyable( pen.BROCADE_PEN, orig, opts )
+        cbnc_bytes = cbnc_obj.pack()
+        cbnc_obj_unpack = block.CustomBlockNonCopyable.unpack( cbnc_bytes )
+        print
+        print( '770', cbnc_obj)
+        print( '771', cbnc_obj_unpack)
+        assert cbnc_obj_unpack == cbnc_obj
 
     assert_custom_block_codec( '' )
     assert_custom_block_codec( 'a' )

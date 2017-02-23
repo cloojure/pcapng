@@ -263,6 +263,11 @@ class SimplePacketBlock:
     def __init__(self, pkt_data):
         self.pkt_data = to_bytes(pkt_data)        #todo is list & tuple & str ok?
 
+    def to_map(self):           return util.select_keys(self.__dict__, ['pkt_data'] )
+    def __repr__(self):         return str( self.to_map() )
+    def __eq__(self, other):    return self.to_map() == other.to_map()
+    def __ne__(self, other):    return (not __eq__(self,other))
+
     @staticmethod
     def dispatch_entry(): return { SimplePacketBlock.SPEC_CODE : SimplePacketBlock.unpack }
 
@@ -288,16 +293,10 @@ class SimplePacketBlock:
         (block_type, block_total_len, original_pkt_len) = struct.unpack( SimplePacketBlock.head_encoding, block_bytes[:12] )
         (block_total_len_end,) = struct.unpack( SimplePacketBlock.tail_encoding, block_bytes[-4:] )
         assert block_type       == SimplePacketBlock.SPEC_CODE
-        assert block_total_len  == block_total_len_end
-        pkt_data_pad_len    = util.block32_ceil_num_bytes(original_pkt_len)
-        pkt_data            = block_bytes[12 : (12 + original_pkt_len)]  #todo clean
-        spb_info =  { 'block_type'          : block_type,
-                      'block_total_len'     : block_total_len,
-                      'original_pkt_len'    : original_pkt_len,
-                      'pkt_data_pad_len'    : pkt_data_pad_len,
-                      'pkt_data'            : pkt_data,
-                      'block_total_len_end' : block_total_len_end }
-        return spb_info
+        assert block_total_len  == block_total_len_end == len( block_bytes )
+        pkt_data    = block_bytes[12 : (12 + original_pkt_len)]
+        result_obj  = SimplePacketBlock( pkt_data )
+        return result_obj
 
 class EnhancedPacketBlock:
     SPEC_CODE = 0x06
@@ -322,7 +321,8 @@ class EnhancedPacketBlock:
                     isinstance(obj, option.EpbOption) )
         return result
 
-    def __init__(self, interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[]):
+    def __init__(self, interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[],
+                        timestamp=None ):
         util.assert_uint32( interface_id )  #todo verify args in all fns
         pkt_data_captured = to_bytes( pkt_data_captured )        #todo is list & tuple & str ok?
         if pkt_data_orig_len is None:
@@ -333,10 +333,26 @@ class EnhancedPacketBlock:
         util.assert_type_list( options_lst )   #todo check type on all fns
         for opt in options_lst:
             assert self.is_epb_option(opt)
+        if timestamp is None:
+            (time_secs, time_usecs) = util.curr_utc_timetuple()
+        else:
+            (time_secs, time_usecs) = timestamp
+
         self.interface_id       = interface_id
         self.pkt_data_captured  = pkt_data_captured
         self.pkt_data_orig_len  = pkt_data_orig_len
         self.options_lst        = options_lst
+        self.time_secs          = time_secs
+        self.time_usecs         = time_usecs
+
+    def to_map(self):
+        return util.select_keys( self.__dict__, [
+            'interface_id', 'pkt_data_captured', 'pkt_data_orig_len', 'options_lst',
+            'time_secs', 'time_usecs' ] )
+
+    def __repr__(self):         return str( self.to_map() )
+    def __eq__(self, other):    return self.to_map() == other.to_map()
+    def __ne__(self, other):    return (not __eq__(self,other))
 
     @staticmethod
     def dispatch_entry(): return { EnhancedPacketBlock.SPEC_CODE : EnhancedPacketBlock.unpack }
@@ -345,7 +361,6 @@ class EnhancedPacketBlock:
         """Encodes a simple packet block. Default value for pkt_data_orig_len is the length
         of the supplied pkt_data."""
         #todo make all arg validation look like this (in order, at top)
-        time_secs, time_usecs       = util.curr_utc_timetuple()
         pkt_data_pad                = util.block32_pad_bytes(self.pkt_data_captured)
         pkt_data_captured_len       = len(self.pkt_data_captured)
         pkt_data_captured_pad_len   = len(pkt_data_pad)
@@ -361,7 +376,8 @@ class EnhancedPacketBlock:
                             len(options_bytes) +
                             4 )      # block total length
         packed_bytes = (struct.pack( self.head_encoding, self.SPEC_CODE, block_total_len, self.interface_id,
-                                     time_secs, time_usecs, pkt_data_captured_len, self.pkt_data_orig_len) +
+                                     self.time_secs, self.time_usecs, pkt_data_captured_len,
+                                     self.pkt_data_orig_len) +
                         pkt_data_pad +
                         options_bytes +
                         struct.pack( self.tail_encoding, block_total_len ))
@@ -394,20 +410,10 @@ class EnhancedPacketBlock:
         block_bytes_stripped        = packed_bytes[28:-4]
         pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
         options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
-        options_lst                 = option.unpack_all(options_bytes)
         options_lst                 = EnhancedPacketBlock.unpack_options( options_bytes )
-
-        epb_info =  { 'block_type'              : block_type,
-                      'block_total_len'         : block_total_len,
-                      'interface_id'            : interface_id,
-                      'time_secs'               : time_secs,
-                      'time_usecs'              : time_usecs,
-                      'pkt_data_captured_len'   : pkt_data_captured_len,
-                      'pkt_data_orig_len'       : pkt_data_orig_len,
-                      'pkt_data'                : pkt_data,
-                      'options_lst'             : options_lst,
-                      'block_total_len_end'     : block_total_len_end }
-        return epb_info
+        result_obj                  = EnhancedPacketBlock(  interface_id, pkt_data, pkt_data_orig_len, options_lst,
+                                                            timestamp=(time_secs, time_usecs) )
+        return result_obj
 
 # custom format really needs a content_length field!
 #todo make subclasses like options:  CustomBlockCopyable CustomBlockNonCopyable
@@ -486,15 +492,13 @@ class CustomBlockCopyable(CustomBlock):
         ( block_type, block_total_len, pen_val ) = struct.unpack( CustomBlock.head_encoding, packed_bytes[:12] )
         (block_total_len_end,)                   = struct.unpack( CustomBlock.tail_encoding, packed_bytes[-4:] )
         assert (block_type == CustomBlockCopyable.SPEC_CODE)
+        assert pen_val == pcapng.pen.BROCADE_PEN
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
         (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
         options_lst = CustomBlock.unpack_options( options_bytes )
-        block_info = { 'block_type'     : block_type,
-                       'pen'            : pen_val,
-                       'content'        : content_bytes,
-                       'options_lst'    : options_lst }
-        return block_info
+        result_obj = CustomBlockCopyable( pen_val, content_bytes, options_lst )
+        return result_obj
 
 class CustomBlockNonCopyable(CustomBlock):
     SPEC_CODE = 0x40000BAD
@@ -511,15 +515,13 @@ class CustomBlockNonCopyable(CustomBlock):
         ( block_type, block_total_len, pen_val ) = struct.unpack( CustomBlock.head_encoding, packed_bytes[:12] )
         (block_total_len_end,)                   = struct.unpack( CustomBlock.tail_encoding, packed_bytes[-4:] )
         assert (block_type == CustomBlockNonCopyable.SPEC_CODE)
+        assert pen_val == pcapng.pen.BROCADE_PEN
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
         (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
         options_lst = CustomBlock.unpack_options( options_bytes )
-        block_info = { 'block_type'     : block_type,
-                       'pen'            : pen_val,
-                       'content'        : content_bytes,
-                       'options_lst'    : options_lst }
-        return block_info
+        result_obj = CustomBlockNonCopyable( pen_val, content_bytes, options_lst )
+        return result_obj
 
 #-----------------------------------------------------------------------------
 class CustomMrtIsisBlock:
@@ -538,11 +540,11 @@ class CustomMrtIsisBlock:
     def unpack(packed_bytes):
         """Unpacks a mrt/isis block wrapped in a pcapng custom block."""
         util.assert_type_bytes(packed_bytes)
-        cbc_info = CustomBlockCopyable.unpack(packed_bytes)
-        assert cbc_info[ 'block_type'   ] == CustomBlockCopyable.SPEC_CODE
-        assert cbc_info[ 'pen'          ] == pcapng.pen.BROCADE_PEN
-        assert cbc_info[ 'options_lst'  ] == CustomMrtIsisBlock.cmib_options
-        mrt_info = mrt.mrt_isis_block_unpack( cbc_info[ 'content' ] )
+        cbc_obj = CustomBlockCopyable.unpack(packed_bytes)
+        assert cbc_obj.block_type   == CustomBlockCopyable.SPEC_CODE
+        assert cbc_obj.pen_val      == pcapng.pen.BROCADE_PEN
+        assert cbc_obj.options_lst  == CustomMrtIsisBlock.cmib_options
+        mrt_info = mrt.mrt_isis_block_unpack( cbc_obj.content )
         return mrt_info
 
 #-----------------------------------------------------------------------------

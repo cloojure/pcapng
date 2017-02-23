@@ -210,6 +210,11 @@ class InterfaceDescBlock:
     def pack(self):
         """Encodes an interface description block, including the specified options."""
         options_bytes   = option.pack_all( self.options_lst )
+        util.assert_type_bytes( options_bytes )
+        util.assert_block32_length( options_bytes )
+        print( '270 options_bytes={}'.format(options_bytes) )
+        print( '271 len(options_bytes)={}'.format( len(options_bytes)) )
+
         block_total_len =   (  4 +         # block type
                                4 +         # block total length
                                2 + 2 +     # linktype + reserved

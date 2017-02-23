@@ -12,14 +12,16 @@ import sys
 from   sys import argv
 import socket
 import pcapng.block
+import pcapng.linktype as linktype
 import pcapng.option as option
-from   pcapng.option import Option
 
 
 DEBUG_ARGS = False
 
-# interface = "eth0"
+#   ***** CHOOSE YOUR LOCAL INTERFACE NAME HERE *****
+interface_name = "eth0"
 interface_name = "wlx803f5d22051b"
+interface_name = "wlp4s0"
 
 usage_text = """
 USAGE: {0} [-i <if_name>]
@@ -158,12 +160,20 @@ def main():
                option.EpbDropCount(   13 ) ]
 
   pcap_fp.write( pcapng.block.SectionHeaderBlock( shb_opts ).pack() )  # must be 1st block
-  pcap_fp.write( pcapng.block.InterfaceDescBlock( idb_opts ).pack() )  # optional block
+
+  idb_obj = pcapng.block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, idb_opts )  # optional block
+  idb_bytes = idb_obj.pack()
+  pcap_fp.write( idb_bytes )
+
   while True:
       pkt_bytes = get_next_packet( socket_fd )
       dbg_print( pkt_bytes )
-      pcap_fp.write( pcapng.block.SimplePacketBlock(      pkt_bytes                           ).pack() )
-      pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
+
+      spb_obj = pcapng.block.SimplePacketBlock( pkt_bytes )
+      spb_bytes = spb_obj.pack()
+      pcap_fp.write( spb_bytes )
+
+      # pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
 
 if __name__ == "__main__":
   main()

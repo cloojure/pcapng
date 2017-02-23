@@ -100,7 +100,6 @@ class SectionHeaderBlock:
                         'SHB_MINOR_VERSION':    self.MINOR_VERSION, }
         result = util.dict_merge( base_map, util.select_keys(self.__dict__, ['options_lst']) )
         return result
-
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
@@ -200,6 +199,11 @@ class InterfaceDescBlock:
         self.reserved       = 0    # spec req zeros
         self.snaplen        = 0    # 0 => no limit
 
+    def to_map(self):           return util.select_keys(self.__dict__, ['link_type', 'options_lst', 'snaplen' ])
+    def __repr__(self):         return str( self.to_map() )
+    def __eq__(self, other):    return self.to_map() == other.to_map()
+    def __ne__(self, other):    return (not __eq__(self,other))
+
     @staticmethod
     def dispatch_entry(): return { InterfaceDescBlock.SPEC_CODE : InterfaceDescBlock.unpack }
 
@@ -242,18 +246,14 @@ class InterfaceDescBlock:
         ( block_type, block_total_len, link_type, reserved, snaplen ) = struct.unpack( InterfaceDescBlock.block_head_encoding,
                                                                                        block_bytes[:16] )
         (block_total_len_end,) = struct.unpack( InterfaceDescBlock.block_tail_encoding, block_bytes[-4:] )
-        assert block_type == InterfaceDescBlock.SPEC_CODE
-        assert block_total_len == block_total_len_end == len(block_bytes)
+        assert block_type       == InterfaceDescBlock.SPEC_CODE
+        assert block_total_len  == block_total_len_end == len(block_bytes)
+        assert reserved         == 0
+        assert snaplen          == 0
         options_bytes = block_bytes[16:-4]
         options_lst = InterfaceDescBlock.unpack_options(options_bytes)  #todo verify only valid options
-        idb_info = { 'block_type'             : block_type,
-                     'block_total_len'        : block_total_len,
-                     'link_type'              : link_type,
-                     'reserved'               : reserved,
-                     'snaplen'                : snaplen,
-                     'options_lst'            : options_lst,
-                     'block_total_len_end'    : block_total_len_end }
-        return idb_info
+        result_obj = InterfaceDescBlock( link_type, options_lst )
+        return result_obj
 
 class SimplePacketBlock:
     SPEC_CODE = 0x03

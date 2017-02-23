@@ -42,18 +42,9 @@ def test_interface_desc_block():
     ]
     idb_obj     = block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, opts )
     idb_bytes   = idb_obj.pack()
-    idb_info    = block.InterfaceDescBlock.unpack( idb_bytes )
-    util.assert_type_dict( idb_info )
-    assert idb_info[ 'block_type'       ] == 0x00000001
-    assert idb_info[ 'block_total_len'  ] == idb_info['block_total_len_end'] == len(idb_bytes)
-    assert idb_info[ 'link_type'        ] == linktype.LINKTYPE_ETHERNET
-    assert idb_info[ 'reserved'         ] == 0
-    assert idb_info[ 'snaplen'          ] == 0
-    print( '251', opts )
-    print( '252', idb_info[ 'options_lst' ] )
-    for opt in idb_info[ 'options_lst'      ]:
-        print( '253', opt )
-    assert idb_info[ 'options_lst'      ] == opts
+    idb_obj_unpacked = block.InterfaceDescBlock.unpack( idb_bytes )
+    assert util.classname( idb_obj_unpacked ) == 'pcapng.block.InterfaceDescBlock'
+    assert idb_obj == idb_obj_unpacked
 
 def test_simple_pkt_block():
     spb_obj   = block.SimplePacketBlock('abc')

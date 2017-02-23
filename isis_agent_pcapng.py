@@ -143,17 +143,27 @@ def main():
 
   print("Starting to listen on socket {}\n".format(interface_name))
   pcap_fp = open( 'data.pcapng', 'wb' );
-  pcap_fp.write( pcapng.block.section_header_block_pack())  # must be 1st block
-  idb_options = [
-      Option( option.OPT_IDB_NAME, interface_name ),
-      Option( option.OPT_IDB_DESCRIPTION, "primary interface on host" ),
-      Option( option.OPT_IDB_SPEED, struct.pack('=Q', 12345) )
-    ]
-  pcap_fp.write( pcapng.block.interface_desc_block_pack( idb_options ))     # optional block
+
+  shb_opts = [ option.ShbHardware( "Dell" ),
+               option.ShbOs( "Ubuntu" ),
+               option.ShbUserAppl( "IntelliJ Idea" ) ]
+
+  idb_opts = [
+      option.IdbName( interface_name ),
+      option.IdbDescription( "primary interface on host" ),
+      option.IdbSpeed( 12345 ) ]
+
+  epb_opts = [ option.EpbFlags(       [13,14,15,16] ),
+               option.EpbHash(        'just about any hash spec can go here' ),
+               option.EpbDropCount(   13 ) ]
+
+  pcap_fp.write( pcapng.block.SectionHeaderBlock( shb_opts ).pack() )  # must be 1st block
+  pcap_fp.write( pcapng.block.InterfaceDescBlock( idb_opts ).pack() )  # optional block
   while True:
       pkt_bytes = get_next_packet( socket_fd )
       dbg_print( pkt_bytes )
-      pcap_fp.write( pcapng.block.simple_pkt_block_pack( pkt_bytes ))
+      pcap_fp.write( pcapng.block.SimplePacketBlock(      pkt_bytes                           ).pack() )
+      pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
 
 if __name__ == "__main__":
   main()

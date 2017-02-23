@@ -96,84 +96,86 @@ def dbg_print(pkt_bytes):
         sys.stdout.flush()
 
 def main():
-  global interface_name
+    global interface_name
 
-  arg1 = str(argv[1]) if 1 < len(argv) else None
-  arg2 = str(argv[2]) if 2 < len(argv) else None
-  no_args = (len(argv) == 1)
-  one_arg = (len(argv) == 2)
-  two_args = (len(argv) == 3)
-  three_or_more_args = (len(argv) > 3)
-  help_flag = (str(arg1) == "-h")
-  interface_flag = (str(arg1) == "-i")
+    arg1 = str(argv[1]) if 1 < len(argv) else None
+    arg2 = str(argv[2]) if 2 < len(argv) else None
+    no_args = (len(argv) == 1)
+    one_arg = (len(argv) == 2)
+    two_args = (len(argv) == 3)
+    three_or_more_args = (len(argv) > 3)
+    help_flag = (str(arg1) == "-h")
+    interface_flag = (str(arg1) == "-i")
 
-  if DEBUG_ARGS:
-    print("arg1 = {}".format(arg1))
-    print("arg2 = {}".format(arg2))
-    print("no_args = {}".format(no_args))
-    print("one_arg = {}".format(one_arg))
-    print("two_args = {}".format(two_args))
-    print("three_or_more_args = {}".format(three_or_more_args))
-    print("help_flag = {}".format(help_flag))
-    print("interface_flag = {}".format(interface_flag))
+    if DEBUG_ARGS:
+          print("arg1 = {}".format(arg1))
+          print("arg2 = {}".format(arg2))
+          print("no_args = {}".format(no_args))
+          print("one_arg = {}".format(one_arg))
+          print("two_args = {}".format(two_args))
+          print("three_or_more_args = {}".format(three_or_more_args))
+          print("help_flag = {}".format(help_flag))
+          print("interface_flag = {}".format(interface_flag))
 
-  if one_arg and help_flag:
-    help()
-    exit()
+    if one_arg and help_flag:
+          help()
+          exit()
 
-  if three_or_more_args or \
-         (two_args and not interface_flag) or \
-         (one_arg and not help_flag):
-    usage()
-    exit()
+    if three_or_more_args or \
+           (two_args and not interface_flag) or \
+           (one_arg and not help_flag):
+          usage()
+          exit()
 
-  if two_args and interface_flag:
-    interface_name = argv[2]
+    if two_args and interface_flag:
+          interface_name = argv[2]
 
-  bpf = BPF( text=prog, debug=2 )
-  is_is_filter = bpf.load_func("isis_filter", BPF.SOCKET_FILTER)
+    bpf = BPF( text=prog, debug=2 )
+    is_is_filter = bpf.load_func("isis_filter", BPF.SOCKET_FILTER)
 
-  print("binding socket to '%s'" % interface_name)
-  BPF.attach_raw_socket(is_is_filter, interface_name)
+    print("binding socket to '%s'" % interface_name)
+    BPF.attach_raw_socket(is_is_filter, interface_name)
 
-  # get file descriptor of the socket previously created inside BPF.attach_raw_socket
-  socket_fd = is_is_filter.sock
+    # get file descriptor of the socket previously created inside BPF.attach_raw_socket
+    socket_fd = is_is_filter.sock
 
-  #create python socket object, from the file descriptor
-  sock = socket.fromfd( socket_fd, socket.AF_PACKET, socket.SOCK_RAW, 0 )
-  sock.setblocking(True)
+    #create python socket object, from the file descriptor
+    sock = socket.fromfd( socket_fd, socket.AF_PACKET, socket.SOCK_RAW, 0 )
+    sock.setblocking(True)
 
-  print("Starting to listen on socket {}\n".format(interface_name))
-  pcap_fp = open( 'data.pcapng', 'wb' );
+    print("Starting to listen on socket {}\n".format(interface_name))
+    pcap_fp = open( 'data.pcapng', 'wb' );
 
-  shb_opts = [ option.ShbHardware( "Dell" ),
-               option.ShbOs( "Ubuntu" ),
-               option.ShbUserAppl( "IntelliJ Idea" ) ]
+    shb_opts = [ option.ShbHardware( "Dell" ),
+                 option.ShbOs( "Ubuntu" ),
+                 option.ShbUserAppl( "IntelliJ Idea" ) ]
 
-  idb_opts = [
-      option.IdbName( interface_name ),
-      option.IdbDescription( "primary interface on host" ),
-      option.IdbSpeed( 12345 ) ]
+    idb_opts = [
+        option.IdbName( interface_name ),
+        option.IdbDescription( "primary interface on host" ),
+        option.IdbSpeed( 12345 ) ]
 
-  epb_opts = [ option.EpbFlags(       [13,14,15,16] ),
-               option.EpbHash(        'just about any hash spec can go here' ),
-               option.EpbDropCount(   13 ) ]
+    epb_opts = [ option.EpbFlags(       [13,14,15,16] ),
+                 option.EpbHash(        'just about any hash spec can go here' ),
+              option.EpbDropCount(   13 ) ]
 
-  pcap_fp.write( pcapng.block.SectionHeaderBlock( shb_opts ).pack() )  # must be 1st block
+    pcap_fp.write( pcapng.block.SectionHeaderBlock( shb_opts ).pack() )  # must be 1st block
 
-  idb_obj = pcapng.block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, idb_opts )  # optional block
-  idb_bytes = idb_obj.pack()
-  pcap_fp.write( idb_bytes )
+    idb_obj = pcapng.block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, idb_opts )  # optional block
+    idb_bytes = idb_obj.pack()
+    pcap_fp.write( idb_bytes )
 
-  while True:
-      pkt_bytes = get_next_packet( socket_fd )
-      dbg_print( pkt_bytes )
+    count = 0
+    while True:
+        pkt_bytes = get_next_packet( socket_fd )
+        dbg_print( pkt_bytes )
 
-      spb_obj = pcapng.block.SimplePacketBlock( pkt_bytes )
-      spb_bytes = spb_obj.pack()
-      pcap_fp.write( spb_bytes )
-
-      # pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
+        count = count + 1
+        (dummy, curr_rem) = divmod(count,2)
+        if curr_rem == 0:
+            pcap_fp.write( pcapng.block.SimplePacketBlock( pkt_bytes ).pack() )
+        else:
+            pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
 
 if __name__ == "__main__":
   main()

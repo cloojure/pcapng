@@ -11,8 +11,4 @@ before_script:
 something:
   script:
     - python --version
-test:
-  script:
-  # this configures Django application to use attached postgres database that is run on `postgres` host
-  - export DATABASE_URL=postgres://postgres:@postgres:5432/python-test-app
-  - python manage.py test
+    - python -c"print( 'hello {}'.format( 1+2 ))"

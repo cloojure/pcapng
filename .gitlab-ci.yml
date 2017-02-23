@@ -9,14 +9,10 @@ before_script:
   - which pytest
   - pytest --version
 
-something:
-  script:
-    - python --version
-    - python -c"print( 'hello {}'.format( 1+2 ))"
-
 testy:
   script:
     - python --version
+    - python -c"print( 'hello {}'.format( 1+2 ))"
     - pytest --version
     - pytest
 

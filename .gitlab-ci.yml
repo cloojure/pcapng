@@ -8,11 +8,9 @@ before_script:
   - python --version
   - which pytest
   - pytest --version
+  - python -c"print( 'hello => {}'.format( 1+2 ))"
 
 testy:
   script:
-    - python --version
-    - python -c"print( 'hello {}'.format( 1+2 ))"
-    - pytest --version
     - pytest
 

@@ -3,3 +3,7 @@ before_script:
   - python --version
   - which pytest
   - pytest --version
+
+something:
+  script:
+    - python --version

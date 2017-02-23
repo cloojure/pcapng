@@ -1,0 +1,5 @@
+before_script:
+  - which python
+  - python --version
+  - which pytest
+  - pytest --version

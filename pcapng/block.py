@@ -77,38 +77,6 @@ def unpack_options_generic( dispatch_table, options_bytes ):
             result.append(new_opt)
     return result
 
-def unpack_options_shb(options_bytes):
-    return unpack_options_generic( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, options_bytes )
-
-def unpack_options_idb(options_bytes):
-    return unpack_options_generic( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, options_bytes )
-
-def unpack_options_epb(options_bytes):
-    result = []
-    option_segs_lst = option.segment_all(options_bytes)
-    for opt_bytes in option_segs_lst:
-        if option.is_end_of_opt( opt_bytes ):
-            continue
-        else:
-            new_opt = Option.unpack_dispatch( EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-            result.append(new_opt)
-    return result
-
-def unpack_options_cb(options_bytes):
-    result = []
-    option_segs_lst = option.segment_all(options_bytes)
-    for opt_bytes in option_segs_lst:
-        if option.is_end_of_opt( opt_bytes ):
-            continue
-        else:
-            new_opt = Option.unpack_dispatch( CustomBlock.UNPACK_DISPATCH_TABLE, opt_bytes )
-            print( '351  new_opt=', new_opt)
-            result.append(new_opt)
-    return result
-
-
-
-
 class Block:
     BLOCK_UNKNOWN = 9999
 
@@ -196,7 +164,7 @@ class SectionHeaderBlock:
         assert block_total_len  == block_total_len_end == len(block_bytes)
         # section_len currently ignored
         options_bytes = block_bytes[24:-4]
-        options_lst = unpack_options_shb(options_bytes)
+        options_lst = unpack_options_generic( SectionHeaderBlock.UNPACK_DISPATCH_TABLE, options_bytes )
         result_obj = SectionHeaderBlock(options_lst)
         return result_obj
 
@@ -280,7 +248,7 @@ class InterfaceDescBlock:
         assert reserved         == 0
         assert snaplen          == 0
         options_bytes = block_bytes[16:-4]
-        options_lst = unpack_options_idb(options_bytes)  #todo verify only valid options
+        options_lst = unpack_options_generic( InterfaceDescBlock.UNPACK_DISPATCH_TABLE, options_bytes )
         result_obj = InterfaceDescBlock( link_type, options_lst )
         return result_obj
 
@@ -427,7 +395,7 @@ class EnhancedPacketBlock:
         block_bytes_stripped        = packed_bytes[28:-4]
         pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
         options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
-        options_lst                 = unpack_options_epb(options_bytes)
+        options_lst                 = unpack_options_generic( EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, options_bytes )
         result_obj                  = EnhancedPacketBlock(  interface_id, pkt_data, pkt_data_orig_len, options_lst,
                                                             timestamp=(time_secs, time_usecs) )
         return result_obj
@@ -500,7 +468,7 @@ class CustomBlockCopyable(CustomBlock):
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
         (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
-        options_lst = unpack_options_cb(options_bytes)
+        options_lst = unpack_options_generic( CustomBlock.UNPACK_DISPATCH_TABLE, options_bytes )
         result_obj = CustomBlockCopyable( pen_val, content_bytes, options_lst )
         return result_obj
 
@@ -523,7 +491,7 @@ class CustomBlockNonCopyable(CustomBlock):
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
         (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
-        options_lst = unpack_options_cb(options_bytes)
+        options_lst = unpack_options_generic( CustomBlock.UNPACK_DISPATCH_TABLE, options_bytes )
         result_obj = CustomBlockNonCopyable( pen_val, content_bytes, options_lst )
         return result_obj
 

@@ -1,4 +1,8 @@
 before_script:
+  - apt-get update -qy
+  - apt-get install -y python-dev python-pip
+  - pip install -r requirements.txt
+  - pip install -U pytest
   - which python
   - python --version
   - which pytest
@@ -7,3 +11,8 @@ before_script:
 something:
   script:
     - python --version
+test:
+  script:
+  # this configures Django application to use attached postgres database that is run on `postgres` host
+  - export DATABASE_URL=postgres://postgres:@postgres:5432/python-test-app
+  - python manage.py test

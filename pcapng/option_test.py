@@ -83,18 +83,27 @@ def test_custom_option_value():
     assert_custom_option_value_codec( pen.BROCADE_PEN, 'Doh!' )
     assert_custom_option_value_codec( pen.BROCADE_PEN, 'How do you like me now?' )
 
-    # opts_lst = [
-    #     option.Comment( "five"          ), option.CustomStringCopyable(    pen.BROCADE_PEN, "yo"),
-    #     option.Comment( "six"           ), option.CustomBinaryCopyable(    pen.BROCADE_PEN, 'Many had a little lamb'),
-    #     option.Comment( "seventy-seven" ), option.CustomStringNonCopyable( pen.BROCADE_PEN, "don't copy me"),
-    #     option.Comment( "eight"         ), option.CustomBinaryNonCopyable( pen.BROCADE_PEN, 'fin'),
-    #     option.Comment( "Agent 009"     ) ]
-    # opts_lst_unpacked = option.unpack_all( option.pack_all( opts_lst ))
-    # for i in range( len( opts_lst )):
-    #     print
-    #     print( 'opt:  {}'.format( opts_lst[i] ))
-    #     print( 'optu: {}'.format( opts_lst_unpacked[i] ))
-    # assert opts_lst == opts_lst_unpacked
+    unpack_dispatch_table = util.dict_merge_all( [
+        option.Comment.dispatch_entry(),
+        option.CustomStringCopyable.dispatch_entry(),
+        option.CustomBinaryCopyable.dispatch_entry(),
+        option.CustomStringNonCopyable.dispatch_entry(),
+        option.CustomBinaryNonCopyable.dispatch_entry() ] )
+
+    opts_lst = [
+        option.Comment( "five"          ), option.CustomStringCopyable(    pen.BROCADE_PEN, "yo"),
+        option.Comment( "six"           ), option.CustomBinaryCopyable(    pen.BROCADE_PEN, 'Many had a little lamb'),
+        option.Comment( "seventy-seven" ), option.CustomStringNonCopyable( pen.BROCADE_PEN, "don't copy me"),
+        option.Comment( "eight"         ), option.CustomBinaryNonCopyable( pen.BROCADE_PEN, 'fin'),
+        option.Comment( "Agent 009"     ) ]
+
+    opts_lst_unpacked = option.unpack_options_generic( unpack_dispatch_table, option.pack_all( opts_lst ))
+    for i in range( len( opts_lst )):
+        print
+        print( 'opt:  {}'.format( opts_lst[i] ))
+        print( 'optu: {}'.format( opts_lst_unpacked[i] ))
+    assert opts_lst == opts_lst_unpacked
+    assert False
 
 def test_Comment():
     s1  = 'Five Stars!'

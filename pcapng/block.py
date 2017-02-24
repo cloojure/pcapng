@@ -383,9 +383,9 @@ class EnhancedPacketBlock:
         block_bytes_stripped        = packed_bytes[28:-4]
         pkt_data                    = block_bytes_stripped[:pkt_data_captured_len]
         options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
-        options_lst                 = option.unpack_all(EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, options_bytes)
-        result_obj                  = EnhancedPacketBlock(  interface_id, pkt_data, pkt_data_orig_len, options_lst,
-                                                            timestamp=(time_secs, time_usecs) )
+        options_lst                 = option.unpack_all( EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, options_bytes )
+        result_obj                  = EnhancedPacketBlock( interface_id, pkt_data, pkt_data_orig_len, options_lst,
+                                                           timestamp=(time_secs, time_usecs) )
         return result_obj
 
 # custom format really needs a content_length field!
@@ -508,6 +508,7 @@ class CustomMrtIsisBlock:
         return mrt_info
 
 #-----------------------------------------------------------------------------
+#todo make a BlockList class?
 
 UNPACK_DISPATCH_TABLE = util.dict_merge_all( [
     SectionHeaderBlock.dispatch_entry(),

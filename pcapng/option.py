@@ -157,6 +157,7 @@ class Option:
             stripped_bytes = opt_bytes[4:]
             return Option( option.OPT_UNKNOWN, stripped_bytes )
 
+
 #wip continue here
 class Comment(Option):
     SPEC_CODE = 1
@@ -882,6 +883,17 @@ def segment_all(raw_bytes):
 
 #-----------------------------------------------------------------------------
 
+def unpack_options_generic( dispatch_table, options_bytes ):
+    result = []
+    option_segs_lst = segment_all(options_bytes)
+    for opt_bytes in option_segs_lst:
+        if is_end_of_opt( opt_bytes ):
+            continue
+        else:
+            new_opt = Option.unpack_dispatch( dispatch_table, opt_bytes )
+            result.append(new_opt)
+    return result
+
 #todo need to add custom options
 def custom_option_value_pack( pen, content=[] ):
     """Packes the *value* of a custom option, i.e. the pair [PEN, content].
@@ -901,5 +913,4 @@ def custom_option_value_unpack( value_packed_bytes ):
     value_dict = { 'pen'            : pen,
                    'content_pad'    : content_pad }
     return value_dict
-
 

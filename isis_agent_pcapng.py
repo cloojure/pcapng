@@ -150,14 +150,13 @@ def main():
                  option.ShbOs( "Ubuntu" ),
                  option.ShbUserAppl( "IntelliJ Idea" ) ]
 
-    idb_opts = [
-        option.IdbName( interface_name ),
-        option.IdbDescription( "primary interface on host" ),
-        option.IdbSpeed( 12345 ) ]
+    idb_opts = [ option.IdbName( interface_name ),
+                 option.IdbDescription( "primary interface on host" ),
+                 option.IdbSpeed( 12345 ) ]
 
     epb_opts = [ option.EpbFlags(       [13,14,15,16] ),
                  option.EpbHash(        'just about any hash spec can go here' ),
-              option.EpbDropCount(   13 ) ]
+                 option.EpbDropCount(   13 ) ]
 
     pcap_fp.write( pcapng.block.SectionHeaderBlock( shb_opts ).pack() )  # must be 1st block
 

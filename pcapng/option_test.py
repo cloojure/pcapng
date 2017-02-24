@@ -14,11 +14,9 @@
 
 
 import pytest
-import struct
 import pcapng.option    as option
 from   pcapng.option    import Option, ShbOption, IdbOption
 import pcapng.pen       as pen
-import pcapng.tlv       as tlv
 import pcapng.util      as util
 from   pcapng.util      import to_bytes
 
@@ -46,7 +44,6 @@ def test_option_codec():
     assert_option_codec( 2, [178] )
     assert_option_codec( 2, [255] )
 
-
 def test_custom_option_value():
     #todo include standalone value pack/unpack
     #todo include pack/unpack  mixed with regular options
@@ -67,7 +64,6 @@ def test_custom_option_value():
         cbnc_unpacked   = option.CustomBinaryNonCopyable.unpack( cbnc.pack() )
         assert cbnc_unpacked == cbnc
 
-
     assert_custom_option_value_codec( pen.BROCADE_PEN, '' )
     assert_custom_option_value_codec( pen.BROCADE_PEN, 'a' )
     assert_custom_option_value_codec( pen.BROCADE_PEN, 'go' )
@@ -81,15 +77,14 @@ def test_custom_option_value():
         option.CustomBinaryCopyable.dispatch_entry(),
         option.CustomStringNonCopyable.dispatch_entry(),
         option.CustomBinaryNonCopyable.dispatch_entry() ] )
-
     opts_lst = [
         option.Comment( "five"          ), option.CustomStringCopyable(    pen.BROCADE_PEN, "yo"),
-        option.Comment( "six"           ), option.CustomBinaryCopyable(    pen.BROCADE_PEN, 'Many had a little lamb'),
+        option.Comment( "six"           ), option.CustomBinaryCopyable(    pen.BROCADE_PEN, '10011010'),
         option.Comment( "seventy-seven" ), option.CustomStringNonCopyable( pen.BROCADE_PEN, "don't copy me"),
         option.Comment( "eight"         ), option.CustomBinaryNonCopyable( pen.BROCADE_PEN, 'fin'),
         option.Comment( "Agent 009"     ) ]
-
-    opts_lst_unpacked = option.unpack_all(unpack_dispatch_table, option.pack_all(opts_lst))
+    packed_bytes = option.pack_all( opts_lst )
+    opts_lst_unpacked = option.unpack_all( unpack_dispatch_table, packed_bytes )
     assert opts_lst == opts_lst_unpacked
 
 def test_Comment():
@@ -305,6 +300,4 @@ def test_EpbDropCount():
     assert len( packed_bytes ) == 12    #todo add this test everywhere
     assert c1.dropcount       == c1u.dropcount       == dropcount
     assert util.classname(c1) == util.classname(c1u) == 'pcapng.option.EpbDropCount'
-
-
 

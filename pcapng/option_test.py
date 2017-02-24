@@ -26,9 +26,11 @@ from   pcapng.util      import to_bytes
 
 def test_option_codec():
     def assert_option_codec(opt_code, opt_value):
-        (opt,remaining_bytes) = option.unpack_rolling( Option(opt_code, opt_value ).pack() )
+        opt          = Option(opt_code, opt_value )
+        opt_unpacked = Option.unpack( opt.pack() )
         assert opt.code     == opt_code
         assert opt.content  == to_bytes(opt_value)
+        assert opt          == opt_unpacked
 
     #todo add tests for opt values of string, byte, short, int, float, double
     #todo add tests for opt value len up to 9999?
@@ -44,16 +46,6 @@ def test_option_codec():
     assert_option_codec( 2, [178] )
     assert_option_codec( 2, [255] )
 
-def test_options_codec():
-    def assert_options_codec(options_lst):
-        options_out = option.unpack_all( option.pack_all( options_lst ))
-        assert options_out == options_lst
-    assert_options_codec(  [ Option(1,'') ] )
-    assert_options_codec(  [ Option(2,''),
-                             Option(3,'a') ] )
-    assert_options_codec(  [ Option(4,''),
-                             Option(5,'a'),
-                             Option(6,'Doh!') ] )
 
 def test_custom_option_value():
     #todo include standalone value pack/unpack

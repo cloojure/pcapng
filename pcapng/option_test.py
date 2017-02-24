@@ -98,12 +98,7 @@ def test_custom_option_value():
         option.Comment( "Agent 009"     ) ]
 
     opts_lst_unpacked = option.unpack_options_generic( unpack_dispatch_table, option.pack_all( opts_lst ))
-    for i in range( len( opts_lst )):
-        print
-        print( 'opt:  {}'.format( opts_lst[i] ))
-        print( 'optu: {}'.format( opts_lst_unpacked[i] ))
     assert opts_lst == opts_lst_unpacked
-    assert False
 
 def test_Comment():
     s1  = 'Five Stars!'

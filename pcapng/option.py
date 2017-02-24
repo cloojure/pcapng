@@ -30,6 +30,13 @@ from   pcapng.util  import to_bytes
 #todo add docstrings for all constructurs
 #todo add docstrings for all methods
 
+#todo add strict string reading conformance?
+    # Section 3.5 of https://pcapng.github.io/pcapng states: "Software that reads these
+    # files MUST NOT assume that strings are zero-terminated, and MUST treat a
+    # zero-value octet as a string terminator."   We just use th length field to read in
+    # strings, and don't terminate early if there is a zero-value byte.
+
+
 #-----------------------------------------------------------------------------
 util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 #-----------------------------------------------------------------------------
@@ -799,45 +806,6 @@ def pack_all(opts_lst):  #todo needs test
     cum_result += Option.END_OF_OPT_BYTES
     return cum_result
 
-# def unpack_rolling(raw_bytes):
-#     print( '560 unpack_rolling() - enter')
-#     #todo verify all fields
-#     """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
-#     util.assert_type_bytes(raw_bytes)
-#     assert 4 <= len(raw_bytes)
-#     (opt_code, content_len_orig) = struct.unpack( '=HH', raw_bytes[:4])
-#     content_len_pad = util.block32_ceil_num_bytes(content_len_orig)
-#     first_block_len_pad = 4 + content_len_pad
-#     assert first_block_len_pad <= len(raw_bytes)
-#     opt_bytes             = raw_bytes[ :first_block_len_pad   ]
-#     raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
-#     opt_content           = opt_bytes[ 4 : 4+content_len_orig ]
-#     option_read = Option( opt_code, opt_content )
-#     print( '569 unpack_rolling() - exit')
-#     return ( option_read, raw_bytes_remaining )
-
-#todo add strict string reading conformance?
-    # Section 3.5 of https://pcapng.github.io/pcapng states: "Software that reads these
-    # files MUST NOT assume that strings are zero-terminated, and MUST treat a
-    # zero-value octet as a string terminator."   We just use th length field to read in
-    # strings, and don't terminate early if there is a zero-value byte.
-
-# def unpack_all(raw_bytes):
-#     """Decodes a block of raw bytes into a list of options."""
-#     print( '550 unpack_all() - enter')
-#     util.assert_type_bytes(raw_bytes)
-#     util.assert_block32_length(raw_bytes)
-#     print( 101, len(raw_bytes), raw_bytes)
-#     options = []
-#     while (0 < len(raw_bytes)):
-#         ( option, raw_bytes_remaining ) = unpack_rolling(raw_bytes)
-#         if option.code == OPT_END_OF_OPT:
-#             break
-#         else:
-#             options.append( option )
-#             raw_bytes = raw_bytes_remaining
-#     print( '559 unpack_all() - enter')
-#     return options
 
 #-----------------------------------------------------------------------------
 def segment_rolling(raw_bytes):     #todo inline below
@@ -853,11 +821,6 @@ def segment_rolling(raw_bytes):     #todo inline below
     raw_bytes_remaining   = raw_bytes[  first_block_len_pad:  ]
     return ( opt_bytes, raw_bytes_remaining )
 
-#todo add strict string reading conformance?
-# Section 3.5 of https://pcapng.github.io/pcapng states: "Software that reads these
-# files MUST NOT assume that strings are zero-terminated, and MUST treat a
-# zero-value octet as a string terminator."   We just use th length field to read in
-# strings, and don't terminate early if there is a zero-value byte.
 def segment_all(raw_bytes):
     """Decodes a block of raw bytes into a list of segments."""
     util.assert_type_bytes(raw_bytes)
@@ -869,7 +832,6 @@ def segment_all(raw_bytes):
         raw_bytes = raw_bytes_remaining
     return segments
 
-#-----------------------------------------------------------------------------
 
 def unpack_dispatch( dispatch_tbl, packed_bytes ):
     (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian

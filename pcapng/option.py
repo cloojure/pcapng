@@ -806,8 +806,6 @@ def pack_all(opts_lst):  #todo needs test
     cum_result += Option.END_OF_OPT_BYTES
     return cum_result
 
-
-#-----------------------------------------------------------------------------
 def segment_rolling(raw_bytes):     #todo inline below
     #todo verify all fields
     """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
@@ -847,7 +845,7 @@ def unpack_dispatch( dispatch_tbl, packed_bytes ):
         stripped_bytes = opt_bytes[4:]
         return Option( option.OPT_UNKNOWN, stripped_bytes )
 
-def unpack_options_generic( dispatch_table, options_bytes ):
+def unpack_all(dispatch_table, options_bytes):
     result = []
     option_segs_lst = segment_all(options_bytes)
     for opt_bytes in option_segs_lst:
@@ -857,24 +855,4 @@ def unpack_options_generic( dispatch_table, options_bytes ):
             new_opt = unpack_dispatch( dispatch_table, opt_bytes )
             result.append(new_opt)
     return result
-
-#todo need to add custom options
-def custom_option_value_pack( pen, content=[] ):
-    """Packes the *value* of a custom option, i.e. the pair [PEN, content].
-    Does not include the custom option code."""
-    pcapng.pen.assert_valid_pen( pen )
-    #todo use block32_bytes_pack/unpack() to avoid padding on output?
-    value_packed_bytes = struct.pack('=L', pen ) + util.block32_pad_bytes( content )
-    return value_packed_bytes
-
-def custom_option_value_unpack( value_packed_bytes ):
-    util.assert_type_bytes(value_packed_bytes)
-    util.assert_block32_length(value_packed_bytes)
-    (pen,) = struct.unpack('=L', value_packed_bytes[:4] )
-    content_pad = value_packed_bytes[4:]
-    pcapng.pen.assert_valid_pen( pen )
-    #todo use block32_bytes_pack/unpack() to avoid padding on output?
-    value_dict = { 'pen'            : pen,
-                   'content_pad'    : content_pad }
-    return value_dict
 

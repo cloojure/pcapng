@@ -89,7 +89,7 @@ def test_custom_option_value():
         option.Comment( "eight"         ), option.CustomBinaryNonCopyable( pen.BROCADE_PEN, 'fin'),
         option.Comment( "Agent 009"     ) ]
 
-    opts_lst_unpacked = option.unpack_options_generic( unpack_dispatch_table, option.pack_all( opts_lst ))
+    opts_lst_unpacked = option.unpack_all(unpack_dispatch_table, option.pack_all(opts_lst))
     assert opts_lst == opts_lst_unpacked
 
 def test_Comment():

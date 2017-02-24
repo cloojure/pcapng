@@ -26,6 +26,10 @@ import pcapng.pen   as pen
 import pcapng.util  as util
 from   pcapng.util  import to_bytes
 
+#-----------------------------------------------------------------------------
+util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
+#-----------------------------------------------------------------------------
+
 #todo add docstrings for all classes
 #todo add docstrings for all constructurs
 #todo add docstrings for all methods
@@ -36,12 +40,13 @@ from   pcapng.util  import to_bytes
     # zero-value octet as a string terminator."   We just use th length field to read in
     # strings, and don't terminate early if there is a zero-value byte.
 
+# option ID codes from PCAPNG spec
+OPT_END_OF_OPT    =     0
+OPT_UNKNOWN       =  9999   # non-standard
 
 #-----------------------------------------------------------------------------
-util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
-#-----------------------------------------------------------------------------
 #todo add global statemachine/var for write (testing) and read (host dependent)
-#todo -> pack.uint64_pack()/_unpack() & similar everywhere
+#todo -> packer.uint64_pack()/_unpack() & similar everywhere
 def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
 def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
 def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
@@ -56,6 +61,7 @@ def float32_pack(   arg ):      return struct.pack(   '=f', arg )
 def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
 
 #-----------------------------------------------------------------------------
+#todo make analous fns for blocks?
 def strip_header( packed_bytes ): #todo use for all unpack()
     util.assert_block32_length( packed_bytes )
     (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -70,55 +76,9 @@ def add_header(id_code, content_len, content):   #todo delete content var?
     packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
     return packed_bytes
 
-#-----------------------------------------------------------------------------
-# option ID codes from PCAPNG spec
-
-OPT_END_OF_OPT    =     0
-OPT_UNKNOWN       =  9999   # non-standard
-
-#todo need to do validation on data values & lengths
-# custom options
-# CUSTOM_STRING_COPYABLE      =  2988   #delete -> class def
-# CUSTOM_BINARY_COPYABLE      =  2989   #delete -> class def
-# CUSTOM_STRING_NON_COPYABLE  = 19372   #delete -> class def
-# CUSTOM_BINARY_NON_COPYABLE  = 19373   #delete -> class def
-
-#todo need to do validation on data values & lengths
-# section header block options
-# OPT_SHB_HARDWARE  = 2    #delete -> class def
-# OPT_SHB_OS        = 3    #delete -> class def
-# OPT_SHB_USERAPPL  = 4    #delete -> class def
-
-#todo need to do validation on data values & lengths
-#todo   make subclasses of Option
-# interface description block options
-# OPT_IDB_NAME            =   2    #delete -> class def
-# OPT_IDB_DESCRIPTION     =   3    #delete -> class def
-# OPT_IDB_IPV4_ADDR       =   4    #delete -> class def
-# OPT_IDB_IPV6_ADDR       =   5   #delete -> class def
-# OPT_IDB_MAC_ADDR        =   6  #delete -> class def
-# OPT_IDB_EUI_ADDR        =   7  #delete -> class def
-# OPT_IDB_SPEED           =   8  #delete -> class def
-# OPT_IDB_TS_RESOL        =   9  #delete -> class def
-# OPT_IDB_TZONE           =  10  #delete -> class def
-# OPT_IDB_FILTER          =  11
-# OPT_IDB_OS              =  12
-# OPT_IDB_FCS_LEN         =  13
-# OPT_IDB_TS_OFFSET       =  14
-
-#todo need to do validation on data values & lengths
-# enhanced packet block options
-# OPT_EPB_FLAGS           =   2   #todo need validation fn & use it
-# OPT_EPB_HASH            =   3   #todo need validation fn & use it
-# OPT_EPB_DROPCOUNT       =   4   #todo need validation fn & use it
-
+#todo all options need to do validation on data values & lengths
 #todo verify all fields
-
-#todo maybe need func to verify valid any option codes?
-
-#todo check type on all fns
-
-#todo need to do validation on data values & lengths
+#todo check type on all fn args
 
 def is_end_of_opt( opt_bytes ):
     return opt_bytes == Option.END_OF_OPT_BYTES
@@ -838,6 +798,7 @@ def unpack_dispatch( dispatch_tbl, packed_bytes ):
         result =  dispatch_fn( packed_bytes )
         return result
     else:
+        #todo make generic OPT_UNKNOWN ?
         print( 'warning - option.unpack_dispatch(): unrecognized Option={}'.format( opt_code )) #todo log
         raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
 

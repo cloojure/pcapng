@@ -139,24 +139,6 @@ class Option:
         packed_bytes    = struct.pack('=HH', self.code, data_len_orig) + data_pad
         return packed_bytes
 
-    @staticmethod
-    def unpack_dispatch( dispatch_tbl, packed_bytes ):
-        print( 'unpack_dispatch() - enter')
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian
-        print( 'unpack_dispatch() - opt_code=', opt_code )
-        dispatch_fn = dispatch_tbl[ opt_code ]
-        if (dispatch_fn != None):
-            result =  dispatch_fn( packed_bytes )
-            print( 'unpack_dispatch() - result=', result )
-            return result
-        else:
-            #todo exception?
-            # raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
-            #
-            print( 'warning - Option.unpack_dispatch(): unrecognized Option={}'.format( opt_code )) #todo log
-            stripped_bytes = opt_bytes[4:]
-            return Option( option.OPT_UNKNOWN, stripped_bytes )
-
 
 #wip continue here
 class Comment(Option):
@@ -883,6 +865,20 @@ def segment_all(raw_bytes):
 
 #-----------------------------------------------------------------------------
 
+def unpack_dispatch( dispatch_tbl, packed_bytes ):
+    (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian
+    dispatch_fn = dispatch_tbl[ opt_code ]
+    if (dispatch_fn != None):
+        result =  dispatch_fn( packed_bytes )
+        return result
+    else:
+        #todo exception?
+        # raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
+        #
+        print( 'warning - option.unpack_dispatch(): unrecognized Option={}'.format( opt_code )) #todo log
+        stripped_bytes = opt_bytes[4:]
+        return Option( option.OPT_UNKNOWN, stripped_bytes )
+
 def unpack_options_generic( dispatch_table, options_bytes ):
     result = []
     option_segs_lst = segment_all(options_bytes)
@@ -890,7 +886,7 @@ def unpack_options_generic( dispatch_table, options_bytes ):
         if is_end_of_opt( opt_bytes ):
             continue
         else:
-            new_opt = Option.unpack_dispatch( dispatch_table, opt_bytes )
+            new_opt = unpack_dispatch( dispatch_table, opt_bytes )
             result.append(new_opt)
     return result
 

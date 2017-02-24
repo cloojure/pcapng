@@ -164,21 +164,12 @@ def test_blocks_lst():
     ]
     packed_bytes = block.pack_all( blk_lst )
 
-    # pcap_fp = open( 'block_list.pcapng', 'wb' )
-    # pcap_fp.write( packed_bytes )
-    # pcap_fp.close()
+    if False:
+        pcap_fp = open( 'block_list.pcapng', 'wb' )
+        pcap_fp.write( packed_bytes )
+        pcap_fp.close()
 
     util.assert_block32_length( packed_bytes )
     blk_lst_unpacked = block.unpack_blocks( packed_bytes )
-    print( 'lengths:  {}  {}'.format( len(blk_lst), len(blk_lst_unpacked)))
-    for i in range( len(blk_lst)):
-        blk_orig = blk_lst[i]
-        blk_unpk = blk_lst_unpacked[i]
-        print
-        print('-------------------------------------------------------')
-        print( 'blk_orig', blk_orig)
-        print
-        print( 'blk_unpk', blk_unpk)
-
     assert blk_lst == blk_lst_unpacked
 

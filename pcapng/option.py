@@ -838,12 +838,8 @@ def unpack_dispatch( dispatch_tbl, packed_bytes ):
         result =  dispatch_fn( packed_bytes )
         return result
     else:
-        #todo exception?
-        # raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
-        #
         print( 'warning - option.unpack_dispatch(): unrecognized Option={}'.format( opt_code )) #todo log
-        stripped_bytes = opt_bytes[4:]
-        return Option( option.OPT_UNKNOWN, stripped_bytes )
+        raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
 
 def unpack_all(dispatch_table, options_bytes):
     result = []

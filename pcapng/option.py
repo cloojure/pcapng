@@ -69,18 +69,20 @@ class Option:
 #   OPT_UNKNOWN       =  9999   # non-standard      #todo use this?
 
     def __init__(self, type_code, content):
-        "Creates a raw Option block"
+        "Creates an Option block"
         #todo assert valid type_code?
         self.type_code  = type_code
         self.content    = to_bytes(content)
 
-    def to_map(self):           return util.select_keys(self.__dict__, ['type_code', 'content'])
+    def to_map(self):
+        "Converts an Option object to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'content'])
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
 
     def pack(self):   #todo needs test
-        """Encodes an option into a bytes block."""
+        "Serialize an Option object into packed bytes"
         #todo validate type_code
         data_len_orig   = len(self.content)
         data_pad        = util.block32_pad_bytes(self.content)
@@ -89,24 +91,25 @@ class Option:
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize an Option object from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return Option( type_code, content )
 
 class EndOfOptions(Option):
+    "Degenerate class used as a sentinal value for Option packed bytes"
     # from PCAPNG spec
     SPEC_CODE = 0
     PACKED_BYTES = struct.pack('=HH', SPEC_CODE, 0)
-
     @staticmethod
     def is_end_of_opt( opt_bytes ):
         "Indicates a block of packed bytes is the End-of-Options sentinal"
         return opt_bytes == EndOfOptions.PACKED_BYTES
 
-
 #wip continue here
 class Comment(Option):
+    "Serialize & deserialze a PCAPNG Comment Option"
     SPEC_CODE = 1
     def __init__(self, content_str):    Option.__init__(self, self.SPEC_CODE, content_str)
 
@@ -115,6 +118,7 @@ class Comment(Option):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize a Comment Option object from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         print( '210 type_code={} content_len={}'.format(type_code, content_len))
         assert type_code == Comment.SPEC_CODE     #todo copy check to all
@@ -125,24 +129,30 @@ class Comment(Option):
 
 #-----------------------------------------------------------------------------
 class CustomOption(Option):
+    "Superclass for all PCAPNG Custom Options"
     def __init__(self, type_code, content):
         """Creates an SHB Option with the specified option type_code & content."""
         Option.__init__(self, type_code, content)
 
-    def to_map(self):           return util.select_keys( self.__dict__, ['type_code', 'pen_val', 'content'] )
+    def to_map(self):
+        "Converts an Custom Option object to a map representation"
+        return util.select_keys( self.__dict__, ['type_code', 'pen_val', 'content'] )
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
 
 class CustomStringCopyable(CustomOption):
+    "Serialize & deserialze a PCAPNG Custom String Copyable Option"
     SPEC_CODE = 2988
     def __init__(self, pen_val, content):
+        "Create a PCAPNG Custom String Copyable Option"
         pen.assert_valid_pen(pen_val)
         self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
     def pack(self):
+        "Serialize a CSC object into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         print( '140 CSC.pack()    content={} content_len={} spec_len={} '.format( self.content, content_len, spec_len ))
@@ -155,6 +165,7 @@ class CustomStringCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize a CSC object from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -163,14 +174,17 @@ class CustomStringCopyable(CustomOption):
         return CustomStringCopyable( pen_val, content )
 
 class CustomBinaryCopyable(CustomOption):
+    "Serialize & deserialze a PCAPNG Custom Binary Copyable Option"
     SPEC_CODE = 2989
     def __init__(self, pen_val, content):
+        "Create a PCAPNG Custom Binary Copyable Option"
         pen.assert_valid_pen(pen_val)
         self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
     def pack(self):
+        "Serialize a CBC object into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
@@ -182,6 +196,7 @@ class CustomBinaryCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize a CBC object from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -189,14 +204,17 @@ class CustomBinaryCopyable(CustomOption):
         return CustomBinaryCopyable( pen_val, content )
 
 class CustomStringNonCopyable(CustomOption):
+    "Serialize & deserialze a PCAPNG Custom String Non-Copyable Option"
     SPEC_CODE = 19372
     def __init__(self, pen_val, content):
+        "Create a PCAPNG Custom String Non-Copyable Option"
         pen.assert_valid_pen(pen_val)
         self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
     def pack(self):
+        "Serialize a CSNC object into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
@@ -208,6 +226,7 @@ class CustomStringNonCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize a CSNC object from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -215,14 +234,17 @@ class CustomStringNonCopyable(CustomOption):
         return CustomStringNonCopyable( pen_val, content )
 
 class CustomBinaryNonCopyable(CustomOption):
+    "Serialize & deserialze a PCAPNG Custom Binary Non-Copyable Option"
     SPEC_CODE = 19373
     def __init__(self, pen_val, content):
+        "Create a PCAPNG Custom Binary Non-Copyable Option"
         pen.assert_valid_pen(pen_val)
         self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
     def pack(self):
+        "Serialize a CBNC object into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
@@ -234,6 +256,7 @@ class CustomBinaryNonCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize a CBNC object from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -242,13 +265,16 @@ class CustomBinaryNonCopyable(CustomOption):
 
 #-----------------------------------------------------------------------------
 class ShbOption(Option):
+    "Superclass for all PCAPNG Segment Header Block Options"
     def __init__(self, type_code, content, code_verify_disable=False):
-        """Creates an SHB Option with the specified option type_code & content."""
+        """Creates an SHB Option."""
         Option.__init__(self, type_code, content)
 
 class ShbHardware(ShbOption):
+    "Serialize & deserialze a PCAPNG SHB Hardware Option"
     SPEC_CODE = 2
     def __init__(self, content_str):
+        "Create a PCAPNG SHB Hardware Option"
         ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -256,14 +282,17 @@ class ShbHardware(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize an SHB Hardware object from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return ShbHardware(content)
 
 class ShbOs(ShbOption):
+    "Serialize & deserialze a PCAPNG SHB OS Option"
     SPEC_CODE = 3
     def __init__(self, content_str):
+        "Create a PCAPNG SHB OS Option"
         ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -271,14 +300,17 @@ class ShbOs(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize an SHB OS object from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return ShbOs(content)
 
 class ShbUserAppl(ShbOption):
+    "Serialize & deserialze a PCAPNG SHB User Application Option"
     SPEC_CODE = 4
     def __init__(self, content_str):
+        "Create a PCAPNG SHB UserAppl Option"
         ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -286,6 +318,7 @@ class ShbUserAppl(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize an SHB UserAppl object from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
@@ -293,13 +326,16 @@ class ShbUserAppl(ShbOption):
 
 #-----------------------------------------------------------------------------
 class IdbOption(Option):
+    "Superclass for all PCAPNG Interface Description Block Options"
     def __init__(self, type_code, content, code_verify_disable=False):
-        """Creates an IDB Option with the specified option type_code & content."""
+        """Creates an IDB Option."""
         Option.__init__(self, type_code, content)
 
 class IdbName(IdbOption):
+    "Serialize & deserialze a PCAPNG IDB Name Option"
     SPEC_CODE = 2
     def __init__(self, content_str):
+        "Create a PCAPNG IDB Name Option"
         IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -307,14 +343,17 @@ class IdbName(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize an IDB Name object from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return IdbName(content)
 
 class IdbDescription(IdbOption):
+    "Serialize & deserialze a PCAPNG IDB Description Option"
     SPEC_CODE = 3
     def __init__(self, content_str):
+        "Create an instance"
         IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -322,14 +361,17 @@ class IdbDescription(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return IdbDescription(content)
 
 class IdbIpv4Addr(IdbOption):
+    "Serialize & deserialze a PCAPNG IPv4 Address Option"
     SPEC_CODE = 4
     def __init__(self, addr_byte_lst, netmask_byte_lst):
+        "Create an instance"
         print( 'IdbIpv4Addr.__init__() - enter')
         addr_byte_lst       = list( addr_byte_lst )
         netmask_byte_lst    = list( netmask_byte_lst )
@@ -340,18 +382,21 @@ class IdbIpv4Addr(IdbOption):
         self.netmask_bytes  = netmask_byte_lst
         print( 'IdbIpv4Addr.__init__() - exit')
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes', 'netmask_bytes'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'addr_bytes', 'netmask_bytes'])
 
     @staticmethod
     def dispatch_entry(): return { IdbIpv4Addr.SPEC_CODE : IdbIpv4Addr.unpack }
 
     def pack(self):   #todo needs test
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         packed_bytes = ( struct.pack('=HH', self.type_code, 8) + to_bytes(self.addr_bytes) + to_bytes(self.netmask_bytes))
         return packed_bytes
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         print( 'IdbIpv4Addr.unpack() - enter')
         assert len(packed_bytes) == 12      #todo check everywhere
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -365,25 +410,26 @@ class IdbIpv4Addr(IdbOption):
         return result
 
 class IdbIpv6Addr(IdbOption):
+    "Serialize & deserialze a PCAPNG IPv6 Address Option"
     SPEC_CODE = 5
     def __init__(self, addr_byte_lst, prefix_len):
-        print( 'IdbIpv6Addr.__init__() - enter')
-        print( 'addr_byte_lst={} prefix_len={}'.format( addr_byte_lst, prefix_len ))
+        "Create an instance"
         addr_byte_lst       = list( addr_byte_lst )
         util.assert_vec16_uint8( addr_byte_lst )
         assert 0 <= prefix_len  <= 128
         self.type_code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
         self.prefix_len     = prefix_len
-        print( 'IdbIpv6Addr.__init__() - exit')
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes', 'prefix_len'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'addr_bytes', 'prefix_len'])
 
     @staticmethod
     def dispatch_entry(): return { IdbIpv6Addr.SPEC_CODE : IdbIpv6Addr.unpack }
 
     def pack(self):   #todo needs test
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content = to_bytes(self.addr_bytes) + to_bytes( [self.prefix_len] )
         content_len = len(content)
         assert content_len == 17
@@ -394,7 +440,7 @@ class IdbIpv6Addr(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        print( 'IdbIpv6Addr.unpack() - enter')      #todo remove dbg prints
+        "Deserialize from packed bytes"
         util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 24      #todo check everywhere
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -403,28 +449,28 @@ class IdbIpv6Addr(IdbOption):
         addr_val        = util.bytes_to_uint8_list( packed_bytes[4:20]  )
         (prefix_len,)   = util.bytes_to_uint8_list( packed_bytes[20:21] )
         result = IdbIpv6Addr( addr_val, prefix_len )
-        print( 'IdbIpv6Addr.unpack() - result=', result)
-        print( 'IdbIpv6Addr.unpack() - exit')
         return result
 
 class IdbMacAddr(IdbOption):
+    "Serialize & deserialze a PCAPNG MAC Address Option"
     SPEC_CODE = 6
     def __init__(self, addr_byte_lst):
-        print( 'IdbMacAddr.__init__() - enter')
+        "Create an instance"
         addr_byte_lst       = list( addr_byte_lst )
         assert len(addr_byte_lst) == 6
         util.assert_uint8_list( addr_byte_lst )
         self.type_code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
-        print( 'IdbMacAddr.__init__() - exit')
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'addr_bytes'])
 
     @staticmethod
     def dispatch_entry(): return { IdbMacAddr.SPEC_CODE : IdbMacAddr.unpack }
 
     def pack(self):   #todo needs test
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content = to_bytes(self.addr_bytes)
         content_len = len(content)
         assert content_len == 6
@@ -435,7 +481,7 @@ class IdbMacAddr(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        print( 'IdbMacAddr.unpack() - enter')      #todo remove dbg prints
+        "Deserialize from packed bytes"
         util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 12      #todo check everywhere
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
@@ -443,25 +489,27 @@ class IdbMacAddr(IdbOption):
         assert content_len == 6    #todo check everywhere
         addr_val    = util.bytes_to_uint8_list( packed_bytes[4:10]  )
         result      = IdbMacAddr( addr_val )
-        print( 'IdbMacAddr.unpack() - result=', result)
-        print( 'IdbMacAddr.unpack() - exit')
         return result
 
 class IdbEuiAddr(IdbOption):
+    "Serialize & deserialze a PCAPNG EUI Address Option"
     SPEC_CODE = 7
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, addr_byte_lst):
+        "Create an instance"
         addr_byte_lst = list( addr_byte_lst )
         assert len(addr_byte_lst) == 8
         util.assert_uint8_list( addr_byte_lst )
         self.type_code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'addr_bytes'])
 
     def pack(self):
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content = to_bytes(self.addr_bytes)
         content_len = len(content)
         assert content_len == 8
@@ -473,6 +521,7 @@ class IdbEuiAddr(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 12      #todo check everywhere
         (type_code, content_len, content) = strip_header( packed_bytes )
@@ -483,18 +532,22 @@ class IdbEuiAddr(IdbOption):
         return result
 
 class IdbSpeed(IdbOption):
+    "Serialize & deserialze a PCAPNG IDB Speed Option"
     SPEC_CODE = 8
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, speed):
+        "Create an instance"
         util.assert_uint64(speed)
         self.type_code   = self.SPEC_CODE
         self.speed  = speed
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'speed'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'speed'])
 
     def pack(self):
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content =  codec.uint64_pack( self.speed )
         content_len = 8     #todo content_len unneeded?
         packed_bytes = add_header( self.type_code, content_len, content )
@@ -505,6 +558,7 @@ class IdbSpeed(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == IdbSpeed.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
@@ -513,6 +567,7 @@ class IdbSpeed(IdbOption):
         return result
 
 class IdbTsResol(IdbOption):
+    "Serialize & deserialze a PCAPNG IDB Timestamp Resolution Option"
     SPEC_CODE = 9
   # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
     POWER_2_BITMASK     = 0x80
@@ -520,6 +575,7 @@ class IdbTsResol(IdbOption):
     EXPONENT_BITMASK    = 0x7F
 
     def __init__(self, ts_resol_exponent, is_power_2=False):
+        "Create an instance"
         assert 0 <= ts_resol_exponent <= 127    # 7 bits only + decimal/binary flag bit
         self.type_code   = self.SPEC_CODE
         self.ts_resol_power  = ts_resol_exponent
@@ -531,10 +587,12 @@ class IdbTsResol(IdbOption):
         else:
             return pow( 10, -self.ts_resol_power )
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'ts_resol_power', 'is_power_2'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'ts_resol_power', 'is_power_2'])
 
     def pack(self):
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         if (self.is_power_2):
             bitmask = IdbTsResol.POWER_2_BITMASK
         else:
@@ -550,6 +608,7 @@ class IdbTsResol(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == IdbTsResol.SPEC_CODE    #todo check everywhere
         assert content_len == 1    #todo check everywhere
@@ -560,17 +619,21 @@ class IdbTsResol(IdbOption):
         return result
 
 class IdbTZone(IdbOption):
+    "Serialize & deserialze a PCAPNG IDB TimeZone Option"
     SPEC_CODE = 10
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, offset):     #todo PCAPNG spec leaves interpretation of offset unspecified
+        "Create an instance"
         self.type_code   = self.SPEC_CODE
         self.offset = offset
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'offset'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'offset'])
 
     def pack(self):
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content = codec.float32_pack( self.offset )
         content_len = 4     #todo content_len unneeded?
         packed_bytes = add_header( self.type_code, content_len, content )
@@ -581,6 +644,7 @@ class IdbTZone(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == IdbTZone.SPEC_CODE    #todo check everywhere
         assert content_len == 4    #todo check everywhere
@@ -589,8 +653,10 @@ class IdbTZone(IdbOption):
         return result
 
 class IdbFilter(IdbOption):   #todo spec says "TODO: Appendix XXX"
+    "Serialize & deserialze a PCAPNG IDB Filter Resolution Option"
     SPEC_CODE = 11
     def __init__(self, content_str):
+        "Create an instance"
         IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -598,13 +664,16 @@ class IdbFilter(IdbOption):   #todo spec says "TODO: Appendix XXX"
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == IdbFilter.SPEC_CODE    #todo check everywhere
         return IdbFilter(content)
 
 class IdbOs(IdbOption):
+    "Serialize & deserialze a PCAPNG IDB OS Option"
     SPEC_CODE = 12
     def __init__(self, content_str):
+        "Create an instance"
         IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -612,23 +681,28 @@ class IdbOs(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == IdbOs.SPEC_CODE    #todo check everywhere
         return IdbOs(content)
 
 class IdbFcsLen(IdbOption):
+    "Serialize & deserialze a PCAPNG IDB Frame Check Sequence (FCS) Length Option"
     SPEC_CODE = 13
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, fcs_len):
+        "Create an instance"
         util.assert_uint8( fcs_len )
         self.type_code       = self.SPEC_CODE
         self.fcs_len    = fcs_len
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'fcs_len'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'fcs_len'])
 
     def pack(self):
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content =  codec.uint8_pack( self.fcs_len )
         content_len = 1     #todo content_len unneeded?
         packed_bytes = add_header( self.type_code, content_len, content )
@@ -639,6 +713,7 @@ class IdbFcsLen(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == IdbFcsLen.SPEC_CODE    #todo check everywhere
         assert content_len == 1    #todo check everywhere
@@ -647,17 +722,21 @@ class IdbFcsLen(IdbOption):
         return result
 
 class IdbTsOffset(IdbOption):   #todo maybe make this uint64 type?
+    "Serialize & deserialze a PCAPNG IDB Timestamp Offset Option"
     SPEC_CODE = 14
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, ts_offset):     #todo PCAPNG spec leaves interpretation of ts_offset unspecified
+        "Create an instance"
         self.type_code       = self.SPEC_CODE
         self.ts_offset  = ts_offset
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'ts_offset'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'ts_offset'])
 
     def pack(self):
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content = codec.int64_pack( self.ts_offset )
         content_len = 8     #todo content_len unneeded?
         packed_bytes = add_header( self.type_code, content_len, content )
@@ -668,6 +747,7 @@ class IdbTsOffset(IdbOption):   #todo maybe make this uint64 type?
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == IdbTsOffset.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
@@ -677,13 +757,16 @@ class IdbTsOffset(IdbOption):   #todo maybe make this uint64 type?
 
 #-----------------------------------------------------------------------------
 class EpbOption(Option):    #todo -> Abstract (or all base classes)
+    "Superclass for PCAPNG Enhanced Packet Block Options"
     def __init__(self, type_code, content):
-        """Creates an EPB Option with the specified option type_code & content."""
+        "Create an instance"
         Option.__init__(self, type_code, content)
 
 class EpbFlags(EpbOption):
+    "Serialize & deserialze a PCAPNG EPB Flags Option"
     SPEC_CODE = 2
     def __init__(self, content):
+        "Create an instance"
         content = to_bytes(content)
         assert len(content) == 4
         EpbOption.__init__(self, self.SPEC_CODE, content)
@@ -693,6 +776,7 @@ class EpbFlags(EpbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == EpbFlags.SPEC_CODE    #todo check everywhere
         assert content_len == 4    #todo check everywhere
@@ -700,8 +784,10 @@ class EpbFlags(EpbOption):
         return result
 
 class EpbHash(EpbOption):
+    "Serialize & deserialze a PCAPNG EPB Hash Option"
     SPEC_CODE = 3
     def __init__(self, content_str):
+        "Create an instance"
         EpbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -709,23 +795,28 @@ class EpbHash(EpbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == EpbHash.SPEC_CODE    #todo check everywhere
         result = EpbHash( content )
         return result
 
 class EpbDropCount(EpbOption):
+    "Serialize & deserialze a PCAPNG EPB Drop Count Option"
     SPEC_CODE = 4
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, dropcount):     #todo PCAPNG spec leaves interpretation of dropcount unspecified
+        "Create an instance"
         self.type_code       = self.SPEC_CODE
         self.dropcount  = dropcount
 
-    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'dropcount'])
+    def to_map(self):
+        "Converts to a map representation"
+        return util.select_keys(self.__dict__, ['type_code', 'dropcount'])
 
     def pack(self):
-        """Encodes into a bytes block."""
+        "Serialize to packed bytes"
         content = codec.uint64_pack( self.dropcount )
         content_len = 8     #todo content_len unneeded?
         packed_bytes = add_header( self.type_code, content_len, content )
@@ -736,6 +827,7 @@ class EpbDropCount(EpbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
+        "Deserialize from packed bytes"
         (type_code, content_len, content) = strip_header( packed_bytes )
         assert type_code == EpbDropCount.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
@@ -750,7 +842,7 @@ class EpbDropCount(EpbOption):
 
 def pack_all(opts_lst):  #todo needs test
     #todo verify all fields
-    """Encodes an options from a dictionary into a bytes block."""
+    """Given a list of options, converts each into packed bytes and concatenates the result"""
     util.assert_type_list(opts_lst)
     cum_result = ''
     for opt in opts_lst:
@@ -760,7 +852,8 @@ def pack_all(opts_lst):  #todo needs test
 
 def segment_rolling(raw_bytes):     #todo inline below
     #todo verify all fields
-    """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
+    """Given the packed bytes for multiple options, unpacks and returns the first option object
+    and the remaining packed bytes."""
     util.assert_type_bytes(raw_bytes)
     assert 4 <= len(raw_bytes)
     (type_code, content_len_orig) = struct.unpack( '=HH', raw_bytes[:4])
@@ -772,7 +865,8 @@ def segment_rolling(raw_bytes):     #todo inline below
     return ( opt_bytes, raw_bytes_remaining )
 
 def segment_all(raw_bytes):
-    """Decodes a block of raw bytes into a list of segments."""
+    """Given the packed bytes for multiple options,
+    returns a list of packed bytes for the individual options."""
     util.assert_type_bytes(raw_bytes)
     util.assert_block32_length(raw_bytes)
     segments = []
@@ -784,9 +878,11 @@ def segment_all(raw_bytes):
 
 
 def unpack_dispatch( dispatch_tbl, packed_bytes ):
+    """Given a dispatch table associating Option type_code's to parsing functions, will invoke
+    the appropriate unpacking function."""
     (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian
     dispatch_fn = dispatch_tbl[ type_code ]
-    if (dispatch_fn != None):
+    if (dispatch_fn is not None):
         result =  dispatch_fn( packed_bytes )
         return result
     else:
@@ -795,6 +891,8 @@ def unpack_dispatch( dispatch_tbl, packed_bytes ):
         raise Exception( 'unpack_dispatch(): unrecognized option type_code={}'.format(type_code))
 
 def unpack_all(dispatch_table, options_bytes):
+    """Given a dispatch table and the packed bytes for multiple options,
+    unpacks the bytes and returns a list of Option objects."""
     result = []
     option_segs_lst = segment_all(options_bytes)
     for opt_bytes in option_segs_lst:

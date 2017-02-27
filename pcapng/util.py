@@ -194,7 +194,7 @@ def curr_utc_secs_hexstr():
 
 def timeTuple_to_float(secs, usecs):
     """Converts a time tuple from (secs, usecs) to float."""
-    return secs + (usecs / 1000000.0)
+    return float(secs) + (float(usecs) / 1000000.0)
 
 def timeTuple_subtract(ts1, ts2):
     """Subtracts two time tuples in (secs, usecs) format, returning a float result."""

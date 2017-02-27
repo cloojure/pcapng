@@ -79,6 +79,13 @@ def assert_int16(arg):                assert (-const.POW_2_15 <= arg < const.POW
 def assert_int32(arg):                assert (-const.POW_2_31 <= arg < const.POW_2_31), 'arg={}'.format(arg)
 def assert_int64(arg):                assert (-const.POW_2_63 <= arg < const.POW_2_63), 'arg={}'.format(arg)
 
+def assert_type_charLst( arg ):
+    "Assert the arg is a list of characters (len-1 strings)"
+    assert_type_list( arg )
+    for val in arg:
+        assert_type_str(val)
+        assert len(val) == 1
+
 def assert_uint8_list( listy ):
     "Assert the arg is a list of uint8 values"
     for val in listy:
@@ -165,7 +172,7 @@ def bytes_to_uint8_list( arg ):  #todo need test
 def int32_to_hexstr(arg):
     """Converts a 32-bit unsigned integer value to a hex string ."""
     assert_uint32(arg)
-    return ( '{:#010x}'.format( arg ))
+    return ( '{:#010x}'.format( arg ))  # "0x"=2 char + "0123abcd"=8 char = 10 char; '0' filled -> '010'
 
 def split_float( fval ):
     """Splits a float into integer and fractional parts."""
@@ -207,7 +214,7 @@ def timeTuple_subtract(ts1, ts2):
 
 def chrList_to_str(arg):
     """ Convert a list of characters to a string"""
-    #todo verify input type & values [0..255]
+    assert_type_charLst( arg )
     strval = ''.join( arg )
     return strval
 

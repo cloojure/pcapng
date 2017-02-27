@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Serialize & deserialze PCAPNG blocks"""
+"""Serialize & deserialze PCAPNG blocks.
+
+See:  https://pcapng.github.io/pcapng/
+"""
 
 #todo add header docstring to all
 
@@ -57,13 +60,14 @@ CUSTOM_MRT_ISIS_BLOCK_OPT = option.CustomStringCopyable( pcapng.pen.BROCADE_PEN,
 #todo maybe create a SectionBlock object with SHB, IDB, options, EPBs, SPBs, etc ?
 
 def strip_header( packed_bytes ): #todo use for all unpack()
+    "Utility function to strip Block id_code & total_len from packed bytes, returning all three. "
     util.assert_block32_length( packed_bytes )
-    (blk_type, blk_total_len, byte_order_magic_found) = struct.unpack('=LLL', packed_bytes[:12])
+    (id_code, total_len, byte_order_magic_found) = struct.unpack('=LLL', packed_bytes[:12])
     #todo if SHB:
     #todo   parse BOM-found;  set global endian;  re-parse fields, verify OK
-    assert blk_total_len <= len(packed_bytes)
+    assert total_len <= len(packed_bytes)
     stripped_bytes = packed_bytes[8:]
-    return (blk_type, blk_total_len, stripped_bytes)
+    return (id_code, total_len, stripped_bytes)
 
 class Block:
     "Superclass for all PCAPNG blocks"

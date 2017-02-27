@@ -41,7 +41,6 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
     # strings, and don't terminate early if there is a zero-value byte.
 
 # option ID codes from PCAPNG spec
-OPT_END_OF_OPT    =     0
 OPT_UNKNOWN       =  9999   # non-standard
 
 #-----------------------------------------------------------------------------
@@ -63,6 +62,7 @@ def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
 #-----------------------------------------------------------------------------
 #todo make analous fns for blocks?
 def strip_header( packed_bytes ): #todo use for all unpack()
+    "Utility function to strip Option id_code & length from packed bytes, returning all three."
     util.assert_block32_length( packed_bytes )
     (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
     content_pad = packed_bytes[4:]
@@ -72,6 +72,7 @@ def strip_header( packed_bytes ): #todo use for all unpack()
 
 #todo use everywhere
 def add_header(id_code, content_len, content):   #todo delete content var?
+    "Utility function to prepend an Option's id_code and length field to packed bytes, with 32-bit padding."
     content_pad = util.block32_pad_bytes( content )
     packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
     return packed_bytes
@@ -80,9 +81,6 @@ def add_header(id_code, content_len, content):   #todo delete content var?
 #todo verify all fields
 #todo check type on all fn args
 
-def is_end_of_opt( opt_bytes ):
-    return opt_bytes == Option.END_OF_OPT_BYTES
-
 #todo verify all fields
 class Option:
     def __init__(self, code, content):
@@ -90,8 +88,6 @@ class Option:
       # assert (code in ALL_OPTIONS)
         self.code       = code
         self.content    = to_bytes(content)
-
-    END_OF_OPT_BYTES = struct.pack('=HH', OPT_END_OF_OPT, 0)
 
     def to_map(self):           return util.select_keys(self.__dict__, ['code', 'content'])
     def __repr__(self):         return str( self.to_map() )
@@ -112,6 +108,17 @@ class Option:
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return Option( opt_code, content )
+
+class EndOfOptions(Option):
+    # from PCAPNG spec
+    SPEC_CODE = 0
+    PACKED_BYTES = struct.pack('=HH', SPEC_CODE, 0)
+
+    @staticmethod
+    def is_end_of_opt( opt_bytes ):
+        "Indicates a block of packed bytes is the End-of-Options sentinal"
+        return opt_bytes == EndOfOptions.PACKED_BYTES
+
 
 #wip continue here
 class Comment(Option):
@@ -763,7 +770,7 @@ def pack_all(opts_lst):  #todo needs test
     cum_result = ''
     for opt in opts_lst:
         cum_result += opt.pack()
-    cum_result += Option.END_OF_OPT_BYTES
+    cum_result += EndOfOptions.PACKED_BYTES
     return cum_result
 
 def segment_rolling(raw_bytes):     #todo inline below
@@ -806,7 +813,7 @@ def unpack_all(dispatch_table, options_bytes):
     result = []
     option_segs_lst = segment_all(options_bytes)
     for opt_bytes in option_segs_lst:
-        if is_end_of_opt( opt_bytes ):
+        if EndOfOptions.is_end_of_opt( opt_bytes ):
             continue
         else:
             new_opt = unpack_dispatch( dispatch_table, opt_bytes )

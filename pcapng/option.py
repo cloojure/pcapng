@@ -75,14 +75,14 @@ class Option:
         self.content    = to_bytes(content)
 
     def to_map(self):
-        "Converts an Option object to a map representation"
+        "Converts to a map representation"
         return util.select_keys(self.__dict__, ['type_code', 'content'])
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
 
     def pack(self):   #todo needs test
-        "Serialize an Option object into packed bytes"
+        "Serialize into packed bytes"
         #todo validate type_code
         data_len_orig   = len(self.content)
         data_pad        = util.block32_pad_bytes(self.content)
@@ -91,7 +91,7 @@ class Option:
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize an Option object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
@@ -111,14 +111,16 @@ class EndOfOptions(Option):
 class Comment(Option):
     "Serialize & deserialze a PCAPNG Comment Option"
     SPEC_CODE = 1
-    def __init__(self, content_str):    Option.__init__(self, self.SPEC_CODE, content_str)
+    def __init__(self, content_str):
+        "Create an instance"
+        Option.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
     def dispatch_entry(): return { Comment.SPEC_CODE : Comment.unpack }
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize a Comment Option object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         print( '210 type_code={} content_len={}'.format(type_code, content_len))
         assert type_code == Comment.SPEC_CODE     #todo copy check to all
@@ -131,11 +133,11 @@ class Comment(Option):
 class CustomOption(Option):
     "Superclass for all PCAPNG Custom Options"
     def __init__(self, type_code, content):
-        """Creates an SHB Option with the specified option type_code & content."""
+        "Create an instance"
         Option.__init__(self, type_code, content)
 
     def to_map(self):
-        "Converts an Custom Option object to a map representation"
+        "Converts to a map representation"
         return util.select_keys( self.__dict__, ['type_code', 'pen_val', 'content'] )
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
@@ -152,7 +154,7 @@ class CustomStringCopyable(CustomOption):
         self.content    = to_bytes(content)
 
     def pack(self):
-        "Serialize a CSC object into packed bytes"
+        "Serialize into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         print( '140 CSC.pack()    content={} content_len={} spec_len={} '.format( self.content, content_len, spec_len ))
@@ -165,7 +167,7 @@ class CustomStringCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize a CSC object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -177,14 +179,14 @@ class CustomBinaryCopyable(CustomOption):
     "Serialize & deserialze a PCAPNG Custom Binary Copyable Option"
     SPEC_CODE = 2989
     def __init__(self, pen_val, content):
-        "Create a PCAPNG Custom Binary Copyable Option"
+        "Create an instance"
         pen.assert_valid_pen(pen_val)
         self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
     def pack(self):
-        "Serialize a CBC object into packed bytes"
+        "Serialize into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
@@ -196,7 +198,7 @@ class CustomBinaryCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize a CBC object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -207,14 +209,14 @@ class CustomStringNonCopyable(CustomOption):
     "Serialize & deserialze a PCAPNG Custom String Non-Copyable Option"
     SPEC_CODE = 19372
     def __init__(self, pen_val, content):
-        "Create a PCAPNG Custom String Non-Copyable Option"
+        "Create an instance"
         pen.assert_valid_pen(pen_val)
         self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
     def pack(self):
-        "Serialize a CSNC object into packed bytes"
+        "Serialize into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
@@ -226,7 +228,7 @@ class CustomStringNonCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize a CSNC object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -237,14 +239,14 @@ class CustomBinaryNonCopyable(CustomOption):
     "Serialize & deserialze a PCAPNG Custom Binary Non-Copyable Option"
     SPEC_CODE = 19373
     def __init__(self, pen_val, content):
-        "Create a PCAPNG Custom Binary Non-Copyable Option"
+        "Create an instance"
         pen.assert_valid_pen(pen_val)
         self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
     def pack(self):
-        "Serialize a CBNC object into packed bytes"
+        "Serialize into packed bytes"
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
@@ -256,7 +258,7 @@ class CustomBinaryNonCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize a CBNC object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
@@ -267,14 +269,14 @@ class CustomBinaryNonCopyable(CustomOption):
 class ShbOption(Option):
     "Superclass for all PCAPNG Segment Header Block Options"
     def __init__(self, type_code, content, code_verify_disable=False):
-        """Creates an SHB Option."""
+        "Create an instance"
         Option.__init__(self, type_code, content)
 
 class ShbHardware(ShbOption):
     "Serialize & deserialze a PCAPNG SHB Hardware Option"
     SPEC_CODE = 2
     def __init__(self, content_str):
-        "Create a PCAPNG SHB Hardware Option"
+        "Create an instance"
         ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -282,7 +284,7 @@ class ShbHardware(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize an SHB Hardware object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
@@ -292,7 +294,7 @@ class ShbOs(ShbOption):
     "Serialize & deserialze a PCAPNG SHB OS Option"
     SPEC_CODE = 3
     def __init__(self, content_str):
-        "Create a PCAPNG SHB OS Option"
+        "Create an instance"
         ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -300,7 +302,7 @@ class ShbOs(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize an SHB OS object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
@@ -310,7 +312,7 @@ class ShbUserAppl(ShbOption):
     "Serialize & deserialze a PCAPNG SHB User Application Option"
     SPEC_CODE = 4
     def __init__(self, content_str):
-        "Create a PCAPNG SHB UserAppl Option"
+        "Create an instance"
         ShbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -318,7 +320,7 @@ class ShbUserAppl(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize an SHB UserAppl object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
@@ -328,14 +330,14 @@ class ShbUserAppl(ShbOption):
 class IdbOption(Option):
     "Superclass for all PCAPNG Interface Description Block Options"
     def __init__(self, type_code, content, code_verify_disable=False):
-        """Creates an IDB Option."""
+        "Create an instance"
         Option.__init__(self, type_code, content)
 
 class IdbName(IdbOption):
     "Serialize & deserialze a PCAPNG IDB Name Option"
     SPEC_CODE = 2
     def __init__(self, content_str):
-        "Create a PCAPNG IDB Name Option"
+        "Create an instance"
         IdbOption.__init__(self, self.SPEC_CODE, content_str)
 
     @staticmethod
@@ -343,7 +345,7 @@ class IdbName(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        "Deserialize an IDB Name object from packed bytes"
+        "Deserialize from packed bytes"
         (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]

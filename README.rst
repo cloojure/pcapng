@@ -7,7 +7,7 @@ athomps@brocade.com
 Please see the IETF document `PCAP Next Generation (pcapng) Capture File Format <https://pcapng.github.io/pcapng/>`_
 
 Please also see the project `home page on GitLab <https://gitlab.com/netdev-americas/pcapng/>`_
- and `at https://pypi.python.org/pypi/pcapng <https://pypi.python.org/pypi/pcapng>`_
+ and `at PyPI - the Python Package Index <https://pypi.python.org/pypi/pcapng>`_
 
 ===========
 Quick Start

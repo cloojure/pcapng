@@ -14,6 +14,7 @@ Quick Start
 ===========
 
 PCAPNG files must begin with a Section Header Block::
+
     import pcapng.block
     import pcapng.linktype
     import pcapng.option

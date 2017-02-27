@@ -71,7 +71,7 @@ class Option:
     def __init__(self, type_code, content):
         "Creates a raw Option block"
         #todo assert valid type_code?
-        self.type_code       = type_code
+        self.type_code  = type_code
         self.content    = to_bytes(content)
 
     def to_map(self):           return util.select_keys(self.__dict__, ['type_code', 'content'])

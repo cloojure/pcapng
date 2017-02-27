@@ -60,24 +60,24 @@ CUSTOM_MRT_ISIS_BLOCK_OPT = option.CustomStringCopyable( pcapng.pen.BROCADE_PEN,
 #todo maybe create a SectionBlock object with SHB, IDB, options, EPBs, SPBs, etc ?
 
 def strip_header( packed_bytes ): #todo use for all unpack()
-    "Utility function to strip Block id_code & total_len from packed bytes, returning all three. "
+    "Utility function to strip Block type_code & total_len from packed bytes, returning all three. "
     util.assert_block32_length( packed_bytes )
-    (id_code, total_len, byte_order_magic_found) = struct.unpack('=LLL', packed_bytes[:12])
+    (type_code, total_len, byte_order_magic_found) = struct.unpack('=LLL', packed_bytes[:12])
     #todo if SHB:
     #todo   parse BOM-found;  set global endian;  re-parse fields, verify OK
     assert total_len <= len(packed_bytes)
     stripped_bytes = packed_bytes[8:]
-    return (id_code, total_len, stripped_bytes)
+    return (type_code, total_len, stripped_bytes)
 
 class Block:
     "Superclass for all PCAPNG blocks"
     BLOCK_UNKNOWN = 9999
 
-    def __init__(self, code, content):
-        self.code    = code
+    def __init__(self, type_code, content):
+        self.type_code    = type_code
         self.content = content
 
-    def to_map(self):           return util.select_keys(self.__dict__, ['code'] )
+    def to_map(self):           return util.select_keys(self.__dict__, ['type_code'] )
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))

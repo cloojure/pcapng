@@ -7,13 +7,12 @@ from __future__ import print_function
 
 from   bcc import BPF
 import os
-import struct
 import sys
 from   sys import argv
 import socket
 import pcapng.block
-import pcapng.linktype as linktype
-import pcapng.option as option
+import pcapng.linktype
+import pcapng.option
 
 
 DEBUG_ARGS = False
@@ -146,17 +145,17 @@ def main():
     print("Starting to listen on socket {}\n".format(interface_name))
     pcap_fp = open( 'data.pcapng', 'wb' );
 
-    shb_opts = [ option.ShbHardware( "Dell" ),
-                 option.ShbOs( "Ubuntu" ),
-                 option.ShbUserAppl( "IntelliJ Idea" ) ]
+    shb_opts = [ pcapng.option.ShbHardware( "Dell" ),
+                 pcapng.option.ShbOs( "Ubuntu" ),
+                 pcapng.option.ShbUserAppl( "IntelliJ Idea" ) ]
     shb_obj = pcapng.block.SectionHeaderBlock( shb_opts )
     shb_packed_bytes = shb_obj.pack()
     pcap_fp.write( shb_packed_bytes )  # must be 1st block
 
-    idb_opts = [ option.IdbName( interface_name ),
-                 option.IdbDescription( "primary interface on host" ),
-                 option.IdbSpeed( 12345 ) ]
-    idb_obj = pcapng.block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, idb_opts )  # optional block
+    idb_opts = [ pcapng.option.IdbName( interface_name ),
+                 pcapng.option.IdbDescription( "primary interface on host" ),
+                 pcapng.option.IdbSpeed( 12345 ) ]
+    idb_obj = pcapng.block.InterfaceDescBlock( pcapng.linktype.LINKTYPE_ETHERNET, idb_opts )  # optional block
     pcap_fp.write( idb_obj.pack() )
 
     count = 0
@@ -168,9 +167,9 @@ def main():
         pkt_bytes = get_next_packet( socket_fd )
         dbg_print( pkt_bytes )
 
-        epb_opts = [ option.EpbFlags(       [13,14,15,16] ),
-                     option.EpbHash(        'just about any hash spec can go here' ),
-                     option.EpbDropCount(   13 ) ]
+        epb_opts = [ pcapng.option.EpbFlags(       [13,14,15,16] ),
+                     pcapng.option.EpbHash(        'just about any hash spec can go here' ),
+                     pcapng.option.EpbDropCount(   13 ) ]
         pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
 
 if __name__ == "__main__":

@@ -25,19 +25,25 @@ import pcapng.codec
 
 #todo migrate fns to general libs
 
+#-----------------------------------------------------------------------------
 # Global var's
-TEST_CTX = {
+
+# Test Context: dummy values used for testing purposes
+gbl_test_ctx = {
     'enable'    : False,
-    'utc_secs'  : -1.2      # floating point unix time
+    'utc_secs'  : -12.345      # floating point unix time
 }
 
 def test_time_utc_set(utc_secs):
-    global TEST_CTX
-    TEST_CTX['enable']      = True
-    TEST_CTX['utc_time']    = utc_secs
+    "Enable testing context with dummy time"
+    global gbl_test_ctx
+    gbl_test_ctx['enable']      = True
+    gbl_test_ctx['utc_time']    = utc_secs
+
 def test_time_utc_unset():
-    global TEST_CTX
-    TEST_CTX['enable']      = False
+    "Disable testing context"
+    global gbl_test_ctx
+    gbl_test_ctx['enable']      = False
 
 #-----------------------------------------------------------------------------
 
@@ -50,6 +56,7 @@ def is_python3():
     return ((major == 3) and (minor >= 5))
 
 def assert_python2():
+    "Assert running in Python 2, version 2.7 or later"
     assert is_python2()
 
 #-----------------------------------------------------------------------------
@@ -158,7 +165,7 @@ def bytes_to_uint8_list( arg ):  #todo need test
 def int32_to_hexstr(arg):
     """Converts a 32-bit unsigned integer value to a hex string ."""
     assert_uint32(arg)
-    return ( '0x' + format( curr_utc_secs(), '08x' ))
+    return ( '{:#010x}'.format( arg ))
 
 def split_float( fval ):
     """Splits a float into integer and fractional parts."""
@@ -168,9 +175,9 @@ def split_float( fval ):
 
 def curr_utc_timetuple():
     """Returns the current UTC time as a (secs, usecs) tuple."""
-    global TEST_CTX
-    if TEST_CTX['enable']:
-        utc_secs = TEST_CTX['utc_time']
+    global gbl_test_ctx
+    if gbl_test_ctx['enable']:
+        utc_secs = gbl_test_ctx['utc_time']
     else:
         utc_secs = time.time()
     secs, usecs = split_float( utc_secs )

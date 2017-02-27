@@ -22,6 +22,7 @@ http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercont
 """
 import struct
 
+import pcapng.codec as codec
 import pcapng.pen   as pen
 import pcapng.util  as util
 from   pcapng.util  import to_bytes
@@ -40,41 +41,22 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
     # zero-value octet as a string terminator."   We just use th length field to read in
     # strings, and don't terminate early if there is a zero-value byte.
 
-# option ID codes from PCAPNG spec
-OPT_UNKNOWN       =  9999   # non-standard
-
-#-----------------------------------------------------------------------------
-#todo add global statemachine/var for write (testing) and read (host dependent)
-#todo -> packer.uint64_pack()/_unpack() & similar everywhere
-def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
-def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
-def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
-def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
-
-def  int8_pack(    arg ):       return struct.pack(   '=b', arg )
-def  int8_unpack(  arg ):       return struct.unpack( '=b', arg )[0]
-def  int64_pack(   arg ):       return struct.pack(   '=q', arg )
-def  int64_unpack( arg ):       return struct.unpack( '=q', arg )[0]
-
-def float32_pack(   arg ):      return struct.pack(   '=f', arg )
-def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
-
 #-----------------------------------------------------------------------------
 #todo make analous fns for blocks?
 def strip_header( packed_bytes ): #todo use for all unpack()
-    "Utility function to strip Option id_code & length from packed bytes, returning all three."
+    "Utility function to strip Option type_code & length from packed bytes, returning all three."
     util.assert_block32_length( packed_bytes )
-    (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+    (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
     content_pad = packed_bytes[4:]
     assert content_len <= len(content_pad)
     content = content_pad[:content_len]
-    return (opt_code, content_len, content)
+    return (type_code, content_len, content)
 
 #todo use everywhere
-def add_header(id_code, content_len, content):   #todo delete content var?
-    "Utility function to prepend an Option's id_code and length field to packed bytes, with 32-bit padding."
+def add_header(type_code, content_len, content):   #todo delete content var?
+    "Utility function to prepend an Option's type_code and length field to packed bytes, with 32-bit padding."
     content_pad = util.block32_pad_bytes( content )
-    packed_bytes = struct.pack('=HH', id_code, content_len) + content_pad
+    packed_bytes = struct.pack('=HH', type_code, content_len) + content_pad
     return packed_bytes
 
 #todo all options need to do validation on data values & lengths
@@ -83,31 +65,34 @@ def add_header(id_code, content_len, content):   #todo delete content var?
 
 #todo verify all fields
 class Option:
-    def __init__(self, code, content):
-        """Creates an Option with the specified option code & content."""
-      # assert (code in ALL_OPTIONS)
-        self.code       = code
+    "Superclass for all PCAPNG options"
+#   OPT_UNKNOWN       =  9999   # non-standard      #todo use this?
+
+    def __init__(self, type_code, content):
+        "Creates a raw Option block"
+        #todo assert valid type_code?
+        self.type_code       = type_code
         self.content    = to_bytes(content)
 
-    def to_map(self):           return util.select_keys(self.__dict__, ['code', 'content'])
+    def to_map(self):           return util.select_keys(self.__dict__, ['type_code', 'content'])
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
 
     def pack(self):   #todo needs test
         """Encodes an option into a bytes block."""
-        #todo validate code
+        #todo validate type_code
         data_len_orig   = len(self.content)
         data_pad        = util.block32_pad_bytes(self.content)
-        packed_bytes    = struct.pack('=HH', self.code, data_len_orig) + data_pad
+        packed_bytes    = struct.pack('=HH', self.type_code, data_len_orig) + data_pad
         return packed_bytes
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
-        return Option( opt_code, content )
+        return Option( type_code, content )
 
 class EndOfOptions(Option):
     # from PCAPNG spec
@@ -130,9 +115,9 @@ class Comment(Option):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        print( '210 opt_code={} content_len={}'.format(opt_code, content_len))
-        assert opt_code == Comment.SPEC_CODE     #todo copy check to all
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        print( '210 type_code={} content_len={}'.format(type_code, content_len))
+        assert type_code == Comment.SPEC_CODE     #todo copy check to all
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         print( '211 content_pad={} content={}'.format(content_pad, content))
@@ -140,11 +125,11 @@ class Comment(Option):
 
 #-----------------------------------------------------------------------------
 class CustomOption(Option):
-    def __init__(self, code, content):
-        """Creates an SHB Option with the specified option code & content."""
-        Option.__init__( self, code, content )
+    def __init__(self, type_code, content):
+        """Creates an SHB Option with the specified option type_code & content."""
+        Option.__init__(self, type_code, content)
 
-    def to_map(self):           return util.select_keys( self.__dict__, ['code', 'pen_val', 'content'] )
+    def to_map(self):           return util.select_keys( self.__dict__, ['type_code', 'pen_val', 'content'] )
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
     def __ne__(self, other):    return (not __eq__(self,other))
@@ -153,7 +138,7 @@ class CustomStringCopyable(CustomOption):
     SPEC_CODE = 2988
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = self.SPEC_CODE
+        self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
@@ -162,7 +147,7 @@ class CustomStringCopyable(CustomOption):
         spec_len        = content_len + 4   # spec definition of length includes PEN
         print( '140 CSC.pack()    content={} content_len={} spec_len={} '.format( self.content, content_len, spec_len ))
         content_pad     = util.block32_pad_bytes(self.content)
-        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        packed_bytes    = struct.pack( '=HHL', self.type_code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
 
     @staticmethod
@@ -170,7 +155,7 @@ class CustomStringCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
@@ -181,7 +166,7 @@ class CustomBinaryCopyable(CustomOption):
     SPEC_CODE = 2989
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = self.SPEC_CODE
+        self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
@@ -189,7 +174,7 @@ class CustomBinaryCopyable(CustomOption):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
-        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        packed_bytes    = struct.pack( '=HHL', self.type_code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
 
     @staticmethod
@@ -197,7 +182,7 @@ class CustomBinaryCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
@@ -207,7 +192,7 @@ class CustomStringNonCopyable(CustomOption):
     SPEC_CODE = 19372
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = self.SPEC_CODE
+        self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
@@ -215,7 +200,7 @@ class CustomStringNonCopyable(CustomOption):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
-        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        packed_bytes    = struct.pack( '=HHL', self.type_code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
 
     @staticmethod
@@ -223,7 +208,7 @@ class CustomStringNonCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
@@ -233,7 +218,7 @@ class CustomBinaryNonCopyable(CustomOption):
     SPEC_CODE = 19373
     def __init__(self, pen_val, content):
         pen.assert_valid_pen(pen_val)
-        self.code       = self.SPEC_CODE
+        self.type_code       = self.SPEC_CODE
         self.pen_val    = pen_val
         self.content    = to_bytes(content)
 
@@ -241,7 +226,7 @@ class CustomBinaryNonCopyable(CustomOption):
         content_len     = len(self.content)
         spec_len        = content_len + 4   # spec definition of length includes PEN
         content_pad     = util.block32_pad_bytes(self.content)
-        packed_bytes    = struct.pack( '=HHL', self.code, spec_len, self.pen_val ) + content_pad
+        packed_bytes    = struct.pack( '=HHL', self.type_code, spec_len, self.pen_val ) + content_pad
         return packed_bytes
 
     @staticmethod
@@ -249,7 +234,7 @@ class CustomBinaryNonCopyable(CustomOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
+        (type_code, spec_len, pen_val) = struct.unpack('=HHL', packed_bytes[:8])
         content_len     = spec_len - 4
         content_pad     = packed_bytes[8:]
         content         = content_pad[:content_len]
@@ -257,9 +242,9 @@ class CustomBinaryNonCopyable(CustomOption):
 
 #-----------------------------------------------------------------------------
 class ShbOption(Option):
-    def __init__(self, code, content, code_verify_disable=False):
-        """Creates an SHB Option with the specified option code & content."""
-        Option.__init__( self, code, content )
+    def __init__(self, type_code, content, code_verify_disable=False):
+        """Creates an SHB Option with the specified option type_code & content."""
+        Option.__init__(self, type_code, content)
 
 class ShbHardware(ShbOption):
     SPEC_CODE = 2
@@ -271,7 +256,7 @@ class ShbHardware(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return ShbHardware(content)
@@ -286,7 +271,7 @@ class ShbOs(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return ShbOs(content)
@@ -301,16 +286,16 @@ class ShbUserAppl(ShbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return ShbUserAppl(content)
 
 #-----------------------------------------------------------------------------
 class IdbOption(Option):
-    def __init__(self, code, content, code_verify_disable=False):
-        """Creates an IDB Option with the specified option code & content."""
-        Option.__init__( self, code, content )
+    def __init__(self, type_code, content, code_verify_disable=False):
+        """Creates an IDB Option with the specified option type_code & content."""
+        Option.__init__(self, type_code, content)
 
 class IdbName(IdbOption):
     SPEC_CODE = 2
@@ -322,7 +307,7 @@ class IdbName(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return IdbName(content)
@@ -337,7 +322,7 @@ class IdbDescription(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
         content_pad = packed_bytes[4:]
         content = content_pad[:content_len]
         return IdbDescription(content)
@@ -350,27 +335,27 @@ class IdbIpv4Addr(IdbOption):
         netmask_byte_lst    = list( netmask_byte_lst )
         util.assert_vec4_uint8( addr_byte_lst )
         util.assert_vec4_uint8( netmask_byte_lst )
-        self.code           = self.SPEC_CODE
+        self.type_code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
         self.netmask_bytes  = netmask_byte_lst
         print( 'IdbIpv4Addr.__init__() - exit')
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes', 'netmask_bytes'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes', 'netmask_bytes'])
 
     @staticmethod
     def dispatch_entry(): return { IdbIpv4Addr.SPEC_CODE : IdbIpv4Addr.unpack }
 
     def pack(self):   #todo needs test
         """Encodes into a bytes block."""
-        packed_bytes = ( struct.pack('=HH', self.code, 8) + to_bytes(self.addr_bytes) + to_bytes(self.netmask_bytes))
+        packed_bytes = ( struct.pack('=HH', self.type_code, 8) + to_bytes(self.addr_bytes) + to_bytes(self.netmask_bytes))
         return packed_bytes
 
     @staticmethod
     def unpack( packed_bytes ):
         print( 'IdbIpv4Addr.unpack() - enter')
         assert len(packed_bytes) == 12      #todo check everywhere
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        assert opt_code == IdbIpv4Addr.SPEC_CODE    #todo check everywhere
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        assert type_code == IdbIpv4Addr.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
         addr_val    = util.bytes_to_uint8_list( packed_bytes[4:8]  )
         netmask_val = util.bytes_to_uint8_list( packed_bytes[8:12] )
@@ -387,12 +372,12 @@ class IdbIpv6Addr(IdbOption):
         addr_byte_lst       = list( addr_byte_lst )
         util.assert_vec16_uint8( addr_byte_lst )
         assert 0 <= prefix_len  <= 128
-        self.code           = self.SPEC_CODE
+        self.type_code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
         self.prefix_len     = prefix_len
         print( 'IdbIpv6Addr.__init__() - exit')
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes', 'prefix_len'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes', 'prefix_len'])
 
     @staticmethod
     def dispatch_entry(): return { IdbIpv6Addr.SPEC_CODE : IdbIpv6Addr.unpack }
@@ -403,7 +388,7 @@ class IdbIpv6Addr(IdbOption):
         content_len = len(content)
         assert content_len == 17
         content_pad = util.block32_pad_bytes( content )
-        packed_bytes = struct.pack('=HH', self.code, content_len) + content_pad
+        packed_bytes = struct.pack('=HH', self.type_code, content_len) + content_pad
         util.assert_block32_length( packed_bytes )  #todo add to all
         return packed_bytes
 
@@ -412,8 +397,8 @@ class IdbIpv6Addr(IdbOption):
         print( 'IdbIpv6Addr.unpack() - enter')      #todo remove dbg prints
         util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 24      #todo check everywhere
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        assert opt_code == IdbIpv6Addr.SPEC_CODE    #todo check everywhere
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        assert type_code == IdbIpv6Addr.SPEC_CODE    #todo check everywhere
         assert content_len == 17    #todo check everywhere
         addr_val        = util.bytes_to_uint8_list( packed_bytes[4:20]  )
         (prefix_len,)   = util.bytes_to_uint8_list( packed_bytes[20:21] )
@@ -429,11 +414,11 @@ class IdbMacAddr(IdbOption):
         addr_byte_lst       = list( addr_byte_lst )
         assert len(addr_byte_lst) == 6
         util.assert_uint8_list( addr_byte_lst )
-        self.code           = self.SPEC_CODE
+        self.type_code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
         print( 'IdbMacAddr.__init__() - exit')
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes'])
 
     @staticmethod
     def dispatch_entry(): return { IdbMacAddr.SPEC_CODE : IdbMacAddr.unpack }
@@ -444,7 +429,7 @@ class IdbMacAddr(IdbOption):
         content_len = len(content)
         assert content_len == 6
         content_pad = util.block32_pad_bytes( content )
-        packed_bytes = struct.pack('=HH', self.code, content_len) + content_pad
+        packed_bytes = struct.pack('=HH', self.type_code, content_len) + content_pad
         util.assert_block32_length( packed_bytes )  #todo add to all
         return packed_bytes
 
@@ -453,8 +438,8 @@ class IdbMacAddr(IdbOption):
         print( 'IdbMacAddr.unpack() - enter')      #todo remove dbg prints
         util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 12      #todo check everywhere
-        (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
-        assert opt_code == IdbMacAddr.SPEC_CODE    #todo check everywhere
+        (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])
+        assert type_code == IdbMacAddr.SPEC_CODE    #todo check everywhere
         assert content_len == 6    #todo check everywhere
         addr_val    = util.bytes_to_uint8_list( packed_bytes[4:10]  )
         result      = IdbMacAddr( addr_val )
@@ -470,17 +455,17 @@ class IdbEuiAddr(IdbOption):
         addr_byte_lst = list( addr_byte_lst )
         assert len(addr_byte_lst) == 8
         util.assert_uint8_list( addr_byte_lst )
-        self.code           = self.SPEC_CODE
+        self.type_code           = self.SPEC_CODE
         self.addr_bytes     = addr_byte_lst
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'addr_bytes'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'addr_bytes'])
 
     def pack(self):
         """Encodes into a bytes block."""
         content = to_bytes(self.addr_bytes)
         content_len = len(content)
         assert content_len == 8
-        packed_bytes = add_header( self.code, content_len, content )
+        packed_bytes = add_header( self.type_code, content_len, content )
         return packed_bytes
 
     @staticmethod
@@ -490,8 +475,8 @@ class IdbEuiAddr(IdbOption):
     def unpack( packed_bytes ):
         util.assert_block32_length( packed_bytes )  #todo add to all
         assert len(packed_bytes) == 12      #todo check everywhere
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbEuiAddr.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbEuiAddr.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
         addr_val    = util.bytes_to_uint8_list( content )
         result      = IdbEuiAddr( addr_val )
@@ -503,16 +488,16 @@ class IdbSpeed(IdbOption):
 
     def __init__(self, speed):
         util.assert_uint64(speed)
-        self.code   = self.SPEC_CODE
+        self.type_code   = self.SPEC_CODE
         self.speed  = speed
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'speed'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'speed'])
 
     def pack(self):
         """Encodes into a bytes block."""
-        content =  uint64_pack( self.speed )
+        content =  codec.uint64_pack( self.speed )
         content_len = 8     #todo content_len unneeded?
-        packed_bytes = add_header( self.code, content_len, content )
+        packed_bytes = add_header( self.type_code, content_len, content )
         return packed_bytes
 
     @staticmethod
@@ -520,10 +505,10 @@ class IdbSpeed(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbSpeed.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbSpeed.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
-        speed   = uint64_unpack( content )
+        speed   = codec.uint64_unpack( content )
         result  = IdbSpeed( speed )
         return result
 
@@ -536,7 +521,7 @@ class IdbTsResol(IdbOption):
 
     def __init__(self, ts_resol_exponent, is_power_2=False):
         assert 0 <= ts_resol_exponent <= 127    # 7 bits only + decimal/binary flag bit
-        self.code   = self.SPEC_CODE
+        self.type_code   = self.SPEC_CODE
         self.ts_resol_power  = ts_resol_exponent
         self.is_power_2  = is_power_2
 
@@ -546,7 +531,7 @@ class IdbTsResol(IdbOption):
         else:
             return pow( 10, -self.ts_resol_power )
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'ts_resol_power', 'is_power_2'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'ts_resol_power', 'is_power_2'])
 
     def pack(self):
         """Encodes into a bytes block."""
@@ -555,9 +540,9 @@ class IdbTsResol(IdbOption):
         else:
             bitmask = IdbTsResol.POWER_10_BITMASK
         byte_val = bitmask | self.ts_resol_power
-        content =  uint8_pack( byte_val )
+        content =  codec.uint8_pack( byte_val )
         content_len = 1     #todo content_len unneeded?
-        packed_bytes = add_header( self.code, content_len, content )
+        packed_bytes = add_header( self.type_code, content_len, content )
         return packed_bytes
 
     @staticmethod
@@ -565,10 +550,10 @@ class IdbTsResol(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbTsResol.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbTsResol.SPEC_CODE    #todo check everywhere
         assert content_len == 1    #todo check everywhere
-        byte_val   = uint8_unpack( content )
+        byte_val   = codec.uint8_unpack( content )
         is_power_2 = bool( byte_val & IdbTsResol.POWER_2_BITMASK )
         ts_resol_power = byte_val & IdbTsResol.EXPONENT_BITMASK
         result  = IdbTsResol( ts_resol_power, is_power_2 )
@@ -579,16 +564,16 @@ class IdbTZone(IdbOption):
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, offset):     #todo PCAPNG spec leaves interpretation of offset unspecified
-        self.code   = self.SPEC_CODE
+        self.type_code   = self.SPEC_CODE
         self.offset = offset
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'offset'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'offset'])
 
     def pack(self):
         """Encodes into a bytes block."""
-        content = float32_pack( self.offset )
+        content = codec.float32_pack( self.offset )
         content_len = 4     #todo content_len unneeded?
-        packed_bytes = add_header( self.code, content_len, content )
+        packed_bytes = add_header( self.type_code, content_len, content )
         return packed_bytes
 
     @staticmethod
@@ -596,10 +581,10 @@ class IdbTZone(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbTZone.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbTZone.SPEC_CODE    #todo check everywhere
         assert content_len == 4    #todo check everywhere
-        offset = float32_unpack( content )
+        offset = codec.float32_unpack( content )
         result = IdbTZone( offset )
         return result
 
@@ -613,8 +598,8 @@ class IdbFilter(IdbOption):   #todo spec says "TODO: Appendix XXX"
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbFilter.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbFilter.SPEC_CODE    #todo check everywhere
         return IdbFilter(content)
 
 class IdbOs(IdbOption):
@@ -627,8 +612,8 @@ class IdbOs(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbOs.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbOs.SPEC_CODE    #todo check everywhere
         return IdbOs(content)
 
 class IdbFcsLen(IdbOption):
@@ -637,16 +622,16 @@ class IdbFcsLen(IdbOption):
 
     def __init__(self, fcs_len):
         util.assert_uint8( fcs_len )
-        self.code       = self.SPEC_CODE
+        self.type_code       = self.SPEC_CODE
         self.fcs_len    = fcs_len
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'fcs_len'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'fcs_len'])
 
     def pack(self):
         """Encodes into a bytes block."""
-        content =  uint8_pack( self.fcs_len )
+        content =  codec.uint8_pack( self.fcs_len )
         content_len = 1     #todo content_len unneeded?
-        packed_bytes = add_header( self.code, content_len, content )
+        packed_bytes = add_header( self.type_code, content_len, content )
         return packed_bytes
 
     @staticmethod
@@ -654,10 +639,10 @@ class IdbFcsLen(IdbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbFcsLen.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbFcsLen.SPEC_CODE    #todo check everywhere
         assert content_len == 1    #todo check everywhere
-        fcs_len = uint8_unpack( content )
+        fcs_len = codec.uint8_unpack( content )
         result  = IdbFcsLen( fcs_len )
         return result
 
@@ -666,16 +651,16 @@ class IdbTsOffset(IdbOption):   #todo maybe make this uint64 type?
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, ts_offset):     #todo PCAPNG spec leaves interpretation of ts_offset unspecified
-        self.code       = self.SPEC_CODE
+        self.type_code       = self.SPEC_CODE
         self.ts_offset  = ts_offset
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'ts_offset'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'ts_offset'])
 
     def pack(self):
         """Encodes into a bytes block."""
-        content = int64_pack( self.ts_offset )
+        content = codec.int64_pack( self.ts_offset )
         content_len = 8     #todo content_len unneeded?
-        packed_bytes = add_header( self.code, content_len, content )
+        packed_bytes = add_header( self.type_code, content_len, content )
         return packed_bytes
 
     @staticmethod
@@ -683,18 +668,18 @@ class IdbTsOffset(IdbOption):   #todo maybe make this uint64 type?
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == IdbTsOffset.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == IdbTsOffset.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
-        ts_offset = int64_unpack( content )
+        ts_offset = codec.int64_unpack( content )
         result = IdbTsOffset( ts_offset )
         return result
 
 #-----------------------------------------------------------------------------
 class EpbOption(Option):    #todo -> Abstract (or all base classes)
-    def __init__(self, code, content):
-        """Creates an EPB Option with the specified option code & content."""
-        Option.__init__( self, code, content )
+    def __init__(self, type_code, content):
+        """Creates an EPB Option with the specified option type_code & content."""
+        Option.__init__(self, type_code, content)
 
 class EpbFlags(EpbOption):
     SPEC_CODE = 2
@@ -708,8 +693,8 @@ class EpbFlags(EpbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == EpbFlags.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == EpbFlags.SPEC_CODE    #todo check everywhere
         assert content_len == 4    #todo check everywhere
         result = EpbFlags( content )
         return result
@@ -724,8 +709,8 @@ class EpbHash(EpbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == EpbHash.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == EpbHash.SPEC_CODE    #todo check everywhere
         result = EpbHash( content )
         return result
 
@@ -734,16 +719,16 @@ class EpbDropCount(EpbOption):
     # BLOCK_LEN = Block32Len( 12 )   #todo create class for this; then BLOCK_LEN.assert_equals( len_val )
 
     def __init__(self, dropcount):     #todo PCAPNG spec leaves interpretation of dropcount unspecified
-        self.code       = self.SPEC_CODE
+        self.type_code       = self.SPEC_CODE
         self.dropcount  = dropcount
 
-    def to_map(self): return util.select_keys(self.__dict__, ['code', 'dropcount'])
+    def to_map(self): return util.select_keys(self.__dict__, ['type_code', 'dropcount'])
 
     def pack(self):
         """Encodes into a bytes block."""
-        content = uint64_pack( self.dropcount )
+        content = codec.uint64_pack( self.dropcount )
         content_len = 8     #todo content_len unneeded?
-        packed_bytes = add_header( self.code, content_len, content )
+        packed_bytes = add_header( self.type_code, content_len, content )
         return packed_bytes
 
     @staticmethod
@@ -751,10 +736,10 @@ class EpbDropCount(EpbOption):
 
     @staticmethod
     def unpack( packed_bytes ):
-        (opt_code, content_len, content) = strip_header( packed_bytes )
-        assert opt_code == EpbDropCount.SPEC_CODE    #todo check everywhere
+        (type_code, content_len, content) = strip_header( packed_bytes )
+        assert type_code == EpbDropCount.SPEC_CODE    #todo check everywhere
         assert content_len == 8    #todo check everywhere
-        dropcount = uint64_unpack( content )
+        dropcount = codec.uint64_unpack( content )
         result = EpbDropCount( dropcount )
         return result
 
@@ -778,7 +763,7 @@ def segment_rolling(raw_bytes):     #todo inline below
     """Given an bytes block of options, decodes and returns the first option and the remaining bytes."""
     util.assert_type_bytes(raw_bytes)
     assert 4 <= len(raw_bytes)
-    (opt_code, content_len_orig) = struct.unpack( '=HH', raw_bytes[:4])
+    (type_code, content_len_orig) = struct.unpack( '=HH', raw_bytes[:4])
     content_len_pad = util.block32_ceil_num_bytes(content_len_orig)
     first_block_len_pad = 4 + content_len_pad
     assert first_block_len_pad <= len(raw_bytes)
@@ -799,15 +784,15 @@ def segment_all(raw_bytes):
 
 
 def unpack_dispatch( dispatch_tbl, packed_bytes ):
-    (opt_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian
-    dispatch_fn = dispatch_tbl[ opt_code ]
+    (type_code, content_len) = struct.unpack('=HH', packed_bytes[:4])    #todo endian
+    dispatch_fn = dispatch_tbl[ type_code ]
     if (dispatch_fn != None):
         result =  dispatch_fn( packed_bytes )
         return result
     else:
         #todo make generic OPT_UNKNOWN ?
-        print( 'warning - option.unpack_dispatch(): unrecognized Option={}'.format( opt_code )) #todo log
-        raise Exception( 'unpack_dispatch(): unrecognized option opt_code={}'.format(opt_code))
+        print( 'warning - option.unpack_dispatch(): unrecognized Option={}'.format( type_code )) #todo log
+        raise Exception( 'unpack_dispatch(): unrecognized option type_code={}'.format(type_code))
 
 def unpack_all(dispatch_table, options_bytes):
     result = []

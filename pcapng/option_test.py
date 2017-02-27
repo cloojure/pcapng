@@ -15,7 +15,6 @@
 
 import pytest
 import pcapng.option    as option
-from   pcapng.option    import Option, ShbOption, IdbOption
 import pcapng.pen       as pen
 import pcapng.util      as util
 from   pcapng.util      import to_bytes
@@ -23,12 +22,12 @@ from   pcapng.util      import to_bytes
 #todo add generative testing for all
 
 def test_option_codec():
-    def assert_option_codec(opt_code, opt_value):
-        opt          = Option(opt_code, opt_value )
-        opt_unpacked = Option.unpack( opt.pack() )
-        assert opt.code     == opt_code
-        assert opt.content  == to_bytes(opt_value)
-        assert opt          == opt_unpacked
+    def assert_option_codec(type_code, opt_value):
+        opt          = option.Option(type_code, opt_value )
+        opt_unpacked = option.Option.unpack( opt.pack() )
+        assert opt.type_code    == type_code
+        assert opt.content      == to_bytes(opt_value)
+        assert opt              == opt_unpacked
 
     #todo add tests for opt values of string, byte, short, int, float, double
     #todo add tests for opt value len up to 9999?

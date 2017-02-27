@@ -18,6 +18,7 @@ import sys
 import time
 import math
 import pcapng.const as const
+import pcapng.codec
 
 #todo check type on all fns
 #todo verify have tests for all
@@ -266,11 +267,11 @@ def assert_block32_length(data):
 def block32_bytes_pack( content=[] ):
     content_len = len( content )
     content_bytes_pad = block32_pad_bytes( content )
-    packed_bytes = struct.pack( '=L', content_len ) + content_bytes_pad
+    packed_bytes = pcapng.codec.uint32_pack( content_len ) + content_bytes_pad
     return packed_bytes
 
 def block32_bytes_unpack_rolling( packed_bytes ):
-    (content_len,) = struct.unpack( '=L', packed_bytes[:4] )
+    content_len = pcapng.codec.uint32_unpack( packed_bytes[:4] )
     content_len_pad = block32_ceil_num_bytes(content_len)
     packed_bytes_nohdr = packed_bytes[4:]
     content_bytes = packed_bytes_nohdr[:content_len]
@@ -281,11 +282,11 @@ def block32_labelled_bytes_pack( label, content=[] ):
     content_bytes_pad = block32_pad_bytes( content )
     content_len = len( content )
     total_len   = 12 + len( content_bytes_pad )
-    packed_bytes = struct.pack( '=LLL', label, total_len, content_len ) + content_bytes_pad
+    packed_bytes = struct.pack( '=LLL', label, total_len, content_len ) + content_bytes_pad  #todo -> pcapng.codec.uint32_pack
     return packed_bytes
 
 def block32_labelled_bytes_unpack_rolling( packed_bytes ):
-    (label, total_len, content_len) = struct.unpack( '=LLL', packed_bytes[:12] )
+    (label, total_len, content_len) = struct.unpack( '=LLL', packed_bytes[:12] )  #todo -> pcapng.codec.uint32_unpack
     content_bytes       = packed_bytes[12:12+content_len]
     remaining_bytes     = packed_bytes[total_len:]
     return label, content_bytes, remaining_bytes

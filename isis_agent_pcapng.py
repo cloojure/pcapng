@@ -149,32 +149,29 @@ def main():
     shb_opts = [ option.ShbHardware( "Dell" ),
                  option.ShbOs( "Ubuntu" ),
                  option.ShbUserAppl( "IntelliJ Idea" ) ]
+    shb_obj = pcapng.block.SectionHeaderBlock( shb_opts )
+    shb_packed_bytes = shb_obj.pack()
+    pcap_fp.write( shb_packed_bytes )  # must be 1st block
 
     idb_opts = [ option.IdbName( interface_name ),
                  option.IdbDescription( "primary interface on host" ),
                  option.IdbSpeed( 12345 ) ]
-
-    epb_opts = [ option.EpbFlags(       [13,14,15,16] ),
-                 option.EpbHash(        'just about any hash spec can go here' ),
-                 option.EpbDropCount(   13 ) ]
-
-    pcap_fp.write( pcapng.block.SectionHeaderBlock( shb_opts ).pack() )  # must be 1st block
-
     idb_obj = pcapng.block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET, idb_opts )  # optional block
-    idb_bytes = idb_obj.pack()
-    pcap_fp.write( idb_bytes )
+    pcap_fp.write( idb_obj.pack() )
 
     count = 0
     while True:
         pkt_bytes = get_next_packet( socket_fd )
         dbg_print( pkt_bytes )
+        pcap_fp.write( pcapng.block.SimplePacketBlock( pkt_bytes ).pack() )
 
-        count = count + 1
-        (dummy, curr_rem) = divmod(count,2)
-        if curr_rem == 0:
-            pcap_fp.write( pcapng.block.SimplePacketBlock( pkt_bytes ).pack() )
-        else:
-            pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
+        pkt_bytes = get_next_packet( socket_fd )
+        dbg_print( pkt_bytes )
+
+        epb_opts = [ option.EpbFlags(       [13,14,15,16] ),
+                     option.EpbHash(        'just about any hash spec can go here' ),
+                     option.EpbDropCount(   13 ) ]
+        pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
 
 if __name__ == "__main__":
   main()

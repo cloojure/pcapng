@@ -155,12 +155,12 @@ def test_blocks_lst():
                                     option.ShbUserAppl( "IntelliJ Idea" ) ] ),
         block.InterfaceDescBlock( linktype.LINKTYPE_ETHERNET,
                                   [ option.IdbName( "Carrier Pigeon" ),
-                                    option.IdbDescription( "don't you wish" ),
+                                    option.IdbDescription( "Something profound here..." ),
                                     option.IdbIpv4Addr(     [192, 168, 13, 7], [255, 255, 255, 0] ),
                                     option.IdbOs( 'Ubuntu Xenial 16.04.1 LTS' ) ] ),
         block.SimplePacketBlock('abc'),
-        block.EnhancedPacketBlock( 0, "Don't have a cow, man."  ),
-        block.CustomBlockCopyable( pen.BROCADE_PEN, 'How do you like me now?' ),
+        block.EnhancedPacketBlock( 0, "<<<Stand-in for actual packet data>>>"  ),
+        block.CustomBlockCopyable( pen.BROCADE_PEN, 'User-defined custom data' ),
     ]
     packed_bytes = block.pack_all( blk_lst )
 

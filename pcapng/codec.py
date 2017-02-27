@@ -38,6 +38,8 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
 
 def uint8_pack(    arg ):       return struct.pack(   '=B', arg )
 def uint8_unpack(  arg ):       return struct.unpack( '=B', arg )[0]
+def uint16_pack(   arg ):       return struct.pack(   '=H', arg )
+def uint16_unpack( arg ):       return struct.unpack( '=H', arg )[0]
 def uint32_pack(   arg ):       return struct.pack(   '=L', arg )
 def uint32_unpack( arg ):       return struct.unpack( '=L', arg )[0]
 def uint64_pack(   arg ):       return struct.pack(   '=Q', arg )
@@ -45,9 +47,15 @@ def uint64_unpack( arg ):       return struct.unpack( '=Q', arg )[0]
 
 def  int8_pack(    arg ):       return struct.pack(   '=b', arg )
 def  int8_unpack(  arg ):       return struct.unpack( '=b', arg )[0]
+def  int16_pack(   arg ):       return struct.pack(   '=h', arg )
+def  int16_unpack( arg ):       return struct.unpack( '=h', arg )[0]
+def  int32_pack(   arg ):       return struct.pack(   '=l', arg )
+def  int32_unpack( arg ):       return struct.unpack( '=l', arg )[0]
 def  int64_pack(   arg ):       return struct.pack(   '=q', arg )
 def  int64_unpack( arg ):       return struct.unpack( '=q', arg )[0]
 
 def float32_pack(   arg ):      return struct.pack(   '=f', arg )
 def float32_unpack( arg ):      return struct.unpack( '=f', arg )[0]
+def float64_pack(   arg ):      return struct.pack(   '=d', arg )
+def float64_unpack( arg ):      return struct.unpack( '=d', arg )[0]
 

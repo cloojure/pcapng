@@ -26,17 +26,18 @@ import pcapng.codec
 #todo migrate fns to general libs
 
 # Global var's
-test_ctx = {
+TEST_CTX = {
     'enable'    : False,
     'utc_secs'  : -1.2      # floating point unix time
 }
+
 def test_time_utc_set(utc_secs):
-    global test_ctx
-    test_ctx['enable']      = True
-    test_ctx['utc_time']    = utc_secs
+    global TEST_CTX
+    TEST_CTX['enable']      = True
+    TEST_CTX['utc_time']    = utc_secs
 def test_time_utc_unset():
-    global test_ctx
-    test_ctx['enable']      = False
+    global TEST_CTX
+    TEST_CTX['enable']      = False
 
 #-----------------------------------------------------------------------------
 
@@ -167,9 +168,9 @@ def split_float( fval ):
 
 def curr_utc_timetuple():
     """Returns the current UTC time as a (secs, usecs) tuple."""
-    global test_ctx
-    if test_ctx['enable']:
-        utc_secs = test_ctx['utc_time']
+    global TEST_CTX
+    if TEST_CTX['enable']:
+        utc_secs = TEST_CTX['utc_time']
     else:
         utc_secs = time.time()
     secs, usecs = split_float( utc_secs )

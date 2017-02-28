@@ -70,8 +70,8 @@ def test_block32_bytes_pack():
     def assert_block32_bytes_packing( data_bytes ):
         orig = to_bytes( data_bytes )
         extra_bytes = to_bytes('dummy-start') + orig + to_bytes('dummy-end')
-        unpacked, remaining = util.block32_bytes_unpack_rolling(
-                              util.block32_bytes_pack(orig) + extra_bytes )
+        unpacked, remaining = util.block32_lv_bytes_unpack_rolling(
+            util.block32_lv_bytes_pack(orig) + extra_bytes )
         assert unpacked  == orig
         assert remaining == extra_bytes
     assert_block32_bytes_packing( '' )
@@ -88,8 +88,8 @@ def test_block32_labelled_bytes_pack():
     def assert_block32_labelled_bytes_packing( data_bytes ):
         orig = to_bytes( data_bytes )
         extra_bytes = to_bytes('dummy-start') + orig + to_bytes('dummy-end')
-        label, unpacked, remaining = util.block32_labelled_bytes_unpack_rolling(
-                                     util.block32_labelled_bytes_pack( block_label, orig ) + extra_bytes )
+        label, unpacked, remaining = util.block32_tlv_bytes_unpack_rolling(
+            util.block32_tlv_bytes_pack(block_label, orig) + extra_bytes )
         assert label     == block_label
         assert unpacked  == orig
         assert remaining == extra_bytes
@@ -194,7 +194,6 @@ def test_xxx():
     assert '\x00\x00\x00\x00\x00\x00\x00\x05' == struct.pack( '!q', 5 )
     assert '\x00\x00\x00\x05'                 == struct.pack( '!l', 5 )
     assert '\x00\x05'                         == struct.pack( '!h', 5 )
-    assert 1 == util.first( [1,2,3] )
 
     assert 3 == len( [ 1, 2, 3] )
     assert (3, 140000) == util.split_float(3.14)

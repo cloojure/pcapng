@@ -218,11 +218,6 @@ def chrList_to_str(arg):
     strval = ''.join( arg )
     return strval
 
-#todo move to pcapng.list (or delete?); only(), second(), last(), butlast(), rest()
-def first( lst ):
-    """Returns the first item in a sequence."""
-    return lst[0]
-
 def select_keys( src_dict, keys_lst ):
     """Returns a new dict containing the specified keys (& values) from src_dict."""
     result = {}
@@ -231,12 +226,13 @@ def select_keys( src_dict, keys_lst ):
     return result
 
 def classname(obj):
-    "Returns a string with the fully-qualified class name of an object"
+    "Given any object, returns the fully-qualified class name as a string"
     module_str  = obj.__class__.__module__
     class_str   = obj.__class__.__name__
     return '{}.{}'.format( module_str, class_str )
 
 def dict_merge( a, b ):  #todo need test
+    "Merge the contents of two dictionaries, returning a new result"
     assert_type_dict(a)
     assert_type_dict(b)
     result = {}
@@ -245,6 +241,7 @@ def dict_merge( a, b ):  #todo need test
     return result
 
 def dict_merge_all( dict_lst ):  #todo need test
+    "Given a list of dict dictionaries, merge the contents returning a new result"
     assert_type_list(dict_lst)
     result = {}
     for curr_dict in dict_lst:
@@ -264,7 +261,7 @@ def block32_ceil_num_bytes(curr_len):
 def pad_bytes(data_bytes, tgt_length, padval=0):
     """Add (n>=0) 'padval' bytes to extend data to tgt_length"""
     num_bytes_needed = tgt_length - len(data_bytes)
-    assert (num_bytes_needed >= 0), "padding cannot be negative"
+    assert (num_bytes_needed >= 0), "padding length cannot be negative"
     data_bytes_pad = to_bytes(data_bytes) + to_bytes([padval]) * num_bytes_needed
     return data_bytes_pad
 
@@ -279,13 +276,17 @@ def assert_block32_length(data):
     assert (0 == rem_bytes), ("data must be 32-bit aligned; len={}  rem_bytes={}".format(
         len(data), rem_bytes ))
 
-def block32_bytes_pack( content=[] ):
+def block32_lv_bytes_pack(content=[]):
+    """Pack arbitrary content using Length-Value (LV) encoding to return packed bytes,
+    padded to the next 32-bit boundary"""
     content_len = len( content )
     content_bytes_pad = block32_pad_bytes( content )
     packed_bytes = pcapng.codec.uint32_pack( content_len ) + content_bytes_pad
     return packed_bytes
 
-def block32_bytes_unpack_rolling( packed_bytes ):
+def block32_lv_bytes_unpack_rolling(packed_bytes):
+    """Given multiple blocks of Length-Value (LV) encoded packed bytes, unpack and return the first
+    content of the first block, and the remaining bytes."""
     content_len = pcapng.codec.uint32_unpack( packed_bytes[:4] )
     content_len_pad = block32_ceil_num_bytes(content_len)
     packed_bytes_nohdr = packed_bytes[4:]
@@ -293,16 +294,21 @@ def block32_bytes_unpack_rolling( packed_bytes ):
     remaining_bytes = packed_bytes_nohdr[content_len_pad:]
     return content_bytes, remaining_bytes
 
-def block32_labelled_bytes_pack( label, content=[] ):
+def block32_tlv_bytes_pack(type_code, content=[]):
+    """Pack arbitrary content using Type-Length-Value (TLV) encoding to return packed bytes,
+    padded to the next 32-bit boundary"""
     content_bytes_pad = block32_pad_bytes( content )
     content_len = len( content )
     total_len   = 12 + len( content_bytes_pad )
-    packed_bytes = struct.pack( '=LLL', label, total_len, content_len ) + content_bytes_pad  #todo -> pcapng.codec.uint32_pack
+    packed_bytes = struct.pack( '=LLL', type_code, total_len, content_len) + content_bytes_pad  #todo -> pcapng.codec.uint32_pack
     return packed_bytes
 
-def block32_labelled_bytes_unpack_rolling( packed_bytes ):
-    (label, total_len, content_len) = struct.unpack( '=LLL', packed_bytes[:12] )  #todo -> pcapng.codec.uint32_unpack
+def block32_tlv_bytes_unpack_rolling(packed_bytes):
+    """Given multiple blocks of Type-Length-Value (TLV) encoded packed bytes, unpack and return the first
+    type & content of the first block, and the remaining bytes."""
+    "Given Unpack data in  format, discarding any padding bytes"
+    (type_code, total_len, content_len) = struct.unpack( '=LLL', packed_bytes[:12] )  #todo -> pcapng.codec.uint32_unpack
     content_bytes       = packed_bytes[12:12+content_len]
     remaining_bytes     = packed_bytes[total_len:]
-    return label, content_bytes, remaining_bytes
+    return type_code, content_bytes, remaining_bytes
 

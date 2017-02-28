@@ -451,7 +451,7 @@ class CustomBlock:
 
     def pack(self):
         "Serialize an CB object into packed bytes"
-        content_bytes = util.block32_bytes_pack( to_bytes( self.content ))
+        content_bytes = util.block32_lv_bytes_pack(to_bytes(self.content))
         options_bytes = option.pack_all( self.options_lst )
         block_total_len = 16 + len(content_bytes) + len(options_bytes)
 
@@ -482,7 +482,7 @@ class CustomBlockCopyable(CustomBlock):
         assert pen_val == pcapng.pen.BROCADE_PEN
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
-        (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
+        (content_bytes, options_bytes) = util.block32_lv_bytes_unpack_rolling(block_bytes_stripped)
         options_lst = option.unpack_all(CustomBlock.UNPACK_DISPATCH_TABLE, options_bytes)
         result_obj = CustomBlockCopyable( pen_val, content_bytes, options_lst )
         return result_obj
@@ -507,7 +507,7 @@ class CustomBlockNonCopyable(CustomBlock):
         assert pen_val == pcapng.pen.BROCADE_PEN
         assert block_total_len == block_total_len_end == len(packed_bytes)
         block_bytes_stripped = packed_bytes[12:-4]
-        (content_bytes, options_bytes) = util.block32_bytes_unpack_rolling( block_bytes_stripped )
+        (content_bytes, options_bytes) = util.block32_lv_bytes_unpack_rolling(block_bytes_stripped)
         options_lst = option.unpack_all(CustomBlock.UNPACK_DISPATCH_TABLE, options_bytes)
         result_obj = CustomBlockNonCopyable( pen_val, content_bytes, options_lst )
         return result_obj

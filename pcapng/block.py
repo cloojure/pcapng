@@ -450,7 +450,8 @@ class CustomBlock:
     def __ne__(self, other):    return (not __eq__(self,other))
 
     def pack(self):
-        "Serialize an CB object into packed bytes"
+        """Serialize an CB object into packed bytes. NOTE: We are required to use
+        Length-Value (LV) encoding for the custom content so that any options may also be recovered."""
         content_bytes = util.block32_lv_bytes_pack(to_bytes(self.content))
         options_bytes = option.pack_all( self.options_lst )
         block_total_len = 16 + len(content_bytes) + len(options_bytes)

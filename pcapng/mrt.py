@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Functions for serialization/deserialization of MRT block data"""
 
 import struct
 import pcapng.linktype
 import pcapng.option
 import pcapng.util
-from pcapng.util import to_bytes
 
 #todo think about how to handle a block of packets
 #todo look at "docopt" usage -> cmdopts processing
@@ -123,17 +123,21 @@ def mrt_block_extended_unpack( packed_bytes ):
     return parsed
 
 def mrt_isis_block_pack( content ):
+    "Serializes content from an MRT ISIS block"
     return mrt_block_pack( ISIS, 0, content )
 
 def mrt_isis_block_unpack( packed_bytes ):
+    "Deserializes content from an MRT ISIS block"
     result =  mrt_block_unpack( packed_bytes )
     assert result['mrt_type'] == ISIS
     return result
 
 def mrt_isis_block_extended_pack( content ):
+    "Serializes content from an MRT ISIS Extended block"
     return mrt_block_extended_pack( ISIS_ET, 0, content )
 
 def mrt_isis_block_extended_unpack( packed_bytes ):
+    "Deserializes content from an MRT ISIS Extended block"
     result =  mrt_block_extended_unpack( packed_bytes )
     assert result['mrt_type'] == ISIS_ET
     return result

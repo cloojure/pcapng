@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import random
 import struct
 import sys
 import time
@@ -139,6 +140,11 @@ def fibonacci_range_signed(limit):   #todo need test
     result = sorted( (pos_vals + neg_vals), key=(lambda x: abs(x)))
     return result
 
+def mod( numer, demon ):
+    dummy, remainder = divmod( numer, demon )
+    return remainder
+
+#-----------------------------------------------------------------------------
 def assert_rel_equal( x, y, digits=None ):
     assert digits
     max_val = float( max( abs(x), abs(y) ))
@@ -179,6 +185,16 @@ def split_float( fval ):
     frac, whole = math.modf( fval )
     micros = int( round( frac * 1000000 ))
     return int(whole), micros
+
+def rand_ints( num_ints, min_val, max_val ):    #todo need test
+    result = []
+    for i in range(num_ints):
+        result.append( random.randint(min_val, max_val))
+    return result
+
+def rand_bytes( n ):    #todo need test
+    int_vals = rand_ints( n, 0, 255 )
+    return to_bytes( int_vals )
 
 def curr_utc_timetuple():
     """Returns the current UTC time as a (secs, usecs) tuple."""

@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Link Type Constants
 
-# http://www.tcpdump.org/linktypes.html
+See:  http://www.tcpdump.org/linktypes.html
+"""
+
 
 LINKTYPE_NULL                             =   0
 LINKTYPE_ETHERNET                         =   1
@@ -125,4 +128,3 @@ LINKTYPE_RDS                              = 265
 LINKTYPE_USB_DARWIN                       = 266
 
 #todo need test valid linktype
-

@@ -14,7 +14,7 @@
 
 
 """
-Constants & functions for encoding/decoding PCAPNG values.
+Functions for serializing/deserializing values for PCAPNG.
 """
 import struct
 import pcapng.util  as util
@@ -32,7 +32,7 @@ util.assert_python2()    #todo make work for python 2.7 or 3.3 ?
     # strings, and don't terminate early if there is a zero-value byte.
 
 #-----------------------------------------------------------------------------
-#todo add global statemachine/var for write (testing) and read (host dependent)
+#todo add endian global statemachine/var for write (testing) and read (host dependent)
 
 #todo add tests for all methods
 

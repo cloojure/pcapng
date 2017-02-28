@@ -80,3 +80,34 @@ Blocks may also be serialized & deserialized in bulk, as seen in the unit tests:
       blk_lst_unpacked = pcapng.block.unpack_blocks( packed_bytes )
       assert blk_lst == blk_lst_unpacked
 
+
+Installation
+============
+
+#todo
+
+
+Building
+========
+
+#todo
+
+Generating Documentation 
+========================
+
+Documentation uses the `pdoc` tool.  Note that pdoc generates documentation from the installed
+`pcapng` package, not directly from thesource code.  To use:
+
+  - sudo pip install pdoc                   # ensure latest pdoc is installed
+  - ./generate-docs.bash                    # generate docs
+  - firefox `doc/pcapng/index.html`         # open html docs in browser (system dependent)
+
+
+#todo
+
+Endian Convention
+=================
+
+#todo
+
+

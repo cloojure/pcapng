@@ -45,7 +45,6 @@ data_len = len(data)
 while count < num_blocks:
     curr_idx = util.mod( count, data_len )
     pkt_bytes = data[ curr_idx ]
-    # print( '101', list(pkt_bytes))
     if True:
         pcap_fp.write( block.SimplePacketBlock( pkt_bytes ).pack() )
     else:

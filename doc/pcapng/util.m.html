@@ -1,0 +1,2630 @@
+<!doctype html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+    <title>pcapng.util API documentation</title>
+    <meta name="description" content="" />
+
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+  
+  <style type="text/css">
+  
+* {
+  box-sizing: border-box;
+}
+/*! normalize.css v1.1.1 | MIT License | git.io/normalize */
+
+/* ==========================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+/**
+ * Correct `block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+    display: block;
+}
+
+/**
+ * Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+audio,
+canvas,
+video {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+
+/**
+ * Prevent modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Firefox 3, and Safari 4.
+ * Known issue: no IE 6 support.
+ */
+
+[hidden] {
+    display: none;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+/**
+ * 1. Prevent system color scheme's background color being used in Firefox, IE,
+ *    and Opera.
+ * 2. Prevent system color scheme's text color being used in Firefox, IE, and
+ *    Opera.
+ * 3. Correct text resizing oddly in IE 6/7 when body `font-size` is set using
+ *    `em` units.
+ * 4. Prevent iOS text size adjust after orientation change, without disabling
+ *    user zoom.
+ */
+
+html {
+    background: #fff; /* 1 */
+    color: #000; /* 2 */
+    font-size: 100%; /* 3 */
+    -webkit-text-size-adjust: 100%; /* 4 */
+    -ms-text-size-adjust: 100%; /* 4 */
+}
+
+/**
+ * Address `font-family` inconsistency between `textarea` and other form
+ * elements.
+ */
+
+html,
+button,
+input,
+select,
+textarea {
+    font-family: sans-serif;
+}
+
+/**
+ * Address margins handled incorrectly in IE 6/7.
+ */
+
+body {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+/**
+ * Address `outline` inconsistency between Chrome and other browsers.
+ */
+
+a:focus {
+    outline: thin dotted;
+}
+
+/**
+ * Improve readability when focused and also mouse hovered in all browsers.
+ */
+
+a:active,
+a:hover {
+    outline: 0;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+/**
+ * Address font sizes and margins set differently in IE 6/7.
+ * Address font sizes within `section` and `article` in Firefox 4+, Safari 5,
+ * and Chrome.
+ */
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0.83em 0;
+}
+
+h3 {
+    font-size: 1.17em;
+    margin: 1em 0;
+}
+
+h4 {
+    font-size: 1em;
+    margin: 1.33em 0;
+}
+
+h5 {
+    font-size: 0.83em;
+    margin: 1.67em 0;
+}
+
+h6 {
+    font-size: 0.67em;
+    margin: 2.33em 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Safari 5, and Chrome.
+ */
+
+abbr[title] {
+    border-bottom: 1px dotted;
+}
+
+/**
+ * Address style set to `bolder` in Firefox 3+, Safari 4/5, and Chrome.
+ */
+
+b,
+strong {
+    font-weight: bold;
+}
+
+blockquote {
+    margin: 1em 40px;
+}
+
+/**
+ * Address styling not present in Safari 5 and Chrome.
+ */
+
+dfn {
+    font-style: italic;
+}
+
+/**
+ * Address differences between Firefox and other browsers.
+ * Known issue: no IE 6/7 normalization.
+ */
+
+hr {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 6/7/8/9.
+ */
+
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+p,
+pre {
+    margin: 1em 0;
+}
+
+/**
+ * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
+ */
+
+code,
+kbd,
+pre,
+samp {
+    font-family: monospace, serif;
+    _font-family: 'courier new', monospace;
+    font-size: 1em;
+}
+
+/**
+ * Improve readability of pre-formatted text in all browsers.
+ */
+
+pre {
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/**
+ * Address CSS quotes not supported in IE 6/7.
+ */
+
+q {
+    quotes: none;
+}
+
+/**
+ * Address `quotes` property not supported in Safari 4.
+ */
+
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+
+small {
+    font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* ==========================================================================
+   Lists
+   ========================================================================== */
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+dl,
+menu,
+ol,
+ul {
+    margin: 1em 0;
+}
+
+dd {
+    margin: 0 0 0 40px;
+}
+
+/**
+ * Address paddings set differently in IE 6/7.
+ */
+
+menu,
+ol,
+ul {
+    padding: 0 0 0 40px;
+}
+
+/**
+ * Correct list images handled incorrectly in IE 7.
+ */
+
+nav ul,
+nav ol {
+    list-style: none;
+    list-style-image: none;
+}
+
+/* ==========================================================================
+   Embedded content
+   ========================================================================== */
+
+/**
+ * 1. Remove border when inside `a` element in IE 6/7/8/9 and Firefox 3.
+ * 2. Improve image quality when scaled in IE 7.
+ */
+
+img {
+    border: 0; /* 1 */
+    -ms-interpolation-mode: bicubic; /* 2 */
+}
+
+/**
+ * Correct overflow displayed oddly in IE 9.
+ */
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Figures
+   ========================================================================== */
+
+/**
+ * Address margin not present in IE 6/7/8/9, Safari 5, and Opera 11.
+ */
+
+figure {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+/**
+ * Correct margin displayed oddly in IE 6/7.
+ */
+
+form {
+    margin: 0;
+}
+
+/**
+ * Define consistent border, margin, and padding.
+ */
+
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/**
+ * 1. Correct color not being inherited in IE 6/7/8/9.
+ * 2. Correct text not wrapping in Firefox 3.
+ * 3. Correct alignment displayed oddly in IE 6/7.
+ */
+
+legend {
+    border: 0; /* 1 */
+    padding: 0;
+    white-space: normal; /* 2 */
+    *margin-left: -7px; /* 3 */
+}
+
+/**
+ * 1. Correct font size not being inherited in all browsers.
+ * 2. Address margins set differently in IE 6/7, Firefox 3+, Safari 5,
+ *    and Chrome.
+ * 3. Improve appearance and consistency in all browsers.
+ */
+
+button,
+input,
+select,
+textarea {
+    font-size: 100%; /* 1 */
+    margin: 0; /* 2 */
+    vertical-align: baseline; /* 3 */
+    *vertical-align: middle; /* 3 */
+}
+
+/**
+ * Address Firefox 3+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+
+button,
+input {
+    line-height: normal;
+}
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Chrome, Safari 5+, and IE 6+.
+ * Correct `select` style inheritance in Firefox 4+ and Opera.
+ */
+
+button,
+select {
+    text-transform: none;
+}
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ * 4. Remove inner spacing in IE 7 without affecting normal text inputs.
+ *    Known issue: inner spacing remains in IE 6.
+ */
+
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+    -webkit-appearance: button; /* 2 */
+    cursor: pointer; /* 3 */
+    *overflow: visible;  /* 4 */
+}
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+
+button[disabled],
+html input[disabled] {
+    cursor: default;
+}
+
+/**
+ * 1. Address box sizing set to content-box in IE 8/9.
+ * 2. Remove excess padding in IE 8/9.
+ * 3. Remove excess padding in IE 7.
+ *    Known issue: excess padding remains in IE 6.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+    *height: 13px; /* 3 */
+    *width: 13px; /* 3 */
+}
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari 5 and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari 5 and Chrome
+ *    (include `-moz` to future-proof).
+ */
+
+input[type="search"] {
+    -webkit-appearance: textfield; /* 1 */
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box; /* 2 */
+    box-sizing: content-box;
+}
+
+/**
+ * Remove inner padding and search cancel button in Safari 5 and Chrome
+ * on OS X.
+ */
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/**
+ * Remove inner padding and border in Firefox 3+.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/**
+ * 1. Remove default vertical scrollbar in IE 6/7/8/9.
+ * 2. Improve readability and alignment in all browsers.
+ */
+
+textarea {
+    overflow: auto; /* 1 */
+    vertical-align: top; /* 2 */
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+/**
+ * Remove most spacing between table cells.
+ */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+  </style>
+
+  <style type="text/css">
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+  body {
+    background: #fff;
+    font-family: "Source Sans Pro", "Helvetica Neueue", Helvetica, sans;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.6em;
+  }
+  #content {
+    width: 70%;
+    max-width: 850px;
+    float: left;
+    padding: 30px 60px;
+    border-left: 1px solid #ddd;
+  }
+  #sidebar {
+    width: 25%;
+    float: left;
+    padding: 30px;
+    overflow: hidden;
+  }
+  #nav {
+    font-size: 130%;
+    margin: 0 0 15px 0;
+  }
+
+  #top {
+    display: block;
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    font-size: .85em;
+    text-transform: uppercase;
+  }
+
+  #footer {
+    font-size: .75em;
+    padding: 5px 30px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+  }
+    #footer p {
+      margin: 0 0 0 30px;
+      display: inline-block;
+    }
+
+  h1, h2, h3, h4, h5 {
+    font-weight: 300;
+  }
+  h1 {
+    font-size: 2.5em;
+    line-height: 1.1em;
+    margin: 0 0 .50em 0;
+  }
+
+  h2 {
+    font-size: 1.75em;
+    margin: 1em 0 .50em 0;
+  }
+
+  h3 {
+    margin: 25px 0 10px 0;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 105%;
+  }
+
+  a {
+    color: #058;
+    text-decoration: none;
+    transition: color .3s ease-in-out;
+  }
+
+  a:hover {
+    color: #e08524;
+    transition: color .3s ease-in-out;
+  }
+
+  pre, code, .mono, .name {
+    font-family: "Ubuntu Mono", "Cousine", "DejaVu Sans Mono", monospace;
+  }
+
+  .title .name {
+    font-weight: bold;
+  }
+  .section-title {
+    margin-top: 2em;
+  }
+  .ident {
+    color: #900;
+  }
+
+  code {
+    background: #f9f9f9;
+  } 
+
+  pre {
+    background: #fefefe;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 0 #f3f3f3;
+    margin: 0 30px;
+    padding: 15px 30px;
+  }
+
+  .codehilite {
+    margin: 0 30px 10px 30px;
+  }
+
+    .codehilite pre {
+      margin: 0;
+    }
+    .codehilite .err { background: #ff3300; color: #fff !important; } 
+
+  table#module-list {
+    font-size: 110%;
+  }
+
+    table#module-list tr td:first-child {
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+
+    table#module-list td {
+      vertical-align: top;
+      padding-bottom: 8px;
+    }
+
+      table#module-list td p {
+        margin: 0 0 7px 0;
+      }
+
+  .def {
+    display: table;
+  }
+
+    .def p {
+      display: table-cell;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .def p:first-child {
+      white-space: nowrap;
+    }
+
+    .def p:last-child {
+      width: 100%;
+    }
+
+
+  #index {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+    ul#index .class_name {
+      /* font-size: 110%; */
+      font-weight: bold;
+    }
+    #index ul {
+      margin: 0;
+    }
+
+  .item {
+    margin: 0 0 15px 0;
+  }
+
+    .item .class {
+      margin: 0 0 25px 30px;
+    }
+
+      .item .class ul.class_list {
+        margin: 0 0 20px 0;
+      }
+
+    .item .name {
+      background: #fafafa;
+      margin: 0;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 3px;
+      display: inline-block;
+      min-width: 40%;
+    }
+      .item .name:hover {
+        background: #f6f6f6;
+      }
+
+    .item .empty_desc {
+      margin: 0 0 5px 0;
+      padding: 0;
+    }
+
+    .item .inheritance {
+      margin: 3px 0 0 30px;
+    }
+
+    .item .inherited {
+      color: #666;
+    }
+
+    .item .desc {
+      padding: 0 8px;
+      margin: 0;
+    }
+
+      .item .desc p {
+        margin: 0 0 10px 0;
+      }
+
+    .source_cont {
+      margin: 0;
+      padding: 0;
+    }
+
+    .source_link a {
+      background: #ffc300;
+      font-weight: 400;
+      font-size: .75em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 1px 1px 0 #f4b700;
+      
+      padding: 3px 8px;
+      border-radius: 2px;
+      transition: background .3s ease-in-out;
+    }
+      .source_link a:hover {
+        background: #FF7200;
+        text-shadow: none;
+        transition: background .3s ease-in-out;
+      }
+
+    .source {
+      display: none;
+      max-height: 600px;
+      overflow-y: scroll;
+      margin-bottom: 15px;
+    }
+
+      .source .codehilite {
+        margin: 0;
+      }
+
+  .desc h1, .desc h2, .desc h3 {
+    font-size: 100% !important;
+  }
+  .clear {
+    clear: both;
+  }
+
+  @media all and (max-width: 950px) {
+    #sidebar {
+      width: 35%;
+    }
+    #content {
+      width: 65%;
+    }
+  }
+  @media all and (max-width: 650px) {
+    #top {
+      display: none;
+    }
+    #sidebar {
+      float: none;
+      width: auto;
+    }
+    #content {
+      float: none;
+      width: auto;
+      padding: 30px;
+    }
+
+    #index ul {
+      padding: 0;
+      margin-bottom: 15px;
+    }
+    #index ul li {
+      display: inline-block;
+      margin-right: 30px;
+    }
+    #footer {
+      text-align: left;
+    }
+    #footer p {
+      display: block;
+      margin: inherit;
+    }
+  }
+
+  /*****************************/
+
+  </style>
+
+  <style type="text/css">
+  .codehilite .hll { background-color: #ffffcc }
+.codehilite  { background: #f8f8f8; }
+.codehilite .c { color: #408080; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #FF0000 } /* Error */
+.codehilite .k { color: #008000; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666666 } /* Operator */
+.codehilite .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #BC7A00 } /* Comment.Preproc */
+.codehilite .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #408080; font-style: italic } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .gr { color: #FF0000 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888888 } /* Generic.Output */
+.codehilite .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #0044DD } /* Generic.Traceback */
+.codehilite .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #008000 } /* Keyword.Pseudo */
+.codehilite .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #B00040 } /* Keyword.Type */
+.codehilite .m { color: #666666 } /* Literal.Number */
+.codehilite .s { color: #BA2121 } /* Literal.String */
+.codehilite .na { color: #7D9029 } /* Name.Attribute */
+.codehilite .nb { color: #008000 } /* Name.Builtin */
+.codehilite .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #880000 } /* Name.Constant */
+.codehilite .nd { color: #AA22FF } /* Name.Decorator */
+.codehilite .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.codehilite .nf { color: #0000FF } /* Name.Function */
+.codehilite .nl { color: #A0A000 } /* Name.Label */
+.codehilite .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #19177C } /* Name.Variable */
+.codehilite .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #bbbbbb } /* Text.Whitespace */
+.codehilite .mb { color: #666666 } /* Literal.Number.Bin */
+.codehilite .mf { color: #666666 } /* Literal.Number.Float */
+.codehilite .mh { color: #666666 } /* Literal.Number.Hex */
+.codehilite .mi { color: #666666 } /* Literal.Number.Integer */
+.codehilite .mo { color: #666666 } /* Literal.Number.Oct */
+.codehilite .sa { color: #BA2121 } /* Literal.String.Affix */
+.codehilite .sb { color: #BA2121 } /* Literal.String.Backtick */
+.codehilite .sc { color: #BA2121 } /* Literal.String.Char */
+.codehilite .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #BA2121 } /* Literal.String.Double */
+.codehilite .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.codehilite .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.codehilite .sx { color: #008000 } /* Literal.String.Other */
+.codehilite .sr { color: #BB6688 } /* Literal.String.Regex */
+.codehilite .s1 { color: #BA2121 } /* Literal.String.Single */
+.codehilite .ss { color: #19177C } /* Literal.String.Symbol */
+.codehilite .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #0000FF } /* Name.Function.Magic */
+.codehilite .vc { color: #19177C } /* Name.Variable.Class */
+.codehilite .vg { color: #19177C } /* Name.Variable.Global */
+.codehilite .vi { color: #19177C } /* Name.Variable.Instance */
+.codehilite .vm { color: #19177C } /* Name.Variable.Magic */
+.codehilite .il { color: #666666 } /* Literal.Number.Integer.Long */
+  </style>
+
+  <style type="text/css">
+  
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
+
+@media print,
+       (-o-min-device-pixel-ratio: 5/4),
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid required HTTP connection: h5bp.com/r
+   ========================================================================== */
+
+@media print {
+    * {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links for images, or javascript/internal links
+     */
+
+    .ir a:after,
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group; /* h5bp.com/t */
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    @page {
+        margin: 0.5cm;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+  </style>
+
+  <script type="text/javascript">
+  function toggle(id, $link) {
+    $node = document.getElementById(id);
+    if (!$node)
+    return;
+    if (!$node.style.display || $node.style.display == 'none') {
+    $node.style.display = 'block';
+    $link.innerHTML = 'Hide source &nequiv;';
+    } else {
+    $node.style.display = 'none';
+    $link.innerHTML = 'Show source &equiv;';
+    }
+  }
+  </script>
+</head>
+<body>
+<a href="#" id="top">Top</a>
+
+<div id="container">
+    
+  
+  <div id="sidebar">
+    <h1>Index</h1>
+    <ul id="index">
+    <li class="set"><h3><a href="#header-variables">Module variables</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#pcapng.util.test_ctx">test_ctx</a></li>
+  </ul>
+
+    </li>
+
+    <li class="set"><h3><a href="#header-functions">Functions</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#pcapng.util.assert_block32_length">assert_block32_length</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_int16">assert_int16</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_int32">assert_int32</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_int64">assert_int64</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_int8">assert_int8</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_python2">assert_python2</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_rel_equal">assert_rel_equal</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_bytearray">assert_type_bytearray</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_bytes">assert_type_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_dict">assert_type_dict</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_list">assert_type_list</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_set">assert_type_set</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_str">assert_type_str</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_uint16">assert_uint16</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_uint32">assert_uint32</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_uint64">assert_uint64</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_uint8">assert_uint8</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_uint8_list">assert_uint8_list</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_vec16_uint8">assert_vec16_uint8</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_vec4_uint8">assert_vec4_uint8</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_bytes_pack">block32_bytes_pack</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_bytes_unpack_rolling">block32_bytes_unpack_rolling</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_ceil_num_bytes">block32_ceil_num_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_labelled_bytes_pack">block32_labelled_bytes_pack</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_labelled_bytes_unpack_rolling">block32_labelled_bytes_unpack_rolling</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_pad_bytes">block32_pad_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.bytes_to_uint8_list">bytes_to_uint8_list</a></li>
+    <li class="mono"><a href="#pcapng.util.chrList_to_str">chrList_to_str</a></li>
+    <li class="mono"><a href="#pcapng.util.classname">classname</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_utc_secs">curr_utc_secs</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_utc_secs_hexstr">curr_utc_secs_hexstr</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_utc_timetuple">curr_utc_timetuple</a></li>
+    <li class="mono"><a href="#pcapng.util.dict_merge">dict_merge</a></li>
+    <li class="mono"><a href="#pcapng.util.dict_merge_all">dict_merge_all</a></li>
+    <li class="mono"><a href="#pcapng.util.fibonacci_list">fibonacci_list</a></li>
+    <li class="mono"><a href="#pcapng.util.fibonacci_range">fibonacci_range</a></li>
+    <li class="mono"><a href="#pcapng.util.fibonacci_range_signed">fibonacci_range_signed</a></li>
+    <li class="mono"><a href="#pcapng.util.first">first</a></li>
+    <li class="mono"><a href="#pcapng.util.int32_to_hexstr">int32_to_hexstr</a></li>
+    <li class="mono"><a href="#pcapng.util.is_python2">is_python2</a></li>
+    <li class="mono"><a href="#pcapng.util.is_python3">is_python3</a></li>
+    <li class="mono"><a href="#pcapng.util.pad_bytes">pad_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.select_keys">select_keys</a></li>
+    <li class="mono"><a href="#pcapng.util.split_float">split_float</a></li>
+    <li class="mono"><a href="#pcapng.util.str_to_bytes">str_to_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.test_time_utc_set">test_time_utc_set</a></li>
+    <li class="mono"><a href="#pcapng.util.test_time_utc_unset">test_time_utc_unset</a></li>
+    <li class="mono"><a href="#pcapng.util.timeTuple_subtract">timeTuple_subtract</a></li>
+    <li class="mono"><a href="#pcapng.util.timeTuple_to_float">timeTuple_to_float</a></li>
+    <li class="mono"><a href="#pcapng.util.to_bytes">to_bytes</a></li>
+  </ul>
+
+    </li>
+
+
+    </ul>
+  </div>
+
+    <article id="content">
+      
+  
+
+  
+
+
+  <header id="section-intro">
+  <h1 class="title"><span class="name">pcapng.util</span> module</h1>
+  
+  
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util" class="source">
+    <div class="codehilite"><pre><span></span><span class="c1"># Copyright 2017 Brocade Communications Systems, Inc</span>
+<span class="c1"># </span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1"># </span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1"># </span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pcapng.const</span> <span class="kn">as</span> <span class="nn">const</span>
+
+<span class="c1">#todo check type on all fns</span>
+<span class="c1">#todo verify have tests for all</span>
+
+<span class="c1">#todo migrate fns to general libs</span>
+
+<span class="c1"># Global var&#39;s</span>
+<span class="n">test_ctx</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;enable&#39;</span>    <span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="s1">&#39;utc_secs&#39;</span>  <span class="p">:</span> <span class="o">-</span><span class="mf">1.2</span>      <span class="c1"># floating point unix time</span>
+<span class="p">}</span>
+<span class="k">def</span> <span class="nf">test_time_utc_set</span><span class="p">(</span><span class="n">utc_secs</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">test_ctx</span>
+    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">utc_secs</span>
+<span class="k">def</span> <span class="nf">test_time_utc_unset</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">test_ctx</span>
+    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1">#-----------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">is_python2</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">micro</span><span class="p">,</span> <span class="n">release_level</span><span class="p">,</span> <span class="n">serial</span><span class="p">)</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">major</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">minor</span> <span class="o">==</span> <span class="mi">7</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">is_python3</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">micro</span><span class="p">,</span> <span class="n">release_level</span><span class="p">,</span> <span class="n">serial</span><span class="p">)</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">major</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">minor</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">assert_python2</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">is_python2</span><span class="p">()</span>
+
+<span class="c1">#-----------------------------------------------------------------------------</span>
+<span class="c1">#todo need tests for all</span>
+
+<span class="k">def</span> <span class="nf">assert_type_bytearray</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>       <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytearray</span>
+<span class="k">def</span> <span class="nf">assert_type_bytes</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>           <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span>
+<span class="k">def</span> <span class="nf">assert_type_str</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span>
+<span class="k">def</span> <span class="nf">assert_type_set</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span>
+<span class="k">def</span> <span class="nf">assert_type_list</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span>
+<span class="k">def</span> <span class="nf">assert_type_dict</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span>
+
+<span class="k">def</span> <span class="nf">assert_uint8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_uint16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">assert_int8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                 <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span>  <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_int16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_int32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_int64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the arg is a list of uint8 values&quot;</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">listy</span><span class="p">:</span>
+        <span class="n">assert_uint8</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">assert_vec4_uint8</span><span class="p">(</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the argument is a length 4 list of uint8 values&quot;</span>
+    <span class="k">print</span><span class="p">(</span> <span class="s1">&#39;#140  type={}  len={}  value={} &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span><span class="n">listy</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">listy</span><span class="p">),</span> <span class="n">listy</span> <span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">listy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="n">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">assert_vec16_uint8</span><span class="p">(</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the argument is a length 16 list of uint8 values&quot;</span>
+<span class="c1">#   print( &#39;#140  type={}  len={}  value={} &#39;.format( type(listy), len(listy), listy ))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">listy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">16</span>
+    <span class="n">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">)</span>
+
+<span class="c1">#-----------------------------------------------------------------------------</span>
+
+<span class="c1">#todo make a pow2_range(), pow2_thru() fns (0 1 2 4 8 16 32 ...)</span>
+<span class="c1">#todo make a sqr_range(), sqr_thru() fns (0 1 2 4 9 16 25 36 ...)</span>
+
+<span class="c1">#todo make a pow2_nbr_range(), pow2_nbr_thru() fns (0 1 2 3 4 5  7 8 9  15 16 17  31 32 33 ...)</span>
+<span class="c1">#todo make a sqr_nbr_range(), sqr_nbr_thru() fns (0 1 2 3 4 5   8 9 10  15 16 17  24 25 26  35 36 37 ...)</span>
+
+<span class="c1">#todo convert to common generator fn</span>
+<span class="k">def</span> <span class="nf">fibonacci_list</span><span class="p">(</span> <span class="n">n</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns a list of the first n Fibonacci numbers&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="n">next_fibo</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">next_fibo</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>   <span class="c1"># in case ask for len smaller than seed list</span>
+
+<span class="k">def</span> <span class="nf">fibonacci_range</span><span class="p">(</span><span class="n">limit</span><span class="p">):</span>   <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Returns a list of Fibonacci numbers less than limit&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="n">next_fibo</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">next_fibo</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">next_fibo</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">fibonacci_range_signed</span><span class="p">(</span><span class="n">limit</span><span class="p">):</span>   <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Returns a symmetric list of pos/neg Fibonacci numbers with abs(val) less than to limit&quot;</span>
+    <span class="n">pos_vals</span> <span class="o">=</span> <span class="n">fibonacci_range</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">neg_vals</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">),</span> <span class="n">fibonacci_range</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="p">(</span><span class="n">pos_vals</span> <span class="o">+</span> <span class="n">neg_vals</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">assert_rel_equal</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+    <span class="k">assert</span> <span class="n">digits</span>
+    <span class="n">max_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="nb">max</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">))</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span> <span class="p">))</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">/</span> <span class="n">max_val</span>
+    <span class="n">cmpr</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="n">digits</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ratio</span> <span class="o">&lt;</span> <span class="n">cmpr</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span> <span class="s1">&#39;assert_rel_equal(): x={}  y={}  digits={}  max_val={}  delta={}  ratio={}  cmpr={} &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">digits</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">cmpr</span> <span class="p">))</span>
+        <span class="k">assert</span> <span class="bp">False</span>
+
+<span class="c1">#todo ensure all have tests</span>
+
+<span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts arg to a &#39;bytes&#39; object.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span> <span class="nb">bytearray</span><span class="p">(</span> <span class="n">arg</span> <span class="p">))</span>    <span class="c1"># if python2, &#39;bytes&#39; is synonym for &#39;str&#39;</span>
+
+<span class="k">def</span> <span class="nf">str_to_bytes</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a string arg to a &#39;bytes&#39; object.&quot;&quot;&quot;</span>
+    <span class="n">assert_type_str</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Convert an ASCII string to &#39;bytes&#39;. Works on both Python2 and Python3.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span><span class="n">arg</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">bytes_to_uint8_list</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="sd">&quot;&quot;&quot;Converts a &#39;bytes&#39; arg to a list of uint8&quot;&quot;&quot;</span>
+    <span class="n">assert_type_bytes</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span><span class="n">arg</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">int32_to_hexstr</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a 32-bit unsigned integer value to a hex string .&quot;&quot;&quot;</span>
+    <span class="n">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">format</span><span class="p">(</span> <span class="n">curr_utc_secs</span><span class="p">(),</span> <span class="s1">&#39;08x&#39;</span> <span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">split_float</span><span class="p">(</span> <span class="n">fval</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Splits a float into integer and fractional parts.&quot;&quot;&quot;</span>
+    <span class="n">frac</span><span class="p">,</span> <span class="n">whole</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">modf</span><span class="p">(</span> <span class="n">fval</span> <span class="p">)</span>
+    <span class="n">micros</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="nb">round</span><span class="p">(</span> <span class="n">frac</span> <span class="o">*</span> <span class="mi">1000000</span> <span class="p">))</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">whole</span><span class="p">),</span> <span class="n">micros</span>
+
+<span class="k">def</span> <span class="nf">curr_utc_timetuple</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) tuple.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">test_ctx</span>
+    <span class="k">if</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span> <span class="n">utc_secs</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span>
+
+<span class="k">def</span> <span class="nf">curr_utc_secs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
+    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">curr_utc_timetuple</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">secs</span>
+
+<span class="k">def</span> <span class="nf">curr_utc_secs_hexstr</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">int32_to_hexstr</span><span class="p">(</span><span class="n">curr_utc_secs</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a time tuple from (secs, usecs) to float.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">secs</span> <span class="o">+</span> <span class="p">(</span><span class="n">usecs</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">timeTuple_subtract</span><span class="p">(</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subtracts two time tuples in (secs, usecs) format, returning a float result.&quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">us1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts1</span>
+    <span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">us2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts2</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">timeTuple_to_float</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">us1</span><span class="p">)</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">timeTuple_to_float</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">us2</span><span class="p">)</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span>
+    <span class="k">return</span> <span class="n">delta</span>
+
+<span class="k">def</span> <span class="nf">chrList_to_str</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a list of characters to a string&quot;&quot;&quot;</span>
+    <span class="c1">#todo verify input type &amp; values [0..255]</span>
+    <span class="n">strval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">strval</span>
+
+<span class="c1">#todo move to pcapng.list (or delete?); only(), second(), last(), butlast(), rest()</span>
+<span class="k">def</span> <span class="nf">first</span><span class="p">(</span> <span class="n">lst</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the first item in a sequence.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">select_keys</span><span class="p">(</span> <span class="n">src_dict</span><span class="p">,</span> <span class="n">keys_lst</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a new dict containing the specified keys (&amp; values) from src_dict.&quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys_lst</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span> <span class="n">key</span> <span class="p">]</span> <span class="o">=</span> <span class="n">src_dict</span><span class="p">[</span> <span class="n">key</span> <span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">classname</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="s2">&quot;Returns a string with the fully-qualified class name of an object&quot;</span>
+    <span class="n">module_str</span>  <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
+    <span class="n">class_str</span>   <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">return</span> <span class="s1">&#39;{}.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">module_str</span><span class="p">,</span> <span class="n">class_str</span> <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">dict_merge_all</span><span class="p">(</span> <span class="n">dict_lst</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="n">assert_type_list</span><span class="p">(</span><span class="n">dict_lst</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">curr_dict</span> <span class="ow">in</span> <span class="n">dict_lst</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">curr_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="c1">#todo move to pcapng.bytes</span>
+<span class="c1">#-----------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">block32_ceil_num_bytes</span><span class="p">(</span><span class="n">curr_len</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of bytes (n &gt;= curr_len) at the next 32-bit boundary&quot;&quot;&quot;</span>
+    <span class="n">num_blks</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">curr_len</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.0</span>
+    <span class="n">num_blks_pad</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span> <span class="n">num_blks</span> <span class="p">))</span>
+    <span class="n">num_bytes_pad</span> <span class="o">=</span> <span class="n">num_blks_pad</span> <span class="o">*</span> <span class="mi">4</span>
+    <span class="k">return</span> <span class="n">num_bytes_pad</span>
+
+<span class="k">def</span> <span class="nf">pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">tgt_length</span><span class="p">,</span> <span class="n">padval</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add (n&gt;=0) &#39;padval&#39; bytes to extend data to tgt_length&quot;&quot;&quot;</span>
+    <span class="n">num_bytes_needed</span> <span class="o">=</span> <span class="n">tgt_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">num_bytes_needed</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;padding cannot be negative&quot;</span>
+    <span class="n">data_bytes_pad</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">([</span><span class="n">padval</span><span class="p">])</span> <span class="o">*</span> <span class="n">num_bytes_needed</span>
+    <span class="k">return</span> <span class="n">data_bytes_pad</span>
+
+<span class="k">def</span> <span class="nf">block32_pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pad data with (n&gt;=0) 0x00 bytes to reach the next 32-bit boundary&quot;&quot;&quot;</span>
+    <span class="n">padded_len</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">padded_len</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">assert_block32_length</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Assert that data length is at a 32-bit boundary&quot;&quot;&quot;</span>
+    <span class="n">rem_bytes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">rem_bytes</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;data must be 32-bit aligned; len={}  rem_bytes={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">rem_bytes</span> <span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">block32_bytes_pack</span><span class="p">(</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
+    <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
+    <span class="k">return</span> <span class="n">packed_bytes</span>
+
+<span class="k">def</span> <span class="nf">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="p">(</span><span class="n">content_len</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">content_len_pad</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="n">content_len</span><span class="p">)</span>
+    <span class="n">packed_bytes_nohdr</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[:</span><span class="n">content_len</span><span class="p">]</span>
+    <span class="n">remaining_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[</span><span class="n">content_len_pad</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
+
+<span class="k">def</span> <span class="nf">block32_labelled_bytes_pack</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
+    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">total_len</span>   <span class="o">=</span> <span class="mi">12</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content_bytes_pad</span> <span class="p">)</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
+    <span class="k">return</span> <span class="n">packed_bytes</span>
+
+<span class="k">def</span> <span class="nf">block32_labelled_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">content_bytes</span>       <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">12</span><span class="o">+</span><span class="n">content_len</span><span class="p">]</span>
+    <span class="n">remaining_bytes</span>     <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="n">total_len</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">label</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
+</pre></div>
+
+  </div>
+
+  </header>
+
+  <section id="section-items">
+    <h2 class="section-title" id="header-variables">Module variables</h2>
+      <div class="item">
+      <p id="pcapng.util.test_ctx" class="name">var <span class="ident">test_ctx</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+
+    <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_block32_length">
+    <p>def <span class="ident">assert_block32_length</span>(</p><p>data)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Assert that data length is at a 32-bit boundary</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_block32_length', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_block32_length" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_block32_length</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Assert that data length is at a 32-bit boundary&quot;&quot;&quot;</span>
+    <span class="n">rem_bytes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">rem_bytes</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;data must be 32-bit aligned; len={}  rem_bytes={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">rem_bytes</span> <span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_int16">
+    <p>def <span class="ident">assert_int16</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int16', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_int16" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_int32">
+    <p>def <span class="ident">assert_int32</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int32', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_int32" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_int64">
+    <p>def <span class="ident">assert_int64</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int64', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_int64" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_int8">
+    <p>def <span class="ident">assert_int8</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int8', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_int8" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                 <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span>  <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_python2">
+    <p>def <span class="ident">assert_python2</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_python2', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_python2" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_python2</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">is_python2</span><span class="p">()</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_rel_equal">
+    <p>def <span class="ident">assert_rel_equal</span>(</p><p>x, y, digits=None)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_rel_equal', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_rel_equal" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_rel_equal</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+    <span class="k">assert</span> <span class="n">digits</span>
+    <span class="n">max_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="nb">max</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">))</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span> <span class="p">))</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">/</span> <span class="n">max_val</span>
+    <span class="n">cmpr</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="n">digits</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ratio</span> <span class="o">&lt;</span> <span class="n">cmpr</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span> <span class="s1">&#39;assert_rel_equal(): x={}  y={}  digits={}  max_val={}  delta={}  ratio={}  cmpr={} &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">digits</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">cmpr</span> <span class="p">))</span>
+        <span class="k">assert</span> <span class="bp">False</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_bytearray">
+    <p>def <span class="ident">assert_type_bytearray</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_bytearray', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_bytearray" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_bytearray</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>       <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytearray</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_bytes">
+    <p>def <span class="ident">assert_type_bytes</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_bytes', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_bytes" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_bytes</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>           <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_dict">
+    <p>def <span class="ident">assert_type_dict</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_dict', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_dict" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_dict</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_list">
+    <p>def <span class="ident">assert_type_list</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_list', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_list" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_list</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_set">
+    <p>def <span class="ident">assert_type_set</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_set', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_set" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_set</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_str">
+    <p>def <span class="ident">assert_type_str</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_str', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_str" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_str</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_uint16">
+    <p>def <span class="ident">assert_uint16</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint16', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_uint16" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_uint32">
+    <p>def <span class="ident">assert_uint32</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint32', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_uint32" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_uint64">
+    <p>def <span class="ident">assert_uint64</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint64', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_uint64" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_uint8">
+    <p>def <span class="ident">assert_uint8</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint8', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_uint8" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_uint8_list">
+    <p>def <span class="ident">assert_uint8_list</span>(</p><p>listy)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Assert the arg is a list of uint8 values</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint8_list', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_uint8_list" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the arg is a list of uint8 values&quot;</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">listy</span><span class="p">:</span>
+        <span class="n">assert_uint8</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_vec16_uint8">
+    <p>def <span class="ident">assert_vec16_uint8</span>(</p><p>listy)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Assert the argument is a length 16 list of uint8 values</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_vec16_uint8', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_vec16_uint8" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_vec16_uint8</span><span class="p">(</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the argument is a length 16 list of uint8 values&quot;</span>
+<span class="c1">#   print( &#39;#140  type={}  len={}  value={} &#39;.format( type(listy), len(listy), listy ))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">listy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">16</span>
+    <span class="n">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_vec4_uint8">
+    <p>def <span class="ident">assert_vec4_uint8</span>(</p><p>listy)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Assert the argument is a length 4 list of uint8 values</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_vec4_uint8', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_vec4_uint8" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_vec4_uint8</span><span class="p">(</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the argument is a length 4 list of uint8 values&quot;</span>
+    <span class="k">print</span><span class="p">(</span> <span class="s1">&#39;#140  type={}  len={}  value={} &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span><span class="n">listy</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">listy</span><span class="p">),</span> <span class="n">listy</span> <span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">listy</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="n">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_bytes_pack">
+    <p>def <span class="ident">block32_bytes_pack</span>(</p><p>content=[])</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_bytes_pack', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_bytes_pack" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_bytes_pack</span><span class="p">(</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
+    <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
+    <span class="k">return</span> <span class="n">packed_bytes</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_bytes_unpack_rolling">
+    <p>def <span class="ident">block32_bytes_unpack_rolling</span>(</p><p>packed_bytes)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_bytes_unpack_rolling', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_bytes_unpack_rolling" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="p">(</span><span class="n">content_len</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">content_len_pad</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="n">content_len</span><span class="p">)</span>
+    <span class="n">packed_bytes_nohdr</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[:</span><span class="n">content_len</span><span class="p">]</span>
+    <span class="n">remaining_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[</span><span class="n">content_len_pad</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_ceil_num_bytes">
+    <p>def <span class="ident">block32_ceil_num_bytes</span>(</p><p>curr_len)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the number of bytes (n &gt;= curr_len) at the next 32-bit boundary</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_ceil_num_bytes', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_ceil_num_bytes" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_ceil_num_bytes</span><span class="p">(</span><span class="n">curr_len</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of bytes (n &gt;= curr_len) at the next 32-bit boundary&quot;&quot;&quot;</span>
+    <span class="n">num_blks</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">curr_len</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.0</span>
+    <span class="n">num_blks_pad</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span> <span class="n">num_blks</span> <span class="p">))</span>
+    <span class="n">num_bytes_pad</span> <span class="o">=</span> <span class="n">num_blks_pad</span> <span class="o">*</span> <span class="mi">4</span>
+    <span class="k">return</span> <span class="n">num_bytes_pad</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_labelled_bytes_pack">
+    <p>def <span class="ident">block32_labelled_bytes_pack</span>(</p><p>label, content=[])</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_labelled_bytes_pack', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_labelled_bytes_pack" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_labelled_bytes_pack</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
+    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">total_len</span>   <span class="o">=</span> <span class="mi">12</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content_bytes_pad</span> <span class="p">)</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
+    <span class="k">return</span> <span class="n">packed_bytes</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_labelled_bytes_unpack_rolling">
+    <p>def <span class="ident">block32_labelled_bytes_unpack_rolling</span>(</p><p>packed_bytes)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_labelled_bytes_unpack_rolling', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_labelled_bytes_unpack_rolling" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_labelled_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">content_bytes</span>       <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">12</span><span class="o">+</span><span class="n">content_len</span><span class="p">]</span>
+    <span class="n">remaining_bytes</span>     <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="n">total_len</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">label</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_pad_bytes">
+    <p>def <span class="ident">block32_pad_bytes</span>(</p><p>data_bytes)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Pad data with (n&gt;=0) 0x00 bytes to reach the next 32-bit boundary</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_pad_bytes', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_pad_bytes" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pad data with (n&gt;=0) 0x00 bytes to reach the next 32-bit boundary&quot;&quot;&quot;</span>
+    <span class="n">padded_len</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">padded_len</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.bytes_to_uint8_list">
+    <p>def <span class="ident">bytes_to_uint8_list</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Converts a 'bytes' arg to a list of uint8</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.bytes_to_uint8_list', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.bytes_to_uint8_list" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">bytes_to_uint8_list</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="sd">&quot;&quot;&quot;Converts a &#39;bytes&#39; arg to a list of uint8&quot;&quot;&quot;</span>
+    <span class="n">assert_type_bytes</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span><span class="n">arg</span><span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.chrList_to_str">
+    <p>def <span class="ident">chrList_to_str</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Convert a list of characters to a string</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.chrList_to_str', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.chrList_to_str" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">chrList_to_str</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a list of characters to a string&quot;&quot;&quot;</span>
+    <span class="c1">#todo verify input type &amp; values [0..255]</span>
+    <span class="n">strval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">strval</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.classname">
+    <p>def <span class="ident">classname</span>(</p><p>obj)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a string with the fully-qualified class name of an object</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.classname', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.classname" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">classname</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="s2">&quot;Returns a string with the fully-qualified class name of an object&quot;</span>
+    <span class="n">module_str</span>  <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
+    <span class="n">class_str</span>   <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">return</span> <span class="s1">&#39;{}.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">module_str</span><span class="p">,</span> <span class="n">class_str</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.curr_utc_secs">
+    <p>def <span class="ident">curr_utc_secs</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the current UTC time in integer seconds.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_utc_secs', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_utc_secs" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_utc_secs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
+    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">curr_utc_timetuple</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">secs</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.curr_utc_secs_hexstr">
+    <p>def <span class="ident">curr_utc_secs_hexstr</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the current UTC time in integer seconds.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_utc_secs_hexstr', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_utc_secs_hexstr" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_utc_secs_hexstr</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">int32_to_hexstr</span><span class="p">(</span><span class="n">curr_utc_secs</span><span class="p">())</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.curr_utc_timetuple">
+    <p>def <span class="ident">curr_utc_timetuple</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the current UTC time as a (secs, usecs) tuple.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_utc_timetuple', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_utc_timetuple" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_utc_timetuple</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) tuple.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">test_ctx</span>
+    <span class="k">if</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span> <span class="n">utc_secs</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.dict_merge">
+    <p>def <span class="ident">dict_merge</span>(</p><p>a, b)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.dict_merge', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.dict_merge" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.dict_merge_all">
+    <p>def <span class="ident">dict_merge_all</span>(</p><p>dict_lst)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.dict_merge_all', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.dict_merge_all" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">dict_merge_all</span><span class="p">(</span> <span class="n">dict_lst</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="n">assert_type_list</span><span class="p">(</span><span class="n">dict_lst</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">curr_dict</span> <span class="ow">in</span> <span class="n">dict_lst</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">curr_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.fibonacci_list">
+    <p>def <span class="ident">fibonacci_list</span>(</p><p>n)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a list of the first n Fibonacci numbers</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.fibonacci_list', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.fibonacci_list" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">fibonacci_list</span><span class="p">(</span> <span class="n">n</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns a list of the first n Fibonacci numbers&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="n">next_fibo</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">next_fibo</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>   <span class="c1"># in case ask for len smaller than seed list</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.fibonacci_range">
+    <p>def <span class="ident">fibonacci_range</span>(</p><p>limit)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a list of Fibonacci numbers less than limit</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.fibonacci_range', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.fibonacci_range" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">fibonacci_range</span><span class="p">(</span><span class="n">limit</span><span class="p">):</span>   <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Returns a list of Fibonacci numbers less than limit&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="n">next_fibo</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">next_fibo</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">next_fibo</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.fibonacci_range_signed">
+    <p>def <span class="ident">fibonacci_range_signed</span>(</p><p>limit)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a symmetric list of pos/neg Fibonacci numbers with abs(val) less than to limit</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.fibonacci_range_signed', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.fibonacci_range_signed" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">fibonacci_range_signed</span><span class="p">(</span><span class="n">limit</span><span class="p">):</span>   <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Returns a symmetric list of pos/neg Fibonacci numbers with abs(val) less than to limit&quot;</span>
+    <span class="n">pos_vals</span> <span class="o">=</span> <span class="n">fibonacci_range</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+    <span class="n">neg_vals</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">),</span> <span class="n">fibonacci_range</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="p">(</span><span class="n">pos_vals</span> <span class="o">+</span> <span class="n">neg_vals</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.first">
+    <p>def <span class="ident">first</span>(</p><p>lst)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the first item in a sequence.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.first', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.first" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">first</span><span class="p">(</span> <span class="n">lst</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the first item in a sequence.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.int32_to_hexstr">
+    <p>def <span class="ident">int32_to_hexstr</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Converts a 32-bit unsigned integer value to a hex string .</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.int32_to_hexstr', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.int32_to_hexstr" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">int32_to_hexstr</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a 32-bit unsigned integer value to a hex string .&quot;&quot;&quot;</span>
+    <span class="n">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">format</span><span class="p">(</span> <span class="n">curr_utc_secs</span><span class="p">(),</span> <span class="s1">&#39;08x&#39;</span> <span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.is_python2">
+    <p>def <span class="ident">is_python2</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.is_python2', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.is_python2" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">is_python2</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">micro</span><span class="p">,</span> <span class="n">release_level</span><span class="p">,</span> <span class="n">serial</span><span class="p">)</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">major</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">minor</span> <span class="o">==</span> <span class="mi">7</span><span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.is_python3">
+    <p>def <span class="ident">is_python3</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.is_python3', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.is_python3" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">is_python3</span><span class="p">():</span>
+    <span class="p">(</span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">micro</span><span class="p">,</span> <span class="n">release_level</span><span class="p">,</span> <span class="n">serial</span><span class="p">)</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">major</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">minor</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.pad_bytes">
+    <p>def <span class="ident">pad_bytes</span>(</p><p>data_bytes, tgt_length, padval=0)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Add (n&gt;=0) 'padval' bytes to extend data to tgt_length</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.pad_bytes', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.pad_bytes" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">tgt_length</span><span class="p">,</span> <span class="n">padval</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add (n&gt;=0) &#39;padval&#39; bytes to extend data to tgt_length&quot;&quot;&quot;</span>
+    <span class="n">num_bytes_needed</span> <span class="o">=</span> <span class="n">tgt_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">num_bytes_needed</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;padding cannot be negative&quot;</span>
+    <span class="n">data_bytes_pad</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">([</span><span class="n">padval</span><span class="p">])</span> <span class="o">*</span> <span class="n">num_bytes_needed</span>
+    <span class="k">return</span> <span class="n">data_bytes_pad</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.select_keys">
+    <p>def <span class="ident">select_keys</span>(</p><p>src_dict, keys_lst)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a new dict containing the specified keys (&amp; values) from src_dict.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.select_keys', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.select_keys" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">select_keys</span><span class="p">(</span> <span class="n">src_dict</span><span class="p">,</span> <span class="n">keys_lst</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a new dict containing the specified keys (&amp; values) from src_dict.&quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys_lst</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span> <span class="n">key</span> <span class="p">]</span> <span class="o">=</span> <span class="n">src_dict</span><span class="p">[</span> <span class="n">key</span> <span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.split_float">
+    <p>def <span class="ident">split_float</span>(</p><p>fval)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Splits a float into integer and fractional parts.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.split_float', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.split_float" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">split_float</span><span class="p">(</span> <span class="n">fval</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Splits a float into integer and fractional parts.&quot;&quot;&quot;</span>
+    <span class="n">frac</span><span class="p">,</span> <span class="n">whole</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">modf</span><span class="p">(</span> <span class="n">fval</span> <span class="p">)</span>
+    <span class="n">micros</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="nb">round</span><span class="p">(</span> <span class="n">frac</span> <span class="o">*</span> <span class="mi">1000000</span> <span class="p">))</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">whole</span><span class="p">),</span> <span class="n">micros</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.str_to_bytes">
+    <p>def <span class="ident">str_to_bytes</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Converts a string arg to a 'bytes' object.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.str_to_bytes', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.str_to_bytes" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">str_to_bytes</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a string arg to a &#39;bytes&#39; object.&quot;&quot;&quot;</span>
+    <span class="n">assert_type_str</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Convert an ASCII string to &#39;bytes&#39;. Works on both Python2 and Python3.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span><span class="n">arg</span><span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.test_time_utc_set">
+    <p>def <span class="ident">test_time_utc_set</span>(</p><p>utc_secs)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.test_time_utc_set', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.test_time_utc_set" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_time_utc_set</span><span class="p">(</span><span class="n">utc_secs</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">test_ctx</span>
+    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">utc_secs</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.test_time_utc_unset">
+    <p>def <span class="ident">test_time_utc_unset</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.test_time_utc_unset', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.test_time_utc_unset" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_time_utc_unset</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">test_ctx</span>
+    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.timeTuple_subtract">
+    <p>def <span class="ident">timeTuple_subtract</span>(</p><p>ts1, ts2)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Subtracts two time tuples in (secs, usecs) format, returning a float result.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.timeTuple_subtract', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.timeTuple_subtract" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timeTuple_subtract</span><span class="p">(</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subtracts two time tuples in (secs, usecs) format, returning a float result.&quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">us1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts1</span>
+    <span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">us2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts2</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">timeTuple_to_float</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">us1</span><span class="p">)</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">timeTuple_to_float</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">us2</span><span class="p">)</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span>
+    <span class="k">return</span> <span class="n">delta</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.timeTuple_to_float">
+    <p>def <span class="ident">timeTuple_to_float</span>(</p><p>secs, usecs)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Converts a time tuple from (secs, usecs) to float.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.timeTuple_to_float', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.timeTuple_to_float" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts a time tuple from (secs, usecs) to float.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">secs</span> <span class="o">+</span> <span class="p">(</span><span class="n">usecs</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.to_bytes">
+    <p>def <span class="ident">to_bytes</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Converts arg to a 'bytes' object.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.to_bytes', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.to_bytes" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts arg to a &#39;bytes&#39; object.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span> <span class="nb">bytearray</span><span class="p">(</span> <span class="n">arg</span> <span class="p">))</span>    <span class="c1"># if python2, &#39;bytes&#39; is synonym for &#39;str&#39;</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+
+
+  </section>
+
+    </article>
+  <div class="clear"> </div>
+  <footer id="footer">
+    <p>
+      Documentation generated by
+      <a href="https://github.com/BurntSushi/pdoc">pdoc 0.3.2</a>
+    </p>
+
+    <p>pdoc is in the public domain with the
+      <a href="http://unlicense.org">UNLICENSE</a></p>
+
+    <p>Design by <a href="http://nadh.in">Kailash Nadh</a></p>
+  </footer>
+</div>
+</body>
+</html>

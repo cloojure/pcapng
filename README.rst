@@ -84,11 +84,13 @@ Blocks may also be serialized & deserialized in bulk, as seen in the unit tests:
 Installation
 ============
 
-  sudo pip install pcapng
+Install from the Python Package Index (PyPI)::
+
+    sudo pip install pcapng
 
 
 API Documentation
-============
+=================
 
 Point your browser to the included HTML documentation::
 
@@ -96,13 +98,13 @@ Point your browser to the included HTML documentation::
 
 
 Sample Programs
-========
+===============
 
-Please see the sample programs:
+Please see the sample programs::
 
-  - isis_agent_pcapng.py    # real-time packet capture from your machine into a PCAPNG file
-  - isis_demo_mrt.py        # same as above but save in Custom Block MRT format 
-  - pcapng_timing.py        # capure 1M sample packets
+    isis_agent_pcapng.py    # real-time packet capture from your machine into a PCAPNG file
+    isis_demo_mrt.py        # same as above but save in Custom Block MRT format
+    pcapng_timing.py        # capure 1M sample packets
 
 The program `isis_agent_pcapng.py` creates an output file `data.pcapng`, which is `viewable in
 Wireshark.  <https://www.wireshark.org/>` 
@@ -121,11 +123,10 @@ Generating Documentation
 ========================
 
 Documentation uses the `pdoc` tool.  Note that pdoc generates documentation from the installed
-`pcapng` package, not directly from thesource code.  To use:
+`pcapng` package, not directly from thesource code.  To use::
 
-  - sudo pip install pdoc       # install pdoc if not present
-  - ./generate-docs.bash        # generate docs
-
+    sudo pip install pdoc       # install pdoc if not present
+    ./generate-docs.bash        # generate docs
 
 Endian Convention
 =================

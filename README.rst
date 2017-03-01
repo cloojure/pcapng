@@ -132,7 +132,7 @@ Documentation uses the ``pdoc`` tool.  Note that pdoc generates documentation fr
 Endian Convention
 =================
 
-The `PCAPNG specificaion <https://pcapng.github.io/pcapng/>`_ mandates that data be saved in the
+`The PCAPNG specificaion <https://pcapng.github.io/pcapng/>`_ mandates that data be saved in the
 native endian format of the capturing machine. This avoids the possible need for byte-swapping
 during data capture, which may aid in efficiency. However, a reader of a PCAPNG file is obligated to
 examine the special BYTE_ORDER_MAGIC field of the Section Header Block in order to determine the

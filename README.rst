@@ -77,7 +77,7 @@ Blocks may also be serialized & deserialized in bulk, as seen in the unit tests:
           pcap_fp.close()
 
       util.assert_block32_length( packed_bytes )
-      blk_lst_unpacked = pcapng.block.unpack_blocks( packed_bytes )
+      blk_lst_unpacked = pcapng.block.unpack_all( packed_bytes )
       assert blk_lst == blk_lst_unpacked
 
 

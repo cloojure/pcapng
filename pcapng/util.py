@@ -106,6 +106,18 @@ def assert_vec16_uint8( listy ):
 
 #-----------------------------------------------------------------------------
 
+def mod( numer, demon ):  #todo need test
+    dummy, remainder = divmod( numer, demon )
+    return remainder
+
+def quot( numer, demon ):  #todo need test
+    quotient, dummy = divmod( numer, demon )
+    return quotient
+
+def take( n, listy):
+    "Return the first n values from a list or a generator"
+    return list( listy )[ :n ]
+
 #todo make a pow2_range(), pow2_thru() fns (0 1 2 4 8 16 32 ...)
 #todo make a sqr_range(), sqr_thru() fns (0 1 2 4 9 16 25 36 ...)
 
@@ -140,9 +152,6 @@ def fibonacci_range_signed(limit):   #todo need test
     result = sorted( (pos_vals + neg_vals), key=(lambda x: abs(x)))
     return result
 
-def mod( numer, demon ):
-    dummy, remainder = divmod( numer, demon )
-    return remainder
 
 #-----------------------------------------------------------------------------
 def assert_rel_equal( x, y, digits=None ):

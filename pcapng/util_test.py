@@ -211,3 +211,14 @@ def test_time():
     util.test_time_utc_set(123456)
     assert '0x0001e240' == util.curr_utc_secs_hexstr()
     util.test_time_utc_unset()
+
+
+def test_take():
+    def generate_ints(N):
+        for i in range(N):
+            yield i
+    gen_vals = generate_ints(99)
+    lst_vals = [0,1,2,3,4,5,6,7,8,9]
+    assert ( [0,1,2,3,4] == util.take( 5, gen_vals )
+                         == util.take( 5, lst_vals ))
+

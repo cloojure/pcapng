@@ -590,7 +590,7 @@ def segment_all(raw_bytes):
         raw_bytes = raw_bytes_remaining
     return blk_segments
 
-def unpack_blocks(packed_bytes):
+def unpack_all(packed_bytes):
     """Given concatenated packed bytes for PCAPNG blocks, returns a list of PCAPNG block objects"""
     result = []
     blk_segments = segment_all( packed_bytes )

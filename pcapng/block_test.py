@@ -170,6 +170,6 @@ def test_blocks_lst():
         pcap_fp.close()
 
     util.assert_block32_length( packed_bytes )
-    blk_lst_unpacked = block.unpack_blocks( packed_bytes )
+    blk_lst_unpacked = block.unpack_all(packed_bytes)
     assert blk_lst == blk_lst_unpacked
 

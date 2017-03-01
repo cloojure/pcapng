@@ -95,7 +95,7 @@ API Documentation
 
 Point your browser to the included HTML documentation::
 
-    firefox `doc/pcapng/index.html`         # or similar (system dependent)
+    firefox doc/pcapng/index.html         # or similar (system dependent)
 
 
 Sample Programs
@@ -107,15 +107,15 @@ Please see the sample programs::
     isis_demo_mrt.py        # same as above but save in Custom Block MRT format
     pcapng_timing.py        # capure 1M sample packets
 
-The program `isis_agent_pcapng.py` creates an output file `data.pcapng`, which is `viewable in
+The program isis_agent_pcapng.py creates an output file **data.pcapng**, which is `viewable in
 Wireshark.  <https://www.wireshark.org/>`_
 
-The program `isis_demo_mrt.py` creates two output files `isis.mrt` & `isis.pcapng`. The first of
+The program **isis_demo_mrt.py** creates two output files **isis.mrt** & **isis.pcapng**. The first of
 thes is in raw MRT format and is not viewable by Wireshark.  For the second file, each raw MRT block
 is wrapped in a PCAPNG Custom Block.  The file may be loaded successfully in Wireshark; however,
 since Wireshark doesn't understand the custom format, it produces a blank display.
 
-The third program `pcapng_timing.py` writes 1 million dummy packets to a PCAPNG file. A flag selects
+The third program **pcapng_timing.py** writes 1 million dummy packets to a PCAPNG file. A flag selects
 either Simple Packet Block or Enhanced Packet Block output format.  Execution on a representative
 computer yields execution times of ~6 seconds and ~16 seconds for SPB and EPB formats, respectively.
 
@@ -123,8 +123,8 @@ computer yields execution times of ~6 seconds and ~16 seconds for SPB and EPB fo
 Generating Documentation 
 ========================
 
-Documentation uses the `pdoc` tool.  Note that pdoc generates documentation from the installed
-`pcapng` package, not directly from thesource code.  To use::
+Documentation uses the **pdoc** tool.  Note that pdoc generates documentation from the installed
+**pcapng** package, not directly from thesource code.  To use::
 
     sudo pip install pdoc       # install pdoc if not present
     ./generate-docs.bash        # generate docs

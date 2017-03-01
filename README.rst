@@ -4,7 +4,8 @@ Tool for reading/writing PCAPNG network packet capture files
 Alan Thompson, Brocade
 athomps@brocade.com
 
-Please see the IETF document `PCAP Next Generation (pcapng) Capture File Format <https://pcapng.github.io/pcapng/>`_
+Please see the IETF document `PCAP Next Generation
+(pcapng) Capture File Format <https://pcapng.github.io/pcapng/>`_
 
 Please also see the project `home page on GitLab <https://gitlab.com/netdev-americas/pcapng/>`_
  and `at PyPI - the Python Package Index <https://pypi.python.org/pypi/pcapng>`_
@@ -107,7 +108,7 @@ Please see the sample programs::
     pcapng_timing.py        # capure 1M sample packets
 
 The program `isis_agent_pcapng.py` creates an output file `data.pcapng`, which is `viewable in
-Wireshark.  <https://www.wireshark.org/>` 
+Wireshark.  <https://www.wireshark.org/>`_
 
 The program `isis_demo_mrt.py` creates two output files `isis.mrt` & `isis.pcapng`. The first of
 thes is in raw MRT format and is not viewable by Wireshark.  For the second file, each raw MRT block
@@ -131,7 +132,7 @@ Documentation uses the `pdoc` tool.  Note that pdoc generates documentation from
 Endian Convention
 =================
 
-The `PCAPNG specificaion <https://pcapng.github.io/pcapng/>` mandates that data be saved in the
+The `PCAPNG specificaion <https://pcapng.github.io/pcapng/>`_ mandates that data be saved in the
 native endian format of the capturing machine. This avoids the possible need for byte-swapping
 during data capture, which may aid in efficiency. However, a reader of a PCAPNG file is obligated to
 examine the special BYTE_ORDER_MAGIC field of the Section Header Block in order to determine the

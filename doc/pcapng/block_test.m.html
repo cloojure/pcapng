@@ -1244,7 +1244,7 @@ table {
         <span class="n">pcap_fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="n">util</span><span class="o">.</span><span class="n">assert_block32_length</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
-    <span class="n">blk_lst_unpacked</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">unpack_blocks</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
+    <span class="n">blk_lst_unpacked</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">blk_lst</span> <span class="o">==</span> <span class="n">blk_lst_unpacked</span>
 </pre></div>
 
@@ -1290,7 +1290,7 @@ table {
         <span class="n">pcap_fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="n">util</span><span class="o">.</span><span class="n">assert_block32_length</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
-    <span class="n">blk_lst_unpacked</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">unpack_blocks</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
+    <span class="n">blk_lst_unpacked</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">blk_lst</span> <span class="o">==</span> <span class="n">blk_lst_unpacked</span>
 </pre></div>
 

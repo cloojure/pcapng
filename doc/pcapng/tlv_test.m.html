@@ -1092,34 +1092,34 @@ table {
 
 <span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">pcapng.tlv</span>  <span class="kn">as</span> <span class="nn">tlv</span>
-<span class="kn">import</span> <span class="nn">pcapng.util</span> <span class="kn">as</span> <span class="nn">util</span>
-<span class="kn">from</span>   <span class="nn">pcapng.util</span> <span class="kn">import</span> <span class="n">to_bytes</span>
+<span class="kn">import</span> <span class="nn">pcapng.const</span> <span class="kn">as</span> <span class="nn">const</span>
+<span class="kn">import</span> <span class="nn">pcapng.tlv</span>   <span class="kn">as</span> <span class="nn">tlv</span>
+<span class="kn">import</span> <span class="nn">pcapng.util</span>  <span class="kn">as</span> <span class="nn">util</span>
 
 <span class="c1">#-----------------------------------------------------------------------------</span>
 <span class="k">def</span> <span class="nf">test_uint8</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint8_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint8_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="n">val_unpacked</span>
 
 <span class="k">def</span> <span class="nf">test_uint16</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint16_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint16_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="n">val_unpacked</span>
 
 <span class="k">def</span> <span class="nf">test_uint32</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint32_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint32_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="n">val_unpacked</span>
 
 <span class="k">def</span> <span class="nf">test_uint64</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">64</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint64_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint64_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1127,28 +1127,28 @@ table {
 
 <span class="c1">#-----------------------------------------------------------------------------</span>
 <span class="k">def</span> <span class="nf">test_int8</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int8_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int8_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="n">val_unpacked</span>
 
 <span class="k">def</span> <span class="nf">test_int16</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int16_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int16_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="n">val_unpacked</span>
 
 <span class="k">def</span> <span class="nf">test_int32</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">31</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int32_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int32_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="n">val_unpacked</span>
 
 <span class="k">def</span> <span class="nf">test_int64</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">63</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int64_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int64_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1248,7 +1248,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_int16', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_int16" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_int16</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int16_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int16_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1273,7 +1273,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_int32', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_int32" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_int32</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">31</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int32_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int32_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1298,7 +1298,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_int64', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_int64" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_int64</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">63</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int64_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int64_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1323,7 +1323,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_int8', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_int8" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_int8</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range_signed</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int8_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">int8_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1348,7 +1348,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_uint16', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_uint16" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_uint16</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint16_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint16_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1373,7 +1373,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_uint32', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_uint32" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_uint32</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint32_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint32_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1398,7 +1398,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_uint64', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_uint64" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_uint64</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">64</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint64_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint64_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
@@ -1423,7 +1423,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.tlv_test.test_uint8', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.tlv_test.test_uint8" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_uint8</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span> <span class="p">):</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span> <span class="p">):</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint8_pack</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
         <span class="n">val_unpacked</span> <span class="o">=</span> <span class="n">tlv</span><span class="o">.</span><span class="n">uint8_unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>

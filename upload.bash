@@ -35,7 +35,7 @@ else
   echo ""
   echo ">>> to install, perform:"
   echo ""
-  echo ">>>    sudo pip install --upgrade  pcapng"
+  echo "        sudo pip install --upgrade  pcapng"
   echo ""
 fi
 

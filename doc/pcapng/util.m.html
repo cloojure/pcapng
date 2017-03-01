@@ -1043,7 +1043,7 @@ table {
     <li class="set"><h3><a href="#header-variables">Module variables</a></h3>
       
   <ul>
-    <li class="mono"><a href="#pcapng.util.test_ctx">test_ctx</a></li>
+    <li class="mono"><a href="#pcapng.util.gbl_test_ctx">gbl_test_ctx</a></li>
   </ul>
 
     </li>
@@ -1060,6 +1060,7 @@ table {
     <li class="mono"><a href="#pcapng.util.assert_rel_equal">assert_rel_equal</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_bytearray">assert_type_bytearray</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_bytes">assert_type_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_charLst">assert_type_charLst</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_dict">assert_type_dict</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_list">assert_type_list</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_set">assert_type_set</a></li>
@@ -1071,12 +1072,12 @@ table {
     <li class="mono"><a href="#pcapng.util.assert_uint8_list">assert_uint8_list</a></li>
     <li class="mono"><a href="#pcapng.util.assert_vec16_uint8">assert_vec16_uint8</a></li>
     <li class="mono"><a href="#pcapng.util.assert_vec4_uint8">assert_vec4_uint8</a></li>
-    <li class="mono"><a href="#pcapng.util.block32_bytes_pack">block32_bytes_pack</a></li>
-    <li class="mono"><a href="#pcapng.util.block32_bytes_unpack_rolling">block32_bytes_unpack_rolling</a></li>
     <li class="mono"><a href="#pcapng.util.block32_ceil_num_bytes">block32_ceil_num_bytes</a></li>
-    <li class="mono"><a href="#pcapng.util.block32_labelled_bytes_pack">block32_labelled_bytes_pack</a></li>
-    <li class="mono"><a href="#pcapng.util.block32_labelled_bytes_unpack_rolling">block32_labelled_bytes_unpack_rolling</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_lv_bytes_pack">block32_lv_bytes_pack</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_lv_bytes_unpack_rolling">block32_lv_bytes_unpack_rolling</a></li>
     <li class="mono"><a href="#pcapng.util.block32_pad_bytes">block32_pad_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_tlv_bytes_pack">block32_tlv_bytes_pack</a></li>
+    <li class="mono"><a href="#pcapng.util.block32_tlv_bytes_unpack_rolling">block32_tlv_bytes_unpack_rolling</a></li>
     <li class="mono"><a href="#pcapng.util.bytes_to_uint8_list">bytes_to_uint8_list</a></li>
     <li class="mono"><a href="#pcapng.util.chrList_to_str">chrList_to_str</a></li>
     <li class="mono"><a href="#pcapng.util.classname">classname</a></li>
@@ -1088,11 +1089,13 @@ table {
     <li class="mono"><a href="#pcapng.util.fibonacci_list">fibonacci_list</a></li>
     <li class="mono"><a href="#pcapng.util.fibonacci_range">fibonacci_range</a></li>
     <li class="mono"><a href="#pcapng.util.fibonacci_range_signed">fibonacci_range_signed</a></li>
-    <li class="mono"><a href="#pcapng.util.first">first</a></li>
     <li class="mono"><a href="#pcapng.util.int32_to_hexstr">int32_to_hexstr</a></li>
     <li class="mono"><a href="#pcapng.util.is_python2">is_python2</a></li>
     <li class="mono"><a href="#pcapng.util.is_python3">is_python3</a></li>
+    <li class="mono"><a href="#pcapng.util.mod">mod</a></li>
     <li class="mono"><a href="#pcapng.util.pad_bytes">pad_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.rand_bytes">rand_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.rand_ints">rand_ints</a></li>
     <li class="mono"><a href="#pcapng.util.select_keys">select_keys</a></li>
     <li class="mono"><a href="#pcapng.util.split_float">split_float</a></li>
     <li class="mono"><a href="#pcapng.util.str_to_bytes">str_to_bytes</a></li>
@@ -1137,29 +1140,38 @@ table {
 <span class="c1"># limitations under the License.</span>
 
 
+<span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">pcapng.const</span> <span class="kn">as</span> <span class="nn">const</span>
+<span class="kn">import</span> <span class="nn">pcapng.codec</span>
 
 <span class="c1">#todo check type on all fns</span>
 <span class="c1">#todo verify have tests for all</span>
 
 <span class="c1">#todo migrate fns to general libs</span>
 
+<span class="c1">#-----------------------------------------------------------------------------</span>
 <span class="c1"># Global var&#39;s</span>
-<span class="n">test_ctx</span> <span class="o">=</span> <span class="p">{</span>
+
+<span class="c1"># Test Context: dummy values used for testing purposes</span>
+<span class="n">gbl_test_ctx</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;enable&#39;</span>    <span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-    <span class="s1">&#39;utc_secs&#39;</span>  <span class="p">:</span> <span class="o">-</span><span class="mf">1.2</span>      <span class="c1"># floating point unix time</span>
+    <span class="s1">&#39;utc_secs&#39;</span>  <span class="p">:</span> <span class="o">-</span><span class="mf">12.345</span>      <span class="c1"># floating point unix time</span>
 <span class="p">}</span>
+
 <span class="k">def</span> <span class="nf">test_time_utc_set</span><span class="p">(</span><span class="n">utc_secs</span><span class="p">):</span>
-    <span class="k">global</span> <span class="n">test_ctx</span>
-    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">utc_secs</span>
+    <span class="s2">&quot;Enable testing context with dummy time&quot;</span>
+    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
+    <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">utc_secs</span>
+
 <span class="k">def</span> <span class="nf">test_time_utc_unset</span><span class="p">():</span>
-    <span class="k">global</span> <span class="n">test_ctx</span>
-    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">False</span>
+    <span class="s2">&quot;Disable testing context&quot;</span>
+    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
+    <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">False</span>
 
 <span class="c1">#-----------------------------------------------------------------------------</span>
 
@@ -1172,6 +1184,7 @@ table {
     <span class="k">return</span> <span class="p">((</span><span class="n">major</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">minor</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">assert_python2</span><span class="p">():</span>
+    <span class="s2">&quot;Assert running in Python 2, version 2.7 or later&quot;</span>
     <span class="k">assert</span> <span class="n">is_python2</span><span class="p">()</span>
 
 <span class="c1">#-----------------------------------------------------------------------------</span>
@@ -1193,6 +1206,13 @@ table {
 <span class="k">def</span> <span class="nf">assert_int16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">assert_int32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">assert_int64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">assert_type_charLst</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the arg is a list of characters (len-1 strings)&quot;</span>
+    <span class="n">assert_type_list</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+        <span class="n">assert_type_str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 
 <span class="k">def</span> <span class="nf">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">):</span>
     <span class="s2">&quot;Assert the arg is a list of uint8 values&quot;</span>
@@ -1247,6 +1267,11 @@ table {
     <span class="n">result</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="p">(</span><span class="n">pos_vals</span> <span class="o">+</span> <span class="n">neg_vals</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
     <span class="k">return</span> <span class="n">result</span>
 
+<span class="k">def</span> <span class="nf">mod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">):</span>
+    <span class="n">dummy</span><span class="p">,</span> <span class="n">remainder</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">remainder</span>
+
+<span class="c1">#-----------------------------------------------------------------------------</span>
 <span class="k">def</span> <span class="nf">assert_rel_equal</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
     <span class="k">assert</span> <span class="n">digits</span>
     <span class="n">max_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="nb">max</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">))</span>
@@ -1280,7 +1305,7 @@ table {
 <span class="k">def</span> <span class="nf">int32_to_hexstr</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts a 32-bit unsigned integer value to a hex string .&quot;&quot;&quot;</span>
     <span class="n">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span> <span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">format</span><span class="p">(</span> <span class="n">curr_utc_secs</span><span class="p">(),</span> <span class="s1">&#39;08x&#39;</span> <span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="s1">&#39;{:#010x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">arg</span> <span class="p">))</span>  <span class="c1"># &quot;0x&quot;=2 char + &quot;0123abcd&quot;=8 char = 10 char; &#39;0&#39; filled -&gt; &#39;010&#39;</span>
 
 <span class="k">def</span> <span class="nf">split_float</span><span class="p">(</span> <span class="n">fval</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Splits a float into integer and fractional parts.&quot;&quot;&quot;</span>
@@ -1288,11 +1313,21 @@ table {
     <span class="n">micros</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="nb">round</span><span class="p">(</span> <span class="n">frac</span> <span class="o">*</span> <span class="mi">1000000</span> <span class="p">))</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">whole</span><span class="p">),</span> <span class="n">micros</span>
 
+<span class="k">def</span> <span class="nf">rand_ints</span><span class="p">(</span> <span class="n">num_ints</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span> <span class="p">):</span>    <span class="c1">#todo need test</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_ints</span><span class="p">):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">rand_bytes</span><span class="p">(</span> <span class="n">n</span> <span class="p">):</span>    <span class="c1">#todo need test</span>
+    <span class="n">int_vals</span> <span class="o">=</span> <span class="n">rand_ints</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">int_vals</span> <span class="p">)</span>
+
 <span class="k">def</span> <span class="nf">curr_utc_timetuple</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) tuple.&quot;&quot;&quot;</span>
-    <span class="k">global</span> <span class="n">test_ctx</span>
-    <span class="k">if</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
-        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
+    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
+    <span class="k">if</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span> <span class="n">utc_secs</span> <span class="p">)</span>
@@ -1309,7 +1344,7 @@ table {
 
 <span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts a time tuple from (secs, usecs) to float.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">secs</span> <span class="o">+</span> <span class="p">(</span><span class="n">usecs</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">usecs</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">timeTuple_subtract</span><span class="p">(</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Subtracts two time tuples in (secs, usecs) format, returning a float result.&quot;&quot;&quot;</span>
@@ -1322,14 +1357,9 @@ table {
 
 <span class="k">def</span> <span class="nf">chrList_to_str</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Convert a list of characters to a string&quot;&quot;&quot;</span>
-    <span class="c1">#todo verify input type &amp; values [0..255]</span>
+    <span class="n">assert_type_charLst</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
     <span class="n">strval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">strval</span>
-
-<span class="c1">#todo move to pcapng.list (or delete?); only(), second(), last(), butlast(), rest()</span>
-<span class="k">def</span> <span class="nf">first</span><span class="p">(</span> <span class="n">lst</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the first item in a sequence.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="k">def</span> <span class="nf">select_keys</span><span class="p">(</span> <span class="n">src_dict</span><span class="p">,</span> <span class="n">keys_lst</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns a new dict containing the specified keys (&amp; values) from src_dict.&quot;&quot;&quot;</span>
@@ -1339,12 +1369,13 @@ table {
     <span class="k">return</span> <span class="n">result</span>
 
 <span class="k">def</span> <span class="nf">classname</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="s2">&quot;Returns a string with the fully-qualified class name of an object&quot;</span>
+    <span class="s2">&quot;Given any object, returns the fully-qualified class name as a string&quot;</span>
     <span class="n">module_str</span>  <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
     <span class="n">class_str</span>   <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">return</span> <span class="s1">&#39;{}.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">module_str</span><span class="p">,</span> <span class="n">class_str</span> <span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Merge the contents of two dictionaries, returning a new result&quot;</span>
     <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1353,6 +1384,7 @@ table {
     <span class="k">return</span> <span class="n">result</span>
 
 <span class="k">def</span> <span class="nf">dict_merge_all</span><span class="p">(</span> <span class="n">dict_lst</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Given a list of dict dictionaries, merge the contents returning a new result&quot;</span>
     <span class="n">assert_type_list</span><span class="p">(</span><span class="n">dict_lst</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">curr_dict</span> <span class="ow">in</span> <span class="n">dict_lst</span><span class="p">:</span>
@@ -1372,7 +1404,7 @@ table {
 <span class="k">def</span> <span class="nf">pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">tgt_length</span><span class="p">,</span> <span class="n">padval</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add (n&gt;=0) &#39;padval&#39; bytes to extend data to tgt_length&quot;&quot;&quot;</span>
     <span class="n">num_bytes_needed</span> <span class="o">=</span> <span class="n">tgt_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="p">(</span><span class="n">num_bytes_needed</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;padding cannot be negative&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">num_bytes_needed</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;padding length cannot be negative&quot;</span>
     <span class="n">data_bytes_pad</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">([</span><span class="n">padval</span><span class="p">])</span> <span class="o">*</span> <span class="n">num_bytes_needed</span>
     <span class="k">return</span> <span class="n">data_bytes_pad</span>
 
@@ -1387,32 +1419,41 @@ table {
     <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">rem_bytes</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;data must be 32-bit aligned; len={}  rem_bytes={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">rem_bytes</span> <span class="p">))</span>
 
-<span class="k">def</span> <span class="nf">block32_bytes_pack</span><span class="p">(</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
+<span class="k">def</span> <span class="nf">block32_lv_bytes_pack</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;Pack arbitrary content using Length-Value (LV) encoding to return packed bytes,</span>
+<span class="sd">    padded to the next 32-bit boundary&quot;&quot;&quot;</span>
     <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
     <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
-    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">codec</span><span class="o">.</span><span class="n">uint32_pack</span><span class="p">(</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
     <span class="k">return</span> <span class="n">packed_bytes</span>
 
-<span class="k">def</span> <span class="nf">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
-    <span class="p">(</span><span class="n">content_len</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
+<span class="k">def</span> <span class="nf">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given multiple blocks of Length-Value (LV) encoded packed bytes, unpack and return the first</span>
+<span class="sd">    content of the first block, and the remaining bytes.&quot;&quot;&quot;</span>
+    <span class="n">content_len</span> <span class="o">=</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">codec</span><span class="o">.</span><span class="n">uint32_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
     <span class="n">content_len_pad</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="n">content_len</span><span class="p">)</span>
     <span class="n">packed_bytes_nohdr</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
     <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[:</span><span class="n">content_len</span><span class="p">]</span>
     <span class="n">remaining_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[</span><span class="n">content_len_pad</span><span class="p">:]</span>
     <span class="k">return</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
 
-<span class="k">def</span> <span class="nf">block32_labelled_bytes_pack</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
+<span class="k">def</span> <span class="nf">block32_tlv_bytes_pack</span><span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;Pack arbitrary content using Type-Length-Value (TLV) encoding to return packed bytes,</span>
+<span class="sd">    padded to the next 32-bit boundary&quot;&quot;&quot;</span>
     <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
     <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
     <span class="n">total_len</span>   <span class="o">=</span> <span class="mi">12</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content_bytes_pad</span> <span class="p">)</span>
-    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>  <span class="c1">#todo -&gt; pcapng.codec.uint32_pack</span>
     <span class="k">return</span> <span class="n">packed_bytes</span>
 
-<span class="k">def</span> <span class="nf">block32_labelled_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
-    <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span> <span class="p">)</span>
+<span class="k">def</span> <span class="nf">block32_tlv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given multiple blocks of Type-Length-Value (TLV) encoded packed bytes, unpack and return the first</span>
+<span class="sd">    type &amp; content of the first block, and the remaining bytes.&quot;&quot;&quot;</span>
+    <span class="s2">&quot;Given Unpack data in  format, discarding any padding bytes&quot;</span>
+    <span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span> <span class="p">)</span>  <span class="c1">#todo -&gt; pcapng.codec.uint32_unpack</span>
     <span class="n">content_bytes</span>       <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">12</span><span class="o">+</span><span class="n">content_len</span><span class="p">]</span>
     <span class="n">remaining_bytes</span>     <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="n">total_len</span><span class="p">:]</span>
-    <span class="k">return</span> <span class="n">label</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
+    <span class="k">return</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
 </pre></div>
 
   </div>
@@ -1422,7 +1463,7 @@ table {
   <section id="section-items">
     <h2 class="section-title" id="header-variables">Module variables</h2>
       <div class="item">
-      <p id="pcapng.util.test_ctx" class="name">var <span class="ident">test_ctx</span></p>
+      <p id="pcapng.util.gbl_test_ctx" class="name">var <span class="ident">gbl_test_ctx</span></p>
       
   
   <div class="source_cont">
@@ -1545,10 +1586,12 @@ table {
 
     
   
+    <div class="desc"><p>Assert running in Python 2, version 2.7 or later</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_python2', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_python2" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_python2</span><span class="p">():</span>
+    <span class="s2">&quot;Assert running in Python 2, version 2.7 or later&quot;</span>
     <span class="k">assert</span> <span class="n">is_python2</span><span class="p">()</span>
 </pre></div>
 
@@ -1621,6 +1664,32 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_bytes', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_type_bytes" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_bytes</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>           <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_charLst">
+    <p>def <span class="ident">assert_type_charLst</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Assert the arg is a list of characters (len-1 strings)</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_charLst', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_charLst" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_charLst</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Assert the arg is a list of characters (len-1 strings)&quot;</span>
+    <span class="n">assert_type_list</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+        <span class="n">assert_type_str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 </pre></div>
 
   </div>
@@ -1864,56 +1933,6 @@ table {
   
       
   <div class="item">
-    <div class="name def" id="pcapng.util.block32_bytes_pack">
-    <p>def <span class="ident">block32_bytes_pack</span>(</p><p>content=[])</p>
-    </div>
-    
-
-    
-  
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_bytes_pack', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.util.block32_bytes_pack" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_bytes_pack</span><span class="p">(</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
-    <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
-    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
-    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
-    <span class="k">return</span> <span class="n">packed_bytes</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-      
-  <div class="item">
-    <div class="name def" id="pcapng.util.block32_bytes_unpack_rolling">
-    <p>def <span class="ident">block32_bytes_unpack_rolling</span>(</p><p>packed_bytes)</p>
-    </div>
-    
-
-    
-  
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_bytes_unpack_rolling', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.util.block32_bytes_unpack_rolling" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
-    <span class="p">(</span><span class="n">content_len</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=L&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
-    <span class="n">content_len_pad</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="n">content_len</span><span class="p">)</span>
-    <span class="n">packed_bytes_nohdr</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
-    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[:</span><span class="n">content_len</span><span class="p">]</span>
-    <span class="n">remaining_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[</span><span class="n">content_len_pad</span><span class="p">:]</span>
-    <span class="k">return</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-      
-  <div class="item">
     <div class="name def" id="pcapng.util.block32_ceil_num_bytes">
     <p>def <span class="ident">block32_ceil_num_bytes</span>(</p><p>curr_len)</p>
     </div>
@@ -1940,21 +1959,24 @@ table {
   
       
   <div class="item">
-    <div class="name def" id="pcapng.util.block32_labelled_bytes_pack">
-    <p>def <span class="ident">block32_labelled_bytes_pack</span>(</p><p>label, content=[])</p>
+    <div class="name def" id="pcapng.util.block32_lv_bytes_pack">
+    <p>def <span class="ident">block32_lv_bytes_pack</span>(</p><p>content=[])</p>
     </div>
     
 
     
   
+    <div class="desc"><p>Pack arbitrary content using Length-Value (LV) encoding to return packed bytes,
+padded to the next 32-bit boundary</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_labelled_bytes_pack', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.util.block32_labelled_bytes_pack" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_labelled_bytes_pack</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">[]</span> <span class="p">):</span>
-    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_lv_bytes_pack', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_lv_bytes_pack" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_lv_bytes_pack</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;Pack arbitrary content using Length-Value (LV) encoding to return packed bytes,</span>
+<span class="sd">    padded to the next 32-bit boundary&quot;&quot;&quot;</span>
     <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
-    <span class="n">total_len</span>   <span class="o">=</span> <span class="mi">12</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content_bytes_pad</span> <span class="p">)</span>
-    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
+    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">codec</span><span class="o">.</span><span class="n">uint32_pack</span><span class="p">(</span> <span class="n">content_len</span> <span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>
     <span class="k">return</span> <span class="n">packed_bytes</span>
 </pre></div>
 
@@ -1965,21 +1987,27 @@ table {
   
       
   <div class="item">
-    <div class="name def" id="pcapng.util.block32_labelled_bytes_unpack_rolling">
-    <p>def <span class="ident">block32_labelled_bytes_unpack_rolling</span>(</p><p>packed_bytes)</p>
+    <div class="name def" id="pcapng.util.block32_lv_bytes_unpack_rolling">
+    <p>def <span class="ident">block32_lv_bytes_unpack_rolling</span>(</p><p>packed_bytes)</p>
     </div>
     
 
     
   
+    <div class="desc"><p>Given multiple blocks of Length-Value (LV) encoded packed bytes, unpack and return the first
+content of the first block, and the remaining bytes.</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_labelled_bytes_unpack_rolling', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.util.block32_labelled_bytes_unpack_rolling" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_labelled_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
-    <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span> <span class="p">)</span>
-    <span class="n">content_bytes</span>       <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">12</span><span class="o">+</span><span class="n">content_len</span><span class="p">]</span>
-    <span class="n">remaining_bytes</span>     <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="n">total_len</span><span class="p">:]</span>
-    <span class="k">return</span> <span class="n">label</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_lv_bytes_unpack_rolling', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_lv_bytes_unpack_rolling" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given multiple blocks of Length-Value (LV) encoded packed bytes, unpack and return the first</span>
+<span class="sd">    content of the first block, and the remaining bytes.&quot;&quot;&quot;</span>
+    <span class="n">content_len</span> <span class="o">=</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">codec</span><span class="o">.</span><span class="n">uint32_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">content_len_pad</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="n">content_len</span><span class="p">)</span>
+    <span class="n">packed_bytes_nohdr</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[:</span><span class="n">content_len</span><span class="p">]</span>
+    <span class="n">remaining_bytes</span> <span class="o">=</span> <span class="n">packed_bytes_nohdr</span><span class="p">[</span><span class="n">content_len_pad</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
 </pre></div>
 
   </div>
@@ -2004,6 +2032,64 @@ table {
     <span class="sd">&quot;&quot;&quot;Pad data with (n&gt;=0) 0x00 bytes to reach the next 32-bit boundary&quot;&quot;&quot;</span>
     <span class="n">padded_len</span> <span class="o">=</span> <span class="n">block32_ceil_num_bytes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">padded_len</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_tlv_bytes_pack">
+    <p>def <span class="ident">block32_tlv_bytes_pack</span>(</p><p>type_code, content=[])</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Pack arbitrary content using Type-Length-Value (TLV) encoding to return packed bytes,
+padded to the next 32-bit boundary</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_tlv_bytes_pack', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_tlv_bytes_pack" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_tlv_bytes_pack</span><span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;Pack arbitrary content using Type-Length-Value (TLV) encoding to return packed bytes,</span>
+<span class="sd">    padded to the next 32-bit boundary&quot;&quot;&quot;</span>
+    <span class="n">content_bytes_pad</span> <span class="o">=</span> <span class="n">block32_pad_bytes</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">content_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content</span> <span class="p">)</span>
+    <span class="n">total_len</span>   <span class="o">=</span> <span class="mi">12</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="n">content_bytes_pad</span> <span class="p">)</span>
+    <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">+</span> <span class="n">content_bytes_pad</span>  <span class="c1">#todo -&gt; pcapng.codec.uint32_pack</span>
+    <span class="k">return</span> <span class="n">packed_bytes</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.block32_tlv_bytes_unpack_rolling">
+    <p>def <span class="ident">block32_tlv_bytes_unpack_rolling</span>(</p><p>packed_bytes)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Given multiple blocks of Type-Length-Value (TLV) encoded packed bytes, unpack and return the first
+type &amp; content of the first block, and the remaining bytes.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.block32_tlv_bytes_unpack_rolling', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.block32_tlv_bytes_unpack_rolling" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">block32_tlv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given multiple blocks of Type-Length-Value (TLV) encoded packed bytes, unpack and return the first</span>
+<span class="sd">    type &amp; content of the first block, and the remaining bytes.&quot;&quot;&quot;</span>
+    <span class="s2">&quot;Given Unpack data in  format, discarding any padding bytes&quot;</span>
+    <span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">content_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span> <span class="p">)</span>  <span class="c1">#todo -&gt; pcapng.codec.uint32_unpack</span>
+    <span class="n">content_bytes</span>       <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">12</span><span class="o">+</span><span class="n">content_len</span><span class="p">]</span>
+    <span class="n">remaining_bytes</span>     <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="n">total_len</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">remaining_bytes</span>
 </pre></div>
 
   </div>
@@ -2050,7 +2136,7 @@ table {
   <div id="source-pcapng.util.chrList_to_str" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">chrList_to_str</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Convert a list of characters to a string&quot;&quot;&quot;</span>
-    <span class="c1">#todo verify input type &amp; values [0..255]</span>
+    <span class="n">assert_type_charLst</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
     <span class="n">strval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">arg</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">strval</span>
 </pre></div>
@@ -2069,12 +2155,12 @@ table {
 
     
   
-    <div class="desc"><p>Returns a string with the fully-qualified class name of an object</p></div>
+    <div class="desc"><p>Given any object, returns the fully-qualified class name as a string</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.classname', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.classname" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">classname</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="s2">&quot;Returns a string with the fully-qualified class name of an object&quot;</span>
+    <span class="s2">&quot;Given any object, returns the fully-qualified class name as a string&quot;</span>
     <span class="n">module_str</span>  <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
     <span class="n">class_str</span>   <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">return</span> <span class="s1">&#39;{}.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">module_str</span><span class="p">,</span> <span class="n">class_str</span> <span class="p">)</span>
@@ -2147,9 +2233,9 @@ table {
   <div id="source-pcapng.util.curr_utc_timetuple" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_utc_timetuple</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) tuple.&quot;&quot;&quot;</span>
-    <span class="k">global</span> <span class="n">test_ctx</span>
-    <span class="k">if</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
-        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
+    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
+    <span class="k">if</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span> <span class="n">utc_secs</span> <span class="p">)</span>
@@ -2170,10 +2256,12 @@ table {
 
     
   
+    <div class="desc"><p>Merge the contents of two dictionaries, returning a new result</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.dict_merge', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.dict_merge" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Merge the contents of two dictionaries, returning a new result&quot;</span>
     <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="n">assert_type_dict</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2196,10 +2284,12 @@ table {
 
     
   
+    <div class="desc"><p>Given a list of dict dictionaries, merge the contents returning a new result</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.dict_merge_all', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.dict_merge_all" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">dict_merge_all</span><span class="p">(</span> <span class="n">dict_lst</span> <span class="p">):</span>  <span class="c1">#todo need test</span>
+    <span class="s2">&quot;Given a list of dict dictionaries, merge the contents returning a new result&quot;</span>
     <span class="n">assert_type_list</span><span class="p">(</span><span class="n">dict_lst</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">curr_dict</span> <span class="ow">in</span> <span class="n">dict_lst</span><span class="p">:</span>
@@ -2298,29 +2388,6 @@ table {
   
       
   <div class="item">
-    <div class="name def" id="pcapng.util.first">
-    <p>def <span class="ident">first</span>(</p><p>lst)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Returns the first item in a sequence.</p></div>
-  <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.first', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.util.first" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">first</span><span class="p">(</span> <span class="n">lst</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the first item in a sequence.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</pre></div>
-
-  </div>
-</div>
-
-  </div>
-  
-      
-  <div class="item">
     <div class="name def" id="pcapng.util.int32_to_hexstr">
     <p>def <span class="ident">int32_to_hexstr</span>(</p><p>arg)</p>
     </div>
@@ -2335,7 +2402,7 @@ table {
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">int32_to_hexstr</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts a 32-bit unsigned integer value to a hex string .&quot;&quot;&quot;</span>
     <span class="n">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span> <span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">format</span><span class="p">(</span> <span class="n">curr_utc_secs</span><span class="p">(),</span> <span class="s1">&#39;08x&#39;</span> <span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="s1">&#39;{:#010x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">arg</span> <span class="p">))</span>  <span class="c1"># &quot;0x&quot;=2 char + &quot;0123abcd&quot;=8 char = 10 char; &#39;0&#39; filled -&gt; &#39;010&#39;</span>
 </pre></div>
 
   </div>
@@ -2389,6 +2456,28 @@ table {
   
       
   <div class="item">
+    <div class="name def" id="pcapng.util.mod">
+    <p>def <span class="ident">mod</span>(</p><p>numer, demon)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.mod', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.mod" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">mod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">):</span>
+    <span class="n">dummy</span><span class="p">,</span> <span class="n">remainder</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">remainder</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="pcapng.util.pad_bytes">
     <p>def <span class="ident">pad_bytes</span>(</p><p>data_bytes, tgt_length, padval=0)</p>
     </div>
@@ -2403,9 +2492,55 @@ table {
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pad_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">,</span> <span class="n">tgt_length</span><span class="p">,</span> <span class="n">padval</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add (n&gt;=0) &#39;padval&#39; bytes to extend data to tgt_length&quot;&quot;&quot;</span>
     <span class="n">num_bytes_needed</span> <span class="o">=</span> <span class="n">tgt_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="p">(</span><span class="n">num_bytes_needed</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;padding cannot be negative&quot;</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">num_bytes_needed</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;padding length cannot be negative&quot;</span>
     <span class="n">data_bytes_pad</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">([</span><span class="n">padval</span><span class="p">])</span> <span class="o">*</span> <span class="n">num_bytes_needed</span>
     <span class="k">return</span> <span class="n">data_bytes_pad</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.rand_bytes">
+    <p>def <span class="ident">rand_bytes</span>(</p><p>n)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.rand_bytes', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.rand_bytes" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">rand_bytes</span><span class="p">(</span> <span class="n">n</span> <span class="p">):</span>    <span class="c1">#todo need test</span>
+    <span class="n">int_vals</span> <span class="o">=</span> <span class="n">rand_ints</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">int_vals</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.rand_ints">
+    <p>def <span class="ident">rand_ints</span>(</p><p>num_ints, min_val, max_val)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.rand_ints', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.rand_ints" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">rand_ints</span><span class="p">(</span> <span class="n">num_ints</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span> <span class="p">):</span>    <span class="c1">#todo need test</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_ints</span><span class="p">):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span>
 </pre></div>
 
   </div>
@@ -2498,13 +2633,15 @@ table {
 
     
   
+    <div class="desc"><p>Enable testing context with dummy time</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.test_time_utc_set', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.test_time_utc_set" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_time_utc_set</span><span class="p">(</span><span class="n">utc_secs</span><span class="p">):</span>
-    <span class="k">global</span> <span class="n">test_ctx</span>
-    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">utc_secs</span>
+    <span class="s2">&quot;Enable testing context with dummy time&quot;</span>
+    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
+    <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">utc_secs</span>
 </pre></div>
 
   </div>
@@ -2521,12 +2658,14 @@ table {
 
     
   
+    <div class="desc"><p>Disable testing context</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.test_time_utc_unset', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.test_time_utc_unset" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_time_utc_unset</span><span class="p">():</span>
-    <span class="k">global</span> <span class="n">test_ctx</span>
-    <span class="n">test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">False</span>
+    <span class="s2">&quot;Disable testing context&quot;</span>
+    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
+    <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="bp">False</span>
 </pre></div>
 
   </div>
@@ -2577,7 +2716,7 @@ table {
   <div id="source-pcapng.util.timeTuple_to_float" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts a time tuple from (secs, usecs) to float.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">secs</span> <span class="o">+</span> <span class="p">(</span><span class="n">usecs</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">usecs</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
 </pre></div>
 
   </div>

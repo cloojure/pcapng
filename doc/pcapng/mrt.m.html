@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>pcapng.mrt API documentation</title>
-    <meta name="description" content="" />
+    <meta name="description" content="Functions for serialization/deserialization of MRT block data" />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -1119,7 +1119,7 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">pcapng.mrt</span> module</h1>
-  
+  <p>Functions for serialization/deserialization of MRT block data</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.mrt', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.mrt" class="source">
@@ -1137,12 +1137,12 @@ table {
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
+<span class="sd">&quot;&quot;&quot;Functions for serialization/deserialization of MRT block data&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">import</span> <span class="nn">pcapng.linktype</span>
 <span class="kn">import</span> <span class="nn">pcapng.option</span>
 <span class="kn">import</span> <span class="nn">pcapng.util</span>
-<span class="kn">from</span> <span class="nn">pcapng.util</span> <span class="kn">import</span> <span class="n">to_bytes</span>
 
 <span class="c1">#todo think about how to handle a block of packets</span>
 <span class="c1">#todo look at &quot;docopt&quot; usage -&gt; cmdopts processing</span>
@@ -1248,17 +1248,21 @@ table {
     <span class="k">return</span> <span class="n">parsed</span>
 
 <span class="k">def</span> <span class="nf">mrt_isis_block_pack</span><span class="p">(</span> <span class="n">content</span> <span class="p">):</span>
+    <span class="s2">&quot;Serializes content from an MRT ISIS block&quot;</span>
     <span class="k">return</span> <span class="n">mrt_block_pack</span><span class="p">(</span> <span class="n">ISIS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">content</span> <span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">mrt_isis_block_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="s2">&quot;Deserializes content from an MRT ISIS block&quot;</span>
     <span class="n">result</span> <span class="o">=</span>  <span class="n">mrt_block_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
     <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mrt_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ISIS</span>
     <span class="k">return</span> <span class="n">result</span>
 
 <span class="k">def</span> <span class="nf">mrt_isis_block_extended_pack</span><span class="p">(</span> <span class="n">content</span> <span class="p">):</span>
+    <span class="s2">&quot;Serializes content from an MRT ISIS Extended block&quot;</span>
     <span class="k">return</span> <span class="n">mrt_block_extended_pack</span><span class="p">(</span> <span class="n">ISIS_ET</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">content</span> <span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">mrt_isis_block_extended_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="s2">&quot;Deserializes content from an MRT ISIS Extended block&quot;</span>
     <span class="n">result</span> <span class="o">=</span>  <span class="n">mrt_block_extended_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
     <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mrt_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ISIS_ET</span>
     <span class="k">return</span> <span class="n">result</span>
@@ -1746,10 +1750,12 @@ table {
 
     
   
+    <div class="desc"><p>Serializes content from an MRT ISIS Extended block</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.mrt.mrt_isis_block_extended_pack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.mrt.mrt_isis_block_extended_pack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">mrt_isis_block_extended_pack</span><span class="p">(</span> <span class="n">content</span> <span class="p">):</span>
+    <span class="s2">&quot;Serializes content from an MRT ISIS Extended block&quot;</span>
     <span class="k">return</span> <span class="n">mrt_block_extended_pack</span><span class="p">(</span> <span class="n">ISIS_ET</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">content</span> <span class="p">)</span>
 </pre></div>
 
@@ -1767,10 +1773,12 @@ table {
 
     
   
+    <div class="desc"><p>Deserializes content from an MRT ISIS Extended block</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.mrt.mrt_isis_block_extended_unpack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.mrt.mrt_isis_block_extended_unpack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">mrt_isis_block_extended_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="s2">&quot;Deserializes content from an MRT ISIS Extended block&quot;</span>
     <span class="n">result</span> <span class="o">=</span>  <span class="n">mrt_block_extended_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
     <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mrt_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ISIS_ET</span>
     <span class="k">return</span> <span class="n">result</span>
@@ -1790,10 +1798,12 @@ table {
 
     
   
+    <div class="desc"><p>Serializes content from an MRT ISIS block</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.mrt.mrt_isis_block_pack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.mrt.mrt_isis_block_pack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">mrt_isis_block_pack</span><span class="p">(</span> <span class="n">content</span> <span class="p">):</span>
+    <span class="s2">&quot;Serializes content from an MRT ISIS block&quot;</span>
     <span class="k">return</span> <span class="n">mrt_block_pack</span><span class="p">(</span> <span class="n">ISIS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">content</span> <span class="p">)</span>
 </pre></div>
 
@@ -1811,10 +1821,12 @@ table {
 
     
   
+    <div class="desc"><p>Deserializes content from an MRT ISIS block</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.mrt.mrt_isis_block_unpack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.mrt.mrt_isis_block_unpack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">mrt_isis_block_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span>
+    <span class="s2">&quot;Deserializes content from an MRT ISIS block&quot;</span>
     <span class="n">result</span> <span class="o">=</span>  <span class="n">mrt_block_unpack</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
     <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mrt_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ISIS</span>
     <span class="k">return</span> <span class="n">result</span>

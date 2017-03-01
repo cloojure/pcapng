@@ -1108,7 +1108,6 @@ table {
 
 <span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">pcapng.option</span>    <span class="kn">as</span> <span class="nn">option</span>
-<span class="kn">from</span>   <span class="nn">pcapng.option</span>    <span class="kn">import</span> <span class="n">Option</span><span class="p">,</span> <span class="n">ShbOption</span><span class="p">,</span> <span class="n">IdbOption</span>
 <span class="kn">import</span> <span class="nn">pcapng.pen</span>       <span class="kn">as</span> <span class="nn">pen</span>
 <span class="kn">import</span> <span class="nn">pcapng.util</span>      <span class="kn">as</span> <span class="nn">util</span>
 <span class="kn">from</span>   <span class="nn">pcapng.util</span>      <span class="kn">import</span> <span class="n">to_bytes</span>
@@ -1116,12 +1115,12 @@ table {
 <span class="c1">#todo add generative testing for all</span>
 
 <span class="k">def</span> <span class="nf">test_option_codec</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">assert_option_codec</span><span class="p">(</span><span class="n">opt_code</span><span class="p">,</span> <span class="n">opt_value</span><span class="p">):</span>
-        <span class="n">opt</span>          <span class="o">=</span> <span class="n">Option</span><span class="p">(</span><span class="n">opt_code</span><span class="p">,</span> <span class="n">opt_value</span> <span class="p">)</span>
-        <span class="n">opt_unpacked</span> <span class="o">=</span> <span class="n">Option</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">opt</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span> <span class="p">)</span>
-        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">code</span>     <span class="o">==</span> <span class="n">opt_code</span>
-        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">content</span>  <span class="o">==</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">opt_value</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">opt</span>          <span class="o">==</span> <span class="n">opt_unpacked</span>
+    <span class="k">def</span> <span class="nf">assert_option_codec</span><span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">opt_value</span><span class="p">):</span>
+        <span class="n">opt</span>          <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">opt_value</span> <span class="p">)</span>
+        <span class="n">opt_unpacked</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">opt</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">type_code</span>    <span class="o">==</span> <span class="n">type_code</span>
+        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">content</span>      <span class="o">==</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">opt_value</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">opt</span>              <span class="o">==</span> <span class="n">opt_unpacked</span>
 
     <span class="c1">#todo add tests for opt values of string, byte, short, int, float, double</span>
     <span class="c1">#todo add tests for opt value len up to 9999?</span>
@@ -2121,12 +2120,12 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.option_test.test_option_codec', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.option_test.test_option_codec" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_option_codec</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">assert_option_codec</span><span class="p">(</span><span class="n">opt_code</span><span class="p">,</span> <span class="n">opt_value</span><span class="p">):</span>
-        <span class="n">opt</span>          <span class="o">=</span> <span class="n">Option</span><span class="p">(</span><span class="n">opt_code</span><span class="p">,</span> <span class="n">opt_value</span> <span class="p">)</span>
-        <span class="n">opt_unpacked</span> <span class="o">=</span> <span class="n">Option</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">opt</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span> <span class="p">)</span>
-        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">code</span>     <span class="o">==</span> <span class="n">opt_code</span>
-        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">content</span>  <span class="o">==</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">opt_value</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">opt</span>          <span class="o">==</span> <span class="n">opt_unpacked</span>
+    <span class="k">def</span> <span class="nf">assert_option_codec</span><span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">opt_value</span><span class="p">):</span>
+        <span class="n">opt</span>          <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">opt_value</span> <span class="p">)</span>
+        <span class="n">opt_unpacked</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">Option</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">opt</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">type_code</span>    <span class="o">==</span> <span class="n">type_code</span>
+        <span class="k">assert</span> <span class="n">opt</span><span class="o">.</span><span class="n">content</span>      <span class="o">==</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">opt_value</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">opt</span>              <span class="o">==</span> <span class="n">opt_unpacked</span>
 
     <span class="c1">#todo add tests for opt values of string, byte, short, int, float, double</span>
     <span class="c1">#todo add tests for opt value len up to 9999?</span>

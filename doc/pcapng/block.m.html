@@ -4,7 +4,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>pcapng.block API documentation</title>
-    <meta name="description" content="Serialize & deserialze PCAPNG blocks" />
+    <meta name="description" content="Serialize & deserialze PCAPNG blocks.
+
+See:  https://pcapng.github.io/pcapng/" />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -1056,7 +1058,7 @@ table {
     <li class="mono"><a href="#pcapng.block.pack_all">pack_all</a></li>
     <li class="mono"><a href="#pcapng.block.segment_all">segment_all</a></li>
     <li class="mono"><a href="#pcapng.block.strip_header">strip_header</a></li>
-    <li class="mono"><a href="#pcapng.block.unpack_blocks">unpack_blocks</a></li>
+    <li class="mono"><a href="#pcapng.block.unpack_all">unpack_all</a></li>
     <li class="mono"><a href="#pcapng.block.unpack_dispatch">unpack_dispatch</a></li>
   </ul>
 
@@ -1195,7 +1197,8 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">pcapng.block</span> module</h1>
-  <p>Serialize &amp; deserialze PCAPNG blocks</p>
+  <p>Serialize &amp; deserialze PCAPNG blocks.</p>
+<p>See:  https://pcapng.github.io/pcapng/</p>
   
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block" class="source">
@@ -1212,7 +1215,10 @@ table {
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
-<span class="sd">&quot;&quot;&quot;Serialize &amp; deserialze PCAPNG blocks&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;Serialize &amp; deserialze PCAPNG blocks.</span>
+
+<span class="sd">See:  https://pcapng.github.io/pcapng/</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1">#todo add header docstring to all</span>
 
@@ -1258,23 +1264,24 @@ table {
 <span class="c1">#todo maybe create a SectionBlock object with SHB, IDB, options, EPBs, SPBs, etc ?</span>
 
 <span class="k">def</span> <span class="nf">strip_header</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span> <span class="c1">#todo use for all unpack()</span>
+    <span class="s2">&quot;Utility function to strip Block type_code &amp; total_len from packed bytes, returning all three. &quot;</span>
     <span class="n">util</span><span class="o">.</span><span class="n">assert_block32_length</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
-    <span class="p">(</span><span class="n">blk_type</span><span class="p">,</span> <span class="n">blk_total_len</span><span class="p">,</span> <span class="n">byte_order_magic_found</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">])</span>
+    <span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">byte_order_magic_found</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">])</span>
     <span class="c1">#todo if SHB:</span>
     <span class="c1">#todo   parse BOM-found;  set global endian;  re-parse fields, verify OK</span>
-    <span class="k">assert</span> <span class="n">blk_total_len</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">total_len</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
     <span class="n">stripped_bytes</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">blk_type</span><span class="p">,</span> <span class="n">blk_total_len</span><span class="p">,</span> <span class="n">stripped_bytes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">stripped_bytes</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Block</span><span class="p">:</span>
     <span class="s2">&quot;Superclass for all PCAPNG blocks&quot;</span>
     <span class="n">BLOCK_UNKNOWN</span> <span class="o">=</span> <span class="mi">9999</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">code</span>    <span class="o">=</span> <span class="n">code</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type_code</span>    <span class="o">=</span> <span class="n">type_code</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
 
-    <span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>           <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>           <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;type_code&#39;</span><span class="p">]</span> <span class="p">)</span>
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="p">)</span>
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">))</span>
@@ -1647,8 +1654,9 @@ table {
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Serialize an CB object into packed bytes&quot;</span>
-        <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_pack</span><span class="p">(</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="p">))</span>
+        <span class="sd">&quot;&quot;&quot;Serialize an CB object into packed bytes. NOTE: We are required to use</span>
+<span class="sd">        Length-Value (LV) encoding for the custom content so that any options may also be recovered.&quot;&quot;&quot;</span>
+        <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_pack</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
         <span class="n">options_bytes</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">pack_all</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span> <span class="p">)</span>
         <span class="n">block_total_len</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span>
 
@@ -1679,7 +1687,7 @@ table {
         <span class="k">assert</span> <span class="n">pen_val</span> <span class="o">==</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">BROCADE_PEN</span>
         <span class="k">assert</span> <span class="n">block_total_len</span> <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="n">block_bytes_stripped</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">block_bytes_stripped</span> <span class="p">)</span>
+        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">block_bytes_stripped</span><span class="p">)</span>
         <span class="n">options_lst</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">CustomBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span>
         <span class="n">result_obj</span> <span class="o">=</span> <span class="n">CustomBlockCopyable</span><span class="p">(</span> <span class="n">pen_val</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_lst</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">result_obj</span>
@@ -1704,7 +1712,7 @@ table {
         <span class="k">assert</span> <span class="n">pen_val</span> <span class="o">==</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">BROCADE_PEN</span>
         <span class="k">assert</span> <span class="n">block_total_len</span> <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="n">block_bytes_stripped</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">block_bytes_stripped</span> <span class="p">)</span>
+        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">block_bytes_stripped</span><span class="p">)</span>
         <span class="n">options_lst</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">CustomBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span>
         <span class="n">result_obj</span> <span class="o">=</span> <span class="n">CustomBlockNonCopyable</span><span class="p">(</span> <span class="n">pen_val</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_lst</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">result_obj</span>
@@ -1786,7 +1794,7 @@ table {
         <span class="n">raw_bytes</span> <span class="o">=</span> <span class="n">raw_bytes_remaining</span>
     <span class="k">return</span> <span class="n">blk_segments</span>
 
-<span class="k">def</span> <span class="nf">unpack_blocks</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">unpack_all</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Given concatenated packed bytes for PCAPNG blocks, returns a list of PCAPNG block objects&quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">blk_segments</span> <span class="o">=</span> <span class="n">segment_all</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
@@ -1901,17 +1909,19 @@ individual block segments</p></div>
 
     
   
+    <div class="desc"><p>Utility function to strip Block type_code &amp; total_len from packed bytes, returning all three.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.strip_header', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block.strip_header" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">strip_header</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">):</span> <span class="c1">#todo use for all unpack()</span>
+    <span class="s2">&quot;Utility function to strip Block type_code &amp; total_len from packed bytes, returning all three. &quot;</span>
     <span class="n">util</span><span class="o">.</span><span class="n">assert_block32_length</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
-    <span class="p">(</span><span class="n">blk_type</span><span class="p">,</span> <span class="n">blk_total_len</span><span class="p">,</span> <span class="n">byte_order_magic_found</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">])</span>
+    <span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">byte_order_magic_found</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;=LLL&#39;</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">12</span><span class="p">])</span>
     <span class="c1">#todo if SHB:</span>
     <span class="c1">#todo   parse BOM-found;  set global endian;  re-parse fields, verify OK</span>
-    <span class="k">assert</span> <span class="n">blk_total_len</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">total_len</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
     <span class="n">stripped_bytes</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">blk_type</span><span class="p">,</span> <span class="n">blk_total_len</span><span class="p">,</span> <span class="n">stripped_bytes</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">type_code</span><span class="p">,</span> <span class="n">total_len</span><span class="p">,</span> <span class="n">stripped_bytes</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1921,8 +1931,8 @@ individual block segments</p></div>
   
       
   <div class="item">
-    <div class="name def" id="pcapng.block.unpack_blocks">
-    <p>def <span class="ident">unpack_blocks</span>(</p><p>packed_bytes)</p>
+    <div class="name def" id="pcapng.block.unpack_all">
+    <p>def <span class="ident">unpack_all</span>(</p><p>packed_bytes)</p>
     </div>
     
 
@@ -1930,9 +1940,9 @@ individual block segments</p></div>
   
     <div class="desc"><p>Given concatenated packed bytes for PCAPNG blocks, returns a list of PCAPNG block objects</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.unpack_blocks', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.block.unpack_blocks" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">unpack_blocks</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.unpack_all', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.block.unpack_all" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">unpack_all</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Given concatenated packed bytes for PCAPNG blocks, returns a list of PCAPNG block objects&quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">blk_segments</span> <span class="o">=</span> <span class="n">segment_all</span><span class="p">(</span> <span class="n">packed_bytes</span> <span class="p">)</span>
@@ -1996,11 +2006,11 @@ individual block segments</p></div>
     <span class="s2">&quot;Superclass for all PCAPNG blocks&quot;</span>
     <span class="n">BLOCK_UNKNOWN</span> <span class="o">=</span> <span class="mi">9999</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">code</span>    <span class="o">=</span> <span class="n">code</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type_code</span>    <span class="o">=</span> <span class="n">type_code</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
 
-    <span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>           <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>           <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;type_code&#39;</span><span class="p">]</span> <span class="p">)</span>
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="p">)</span>
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">))</span>
@@ -2028,7 +2038,7 @@ individual block segments</p></div>
             </div>
           <h3>Instance variables</h3>
             <div class="item">
-            <p id="pcapng.block.Block.code" class="name">var <span class="ident">code</span></p>
+            <p id="pcapng.block.Block.content" class="name">var <span class="ident">content</span></p>
             
 
             
@@ -2038,7 +2048,7 @@ individual block segments</p></div>
 
             </div>
             <div class="item">
-            <p id="pcapng.block.Block.content" class="name">var <span class="ident">content</span></p>
+            <p id="pcapng.block.Block.type_code" class="name">var <span class="ident">type_code</span></p>
             
 
             
@@ -2051,7 +2061,7 @@ individual block segments</p></div>
             
   <div class="item">
     <div class="name def" id="pcapng.block.Block.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, code, content)</p>
+    <p>def <span class="ident">__init__</span>(</p><p>self, type_code, content)</p>
     </div>
     
 
@@ -2060,8 +2070,8 @@ individual block segments</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.Block.__init__', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block.Block.__init__" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">code</span>    <span class="o">=</span> <span class="n">code</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">type_code</span>    <span class="o">=</span> <span class="n">type_code</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
 </pre></div>
 
@@ -2082,7 +2092,7 @@ individual block segments</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.Block.to_map', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block.Block.to_map" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>           <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>           <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;type_code&#39;</span><span class="p">]</span> <span class="p">)</span>
 </pre></div>
 
   </div>
@@ -2140,8 +2150,9 @@ individual block segments</p></div>
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Serialize an CB object into packed bytes&quot;</span>
-        <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_pack</span><span class="p">(</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="p">))</span>
+        <span class="sd">&quot;&quot;&quot;Serialize an CB object into packed bytes. NOTE: We are required to use</span>
+<span class="sd">        Length-Value (LV) encoding for the custom content so that any options may also be recovered.&quot;&quot;&quot;</span>
+        <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_pack</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
         <span class="n">options_bytes</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">pack_all</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span> <span class="p">)</span>
         <span class="n">block_total_len</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span>
 
@@ -2299,13 +2310,15 @@ individual block segments</p></div>
 
     
   
-    <div class="desc"><p>Serialize an CB object into packed bytes</p></div>
+    <div class="desc"><p>Serialize an CB object into packed bytes. NOTE: We are required to use
+Length-Value (LV) encoding for the custom content so that any options may also be recovered.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.CustomBlock.pack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block.CustomBlock.pack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="s2">&quot;Serialize an CB object into packed bytes&quot;</span>
-    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_pack</span><span class="p">(</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;Serialize an CB object into packed bytes. NOTE: We are required to use</span>
+<span class="sd">    Length-Value (LV) encoding for the custom content so that any options may also be recovered.&quot;&quot;&quot;</span>
+    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_pack</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
     <span class="n">options_bytes</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">pack_all</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span> <span class="p">)</span>
     <span class="n">block_total_len</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span>
     <span class="n">packed_bytes</span> <span class="o">=</span> <span class="p">(</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pen_val</span> <span class="p">)</span> <span class="o">+</span>
@@ -2374,7 +2387,7 @@ individual block segments</p></div>
         <span class="k">assert</span> <span class="n">pen_val</span> <span class="o">==</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">BROCADE_PEN</span>
         <span class="k">assert</span> <span class="n">block_total_len</span> <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="n">block_bytes_stripped</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">block_bytes_stripped</span> <span class="p">)</span>
+        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">block_bytes_stripped</span><span class="p">)</span>
         <span class="n">options_lst</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">CustomBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span>
         <span class="n">result_obj</span> <span class="o">=</span> <span class="n">CustomBlockCopyable</span><span class="p">(</span> <span class="n">pen_val</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_lst</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">result_obj</span>
@@ -2518,7 +2531,7 @@ individual block segments</p></div>
     <span class="k">assert</span> <span class="n">pen_val</span> <span class="o">==</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">BROCADE_PEN</span>
     <span class="k">assert</span> <span class="n">block_total_len</span> <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
     <span class="n">block_bytes_stripped</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-    <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">block_bytes_stripped</span> <span class="p">)</span>
+    <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">block_bytes_stripped</span><span class="p">)</span>
     <span class="n">options_lst</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">CustomBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span>
     <span class="n">result_obj</span> <span class="o">=</span> <span class="n">CustomBlockCopyable</span><span class="p">(</span> <span class="n">pen_val</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_lst</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">result_obj</span>
@@ -2627,13 +2640,15 @@ individual block segments</p></div>
 
     
   
-    <div class="desc inherited"><p>Serialize an CB object into packed bytes</p></div>
+    <div class="desc inherited"><p>Serialize an CB object into packed bytes. NOTE: We are required to use
+Length-Value (LV) encoding for the custom content so that any options may also be recovered.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.CustomBlockCopyable.pack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block.CustomBlockCopyable.pack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="s2">&quot;Serialize an CB object into packed bytes&quot;</span>
-    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_pack</span><span class="p">(</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;Serialize an CB object into packed bytes. NOTE: We are required to use</span>
+<span class="sd">    Length-Value (LV) encoding for the custom content so that any options may also be recovered.&quot;&quot;&quot;</span>
+    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_pack</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
     <span class="n">options_bytes</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">pack_all</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span> <span class="p">)</span>
     <span class="n">block_total_len</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span>
     <span class="n">packed_bytes</span> <span class="o">=</span> <span class="p">(</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pen_val</span> <span class="p">)</span> <span class="o">+</span>
@@ -2706,7 +2721,7 @@ individual block segments</p></div>
         <span class="k">assert</span> <span class="n">pen_val</span> <span class="o">==</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">BROCADE_PEN</span>
         <span class="k">assert</span> <span class="n">block_total_len</span> <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="n">block_bytes_stripped</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">block_bytes_stripped</span> <span class="p">)</span>
+        <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">block_bytes_stripped</span><span class="p">)</span>
         <span class="n">options_lst</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">CustomBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span>
         <span class="n">result_obj</span> <span class="o">=</span> <span class="n">CustomBlockNonCopyable</span><span class="p">(</span> <span class="n">pen_val</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_lst</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">result_obj</span>
@@ -2850,7 +2865,7 @@ individual block segments</p></div>
     <span class="k">assert</span> <span class="n">pen_val</span> <span class="o">==</span> <span class="n">pcapng</span><span class="o">.</span><span class="n">pen</span><span class="o">.</span><span class="n">BROCADE_PEN</span>
     <span class="k">assert</span> <span class="n">block_total_len</span> <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
     <span class="n">block_bytes_stripped</span> <span class="o">=</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-    <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_unpack_rolling</span><span class="p">(</span> <span class="n">block_bytes_stripped</span> <span class="p">)</span>
+    <span class="p">(</span><span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_unpack_rolling</span><span class="p">(</span><span class="n">block_bytes_stripped</span><span class="p">)</span>
     <span class="n">options_lst</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span><span class="n">CustomBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span><span class="p">)</span>
     <span class="n">result_obj</span> <span class="o">=</span> <span class="n">CustomBlockNonCopyable</span><span class="p">(</span> <span class="n">pen_val</span><span class="p">,</span> <span class="n">content_bytes</span><span class="p">,</span> <span class="n">options_lst</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">result_obj</span>
@@ -2959,13 +2974,15 @@ individual block segments</p></div>
 
     
   
-    <div class="desc inherited"><p>Serialize an CB object into packed bytes</p></div>
+    <div class="desc inherited"><p>Serialize an CB object into packed bytes. NOTE: We are required to use
+Length-Value (LV) encoding for the custom content so that any options may also be recovered.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.CustomBlockNonCopyable.pack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block.CustomBlockNonCopyable.pack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="s2">&quot;Serialize an CB object into packed bytes&quot;</span>
-    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_bytes_pack</span><span class="p">(</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;Serialize an CB object into packed bytes. NOTE: We are required to use</span>
+<span class="sd">    Length-Value (LV) encoding for the custom content so that any options may also be recovered.&quot;&quot;&quot;</span>
+    <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">block32_lv_bytes_pack</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
     <span class="n">options_bytes</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">pack_all</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span> <span class="p">)</span>
     <span class="n">block_total_len</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span>
     <span class="n">packed_bytes</span> <span class="o">=</span> <span class="p">(</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pen_val</span> <span class="p">)</span> <span class="o">+</span>

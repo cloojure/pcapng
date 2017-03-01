@@ -142,7 +142,7 @@ def main():
     sock = socket.fromfd( socket_fd, socket.AF_PACKET, socket.SOCK_RAW, 0 )
     sock.setblocking(True)
 
-    print("Starting to listen on socket {}\n".format(interface_name))
+    print( "Starting to listen on socket {} -  use CTRL-C to terminate. \n".format( interface_name ))
     pcap_fp = open( 'data.pcapng', 'wb' );
 
     shb_opts = [ pcapng.option.ShbHardware( "Dell" ),

@@ -84,13 +84,38 @@ Blocks may also be serialized & deserialized in bulk, as seen in the unit tests:
 Installation
 ============
 
-#todo
+  sudo pip install pcapng
 
 
-Building
+API Documentation
+============
+
+Point your browser to the included HTML documentation::
+
+    firefox `doc/pcapng/index.html`         # or similar (system dependent)
+
+
+Sample Programs
 ========
 
-#todo
+Please see the sample programs:
+
+  - isis_agent_pcapng.py    # real-time packet capture from your machine into a PCAPNG file
+  - isis_demo_mrt.py        # same as above but save in Custom Block MRT format 
+  - pcapng_timing.py        # capure 1M sample packets
+
+The program `isis_agent_pcapng.py` creates an output file `data.pcapng`, which is `viewable in
+Wireshark.  <https://www.wireshark.org/>` 
+
+The program `isis_demo_mrt.py` creates two output files `isis.mrt` & `isis.pcapng`. The first of
+thes is in raw MRT format and is not viewable by Wireshark.  For the second file, each raw MRT block
+is wrapped in a PCAPNG Custom Block.  The file may be loaded successfully in Wireshark; however,
+since Wireshark doesn't understand the custom format, it produces a blank display.
+
+The third program `pcapng_timing.py` writes 1 million dummy packets to a PCAPNG file. A flag selects
+either Simple Packet Block or Enhanced Packet Block output format.  Execution on a representative
+computer yields execution times of ~6 seconds and ~16 seconds for SPB and EPB formats, respectively.
+
 
 Generating Documentation 
 ========================
@@ -98,16 +123,24 @@ Generating Documentation
 Documentation uses the `pdoc` tool.  Note that pdoc generates documentation from the installed
 `pcapng` package, not directly from thesource code.  To use:
 
-  - sudo pip install pdoc                   # ensure latest pdoc is installed
-  - ./generate-docs.bash                    # generate docs
-  - firefox `doc/pcapng/index.html`         # open html docs in browser (system dependent)
+  - sudo pip install pdoc       # install pdoc if not present
+  - ./generate-docs.bash        # generate docs
 
-
-#todo
 
 Endian Convention
 =================
 
-#todo
+The `PCAPNG specificaion <https://pcapng.github.io/pcapng/>` mandates that data be saved in the
+native endian format of the capturing machine. This avoids the possible need for byte-swapping
+during data capture, which may aid in efficiency. However, a reader of a PCAPNG file is obligated to
+examine the special BYTE_ORDER_MAGIC field of the Section Header Block in order to determine the
+endian convention used in generating the file.  Additionaly, since several PCAPNG files may be
+concatenated together to form a larger, valid PCAPNG file, the reader must re-evaluate the endian
+convention for each subsequent Section Header Block encountered.
+
+Currently, this library does not implement endian-sensitive decoding logic, using native endian
+encoding for both writing and reading. The library thus assumes that both the capturing maching and
+the reading machine share the same endian conventions.  The library may be extended in the future to
+implement the endian-sensitive logic for reading PCAPNG written on foreign hosts.
 
 

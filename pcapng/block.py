@@ -328,7 +328,9 @@ class EnhancedPacketBlock:
 
     def __init__(self, interface_id, pkt_data_captured, pkt_data_orig_len=None, options_lst=[],
                         timestamp=None ):
-        "Creates an EPB object"
+        """Creates an EPB object. If 'timestamp' is not supplied, uses the current UTC time in the
+        default format (uint64 microseconds since unix epoch). User-supplied timestamp must also be
+        in this format unless IDB options uses option.IdbTsResol to specify alternate."""
         util.assert_uint32( interface_id )  #todo verify args in all fns
         pkt_data_captured = to_bytes( pkt_data_captured )        #todo is list & tuple & str ok?
         if pkt_data_orig_len is None:

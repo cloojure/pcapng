@@ -114,7 +114,7 @@ def mod( numer, demon ):
     dummy, remainder = divmod( numer, demon )
     return remainder
 
-def take( n, listy):
+def take( n, listy ):
     "Return the first n values from a list or a generator"
     return list( listy )[ :n ]
 

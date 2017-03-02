@@ -1050,14 +1050,20 @@ table {
     <li class="mono"><a href="#pcapng.util_test.test_block32_pad_len">test_block32_pad_len</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_bytearray">test_bytearray</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_dict_merge">test_dict_merge</a></li>
+    <li class="mono"><a href="#pcapng.util_test.test_even_odd">test_even_odd</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_fibonacci_list">test_fibonacci_list</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_int8">test_int8</a></li>
+    <li class="mono"><a href="#pcapng.util_test.test_mod">test_mod</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_pad_to_block32">test_pad_to_block32</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_pad_to_len">test_pad_to_len</a></li>
+    <li class="mono"><a href="#pcapng.util_test.test_quot">test_quot</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_str_to_bytes">test_str_to_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util_test.test_str_to_intvec">test_str_to_intvec</a></li>
+    <li class="mono"><a href="#pcapng.util_test.test_take">test_take</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_time">test_time</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_to_bytes">test_to_bytes</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_types">test_types</a></li>
+    <li class="mono"><a href="#pcapng.util_test.test_uint64_split32">test_uint64_split32</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_uint8">test_uint8</a></li>
     <li class="mono"><a href="#pcapng.util_test.test_xxx">test_xxx</a></li>
   </ul>
@@ -1167,7 +1173,7 @@ table {
         <span class="n">assert_block32_bytes_packing</span><span class="p">(</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">test_block32_labelled_bytes_pack</span><span class="p">():</span>
-    <span class="n">block_label</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_secs</span><span class="p">()</span>
+    <span class="n">block_label</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_secs</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">assert_block32_labelled_bytes_packing</span><span class="p">(</span> <span class="n">data_bytes</span> <span class="p">):</span>
         <span class="n">orig</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">data_bytes</span> <span class="p">)</span>
         <span class="n">extra_bytes</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="s1">&#39;dummy-start&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">orig</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">(</span><span class="s1">&#39;dummy-end&#39;</span><span class="p">)</span>
@@ -1268,7 +1274,29 @@ table {
     <span class="k">assert</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="mi">2</span>        <span class="p">}</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">dict_merge</span><span class="p">(</span>       <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>            <span class="p">)</span>
     <span class="k">assert</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="mi">3</span> <span class="p">}</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">dict_merge_all</span><span class="p">(</span> <span class="p">[</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">}</span> <span class="p">]</span> <span class="p">)</span>
 
-<span class="c1">#-----------------------------------------------------------------------------</span>
+<span class="k">def</span> <span class="nf">test_even_odd</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_odd</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_odd</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_odd</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_str_to_intvec</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">str_to_intvec</span><span class="p">(</span><span class="s1">&#39;123456&#39;</span><span class="p">)</span>     <span class="o">==</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">56</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">str_to_intvec</span><span class="p">(</span><span class="s1">&#39;420001&#39;</span><span class="p">)</span>     <span class="o">==</span> <span class="p">[</span><span class="mi">42</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">str_to_intvec</span><span class="p">(</span><span class="s1">&#39;123456&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="o">==</span> <span class="p">[</span><span class="mi">123</span><span class="p">,</span> <span class="mi">456</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">test_uint64_split32</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">assert_round_trip</span><span class="p">(</span><span class="n">orig</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">high32</span><span class="p">,</span> <span class="n">low32</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_split32</span><span class="p">(</span> <span class="n">orig</span> <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_join32</span><span class="p">(</span><span class="n">high32</span><span class="p">,</span> <span class="n">low32</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">orig</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span> <span class="p">):</span>
+        <span class="n">assert_round_trip</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">test_xxx</span><span class="p">():</span>
     <span class="n">xx1</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span>   <span class="s1">&#39;!hhl&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="p">)</span>  <span class="c1"># h=&#39;short&#39;, l=&#39;long&#39;</span>
     <span class="n">xx2</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">&#39;!hhl&#39;</span><span class="p">,</span> <span class="n">xx1</span> <span class="p">)</span>      <span class="c1"># ! =&gt; network byte order (big-endian)</span>
@@ -1285,15 +1313,36 @@ table {
     <span class="k">assert</span> <span class="s1">&#39;abc&#39;</span>             <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">chrList_to_str</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">])</span>
 
 <span class="k">def</span> <span class="nf">test_time</span><span class="p">():</span>
-    <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_set</span><span class="p">(</span><span class="mf">123.456789</span><span class="p">)</span>
+    <span class="n">time_tst</span> <span class="o">=</span> <span class="mf">123.456789</span>
+    <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_set</span><span class="p">(</span> <span class="mf">123.456789</span> <span class="p">)</span>
+    <span class="n">util</span><span class="o">.</span><span class="n">assert_rel_equal</span><span class="p">(</span><span class="n">time_tst</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc</span><span class="p">(),</span> <span class="n">digits</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">123456789</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_micros</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">123456</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_millis</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">123</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_secs</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+
     <span class="p">(</span><span class="n">secs</span><span class="p">,</span><span class="n">usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_timetuple</span><span class="p">()</span>
     <span class="k">assert</span> <span class="mi">123</span>    <span class="o">==</span> <span class="n">secs</span>
-    <span class="k">assert</span> <span class="mi">456789</span> <span class="o">==</span> <span class="nb">round</span><span class="p">(</span> <span class="n">usecs</span> <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">456789</span> <span class="o">-</span> <span class="n">usecs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span>
     <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_unset</span><span class="p">()</span>
 
     <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_set</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="s1">&#39;0x0001e240&#39;</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_secs_hexstr</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="s1">&#39;0x0001e240&#39;</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_secs_hexstr</span><span class="p">()</span>
     <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_unset</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">test_quot</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">util</span><span class="o">.</span><span class="n">quot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_mod</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">util</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_take</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">generate_ints</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">i</span>
+    <span class="n">gen_vals</span> <span class="o">=</span> <span class="n">generate_ints</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+    <span class="n">lst_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="p">(</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">take</span><span class="p">(</span> <span class="mi">5</span><span class="p">,</span> <span class="n">gen_vals</span> <span class="p">)</span>
+                         <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">take</span><span class="p">(</span> <span class="mi">5</span><span class="p">,</span> <span class="n">lst_vals</span> <span class="p">))</span>
 </pre></div>
 
   </div>
@@ -1378,7 +1427,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_block32_labelled_bytes_pack', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util_test.test_block32_labelled_bytes_pack" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_block32_labelled_bytes_pack</span><span class="p">():</span>
-    <span class="n">block_label</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_secs</span><span class="p">()</span>
+    <span class="n">block_label</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_secs</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">assert_block32_labelled_bytes_packing</span><span class="p">(</span> <span class="n">data_bytes</span> <span class="p">):</span>
         <span class="n">orig</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">data_bytes</span> <span class="p">)</span>
         <span class="n">extra_bytes</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="s1">&#39;dummy-start&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">orig</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">(</span><span class="s1">&#39;dummy-end&#39;</span><span class="p">)</span>
@@ -1480,6 +1529,33 @@ table {
   
       
   <div class="item">
+    <div class="name def" id="pcapng.util_test.test_even_odd">
+    <p>def <span class="ident">test_even_odd</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_even_odd', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util_test.test_even_odd" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_even_odd</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_odd</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_odd</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">is_odd</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="pcapng.util_test.test_fibonacci_list">
     <p>def <span class="ident">test_fibonacci_list</span>(</p><p>)</p>
     </div>
@@ -1525,6 +1601,27 @@ table {
         <span class="n">util</span><span class="o">.</span><span class="n">assert_int8</span><span class="p">(</span><span class="n">sb</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span> <span class="n">util</span><span class="o">.</span><span class="n">assert_int8</span><span class="p">(</span> <span class="o">-</span><span class="mi">129</span> <span class="p">)</span>
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span> <span class="n">util</span><span class="o">.</span><span class="n">assert_int8</span><span class="p">(</span>  <span class="mi">128</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util_test.test_mod">
+    <p>def <span class="ident">test_mod</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_mod', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util_test.test_mod" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_mod</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">util</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1605,6 +1702,27 @@ table {
   
       
   <div class="item">
+    <div class="name def" id="pcapng.util_test.test_quot">
+    <p>def <span class="ident">test_quot</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_quot', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util_test.test_quot" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_quot</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">util</span><span class="o">.</span><span class="n">quot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="pcapng.util_test.test_str_to_bytes">
     <p>def <span class="ident">test_str_to_bytes</span>(</p><p>)</p>
     </div>
@@ -1626,6 +1744,56 @@ table {
   
       
   <div class="item">
+    <div class="name def" id="pcapng.util_test.test_str_to_intvec">
+    <p>def <span class="ident">test_str_to_intvec</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_str_to_intvec', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util_test.test_str_to_intvec" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_str_to_intvec</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">str_to_intvec</span><span class="p">(</span><span class="s1">&#39;123456&#39;</span><span class="p">)</span>     <span class="o">==</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">56</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">str_to_intvec</span><span class="p">(</span><span class="s1">&#39;420001&#39;</span><span class="p">)</span>     <span class="o">==</span> <span class="p">[</span><span class="mi">42</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">util</span><span class="o">.</span><span class="n">str_to_intvec</span><span class="p">(</span><span class="s1">&#39;123456&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="o">==</span> <span class="p">[</span><span class="mi">123</span><span class="p">,</span> <span class="mi">456</span><span class="p">]</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util_test.test_take">
+    <p>def <span class="ident">test_take</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_take', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util_test.test_take" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_take</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">generate_ints</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">i</span>
+    <span class="n">gen_vals</span> <span class="o">=</span> <span class="n">generate_ints</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+    <span class="n">lst_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="p">(</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">take</span><span class="p">(</span> <span class="mi">5</span><span class="p">,</span> <span class="n">gen_vals</span> <span class="p">)</span>
+                         <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">take</span><span class="p">(</span> <span class="mi">5</span><span class="p">,</span> <span class="n">lst_vals</span> <span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="pcapng.util_test.test_time">
     <p>def <span class="ident">test_time</span>(</p><p>)</p>
     </div>
@@ -1637,14 +1805,20 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_time', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util_test.test_time" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_time</span><span class="p">():</span>
-    <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_set</span><span class="p">(</span><span class="mf">123.456789</span><span class="p">)</span>
+    <span class="n">time_tst</span> <span class="o">=</span> <span class="mf">123.456789</span>
+    <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_set</span><span class="p">(</span> <span class="mf">123.456789</span> <span class="p">)</span>
+    <span class="n">util</span><span class="o">.</span><span class="n">assert_rel_equal</span><span class="p">(</span><span class="n">time_tst</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc</span><span class="p">(),</span> <span class="n">digits</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">123456789</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_micros</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">123456</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_millis</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">123</span> <span class="o">-</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_secs</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+
     <span class="p">(</span><span class="n">secs</span><span class="p">,</span><span class="n">usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_timetuple</span><span class="p">()</span>
     <span class="k">assert</span> <span class="mi">123</span>    <span class="o">==</span> <span class="n">secs</span>
-    <span class="k">assert</span> <span class="mi">456789</span> <span class="o">==</span> <span class="nb">round</span><span class="p">(</span> <span class="n">usecs</span> <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">456789</span> <span class="o">-</span> <span class="n">usecs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span>
     <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_unset</span><span class="p">()</span>
 
     <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_set</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="s1">&#39;0x0001e240&#39;</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_secs_hexstr</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="s1">&#39;0x0001e240&#39;</span> <span class="o">==</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_secs_hexstr</span><span class="p">()</span>
     <span class="n">util</span><span class="o">.</span><span class="n">test_time_utc_unset</span><span class="p">()</span>
 </pre></div>
 
@@ -1715,6 +1889,32 @@ table {
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span> <span class="n">util</span><span class="o">.</span><span class="n">assert_type_dict</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span> <span class="n">util</span><span class="o">.</span><span class="n">assert_type_dict</span><span class="p">(</span> <span class="s1">&#39;a&#39;</span> <span class="p">)</span>
     <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span> <span class="n">util</span><span class="o">.</span><span class="n">assert_type_dict</span><span class="p">(</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util_test.test_uint64_split32">
+    <p>def <span class="ident">test_uint64_split32</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util_test.test_uint64_split32', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util_test.test_uint64_split32" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">test_uint64_split32</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">assert_round_trip</span><span class="p">(</span><span class="n">orig</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">high32</span><span class="p">,</span> <span class="n">low32</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_split32</span><span class="p">(</span> <span class="n">orig</span> <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_join32</span><span class="p">(</span><span class="n">high32</span><span class="p">,</span> <span class="n">low32</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">orig</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">util</span><span class="o">.</span><span class="n">fibonacci_range</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span> <span class="p">):</span>
+        <span class="n">assert_round_trip</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
 
   </div>

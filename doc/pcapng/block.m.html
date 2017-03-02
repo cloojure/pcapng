@@ -1532,7 +1532,9 @@ table {
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">pkt_data_captured</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">options_lst</span><span class="o">=</span><span class="p">[],</span>
                         <span class="n">timestamp</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
-        <span class="s2">&quot;Creates an EPB object&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Creates an EPB object. If &#39;timestamp&#39; is not supplied, uses the current UTC time in the</span>
+<span class="sd">        default format (uint64 microseconds since unix epoch). User-supplied timestamp must also be</span>
+<span class="sd">        in this format unless IDB options uses option.IdbTsResol to specify alternate.&quot;&quot;&quot;</span>
         <span class="n">util</span><span class="o">.</span><span class="n">assert_uint32</span><span class="p">(</span> <span class="n">interface_id</span> <span class="p">)</span>  <span class="c1">#todo verify args in all fns</span>
         <span class="n">pkt_data_captured</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">pkt_data_captured</span> <span class="p">)</span>        <span class="c1">#todo is list &amp; tuple &amp; str ok?</span>
         <span class="k">if</span> <span class="n">pkt_data_orig_len</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -1544,22 +1546,21 @@ table {
         <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">options_lst</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_epb_option</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_timetuple</span><span class="p">()</span>
+            <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_micros</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">timestamp</span>
+            <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">timestamp</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">interface_id</span>       <span class="o">=</span> <span class="n">interface_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_captured</span>  <span class="o">=</span> <span class="n">pkt_data_captured</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_orig_len</span>  <span class="o">=</span> <span class="n">pkt_data_orig_len</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span>        <span class="o">=</span> <span class="n">options_lst</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_secs</span>          <span class="o">=</span> <span class="n">time_secs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_usecs</span>         <span class="o">=</span> <span class="n">time_usecs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_utc_micros</span>    <span class="o">=</span> <span class="n">time_utc_micros</span>
 
     <span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot;Converts an EPB object to a map representation&quot;</span>
         <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span>
             <span class="s1">&#39;interface_id&#39;</span><span class="p">,</span> <span class="s1">&#39;pkt_data_captured&#39;</span><span class="p">,</span> <span class="s1">&#39;pkt_data_orig_len&#39;</span><span class="p">,</span> <span class="s1">&#39;options_lst&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;time_secs&#39;</span><span class="p">,</span> <span class="s1">&#39;time_usecs&#39;</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="s1">&#39;time_utc_micros&#39;</span> <span class="p">]</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="p">)</span>
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span>
@@ -1585,8 +1586,9 @@ table {
                             <span class="n">pkt_data_captured_pad_len</span> <span class="o">+</span>
                             <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span> <span class="o">+</span>
                             <span class="mi">4</span> <span class="p">)</span>      <span class="c1"># block total length</span>
+        <span class="p">(</span><span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_split32</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_utc_micros</span> <span class="p">)</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPEC_CODE</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interface_id</span><span class="p">,</span>
-                                     <span class="bp">self</span><span class="o">.</span><span class="n">time_secs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_usecs</span><span class="p">,</span> <span class="n">pkt_data_captured_len</span><span class="p">,</span>
+                                     <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">,</span> <span class="n">pkt_data_captured_len</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_orig_len</span><span class="p">)</span> <span class="o">+</span>
                         <span class="n">pkt_data_pad</span> <span class="o">+</span>
                         <span class="n">options_bytes</span> <span class="o">+</span>
@@ -1597,9 +1599,10 @@ table {
     <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
         <span class="s2">&quot;Deserialize an EPB object from packed bytes&quot;</span>
         <span class="n">util</span><span class="o">.</span><span class="n">assert_type_bytes</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">,</span>
                 <span class="n">pkt_data_captured_len</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">28</span><span class="p">]</span> <span class="p">)</span>
         <span class="p">(</span><span class="n">block_total_len_end</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">tail_encoding</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:])</span>
+        <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_join32</span><span class="p">(</span> <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span> <span class="p">)</span>
         <span class="k">assert</span> <span class="n">block_type</span>           <span class="o">==</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">SPEC_CODE</span>      <span class="c1">#todo verify block type &amp; all fields, all fns</span>
         <span class="k">assert</span> <span class="n">block_total_len</span>      <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">pkt_data_captured_len</span> <span class="o">&lt;=</span> <span class="n">pkt_data_orig_len</span>
@@ -1610,7 +1613,7 @@ table {
         <span class="n">options_bytes</span>               <span class="o">=</span> <span class="n">block_bytes_stripped</span><span class="p">[</span><span class="n">pkt_data_captured_pad_len</span><span class="p">:]</span>
         <span class="n">options_lst</span>                 <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span> <span class="p">)</span>
         <span class="n">result_obj</span>                  <span class="o">=</span> <span class="n">EnhancedPacketBlock</span><span class="p">(</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">pkt_data</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="p">,</span> <span class="n">options_lst</span><span class="p">,</span>
-                                                           <span class="n">timestamp</span><span class="o">=</span><span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="p">)</span>
+                                                           <span class="n">timestamp</span><span class="o">=</span><span class="n">time_utc_micros</span>  <span class="p">)</span>
         <span class="k">return</span> <span class="n">result_obj</span>
 
 <span class="c1"># custom format really needs a content_length field!</span>
@@ -3211,7 +3214,9 @@ Length-Value (LV) encoding for the custom content so that any options may also b
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">pkt_data_captured</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">options_lst</span><span class="o">=</span><span class="p">[],</span>
                         <span class="n">timestamp</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
-        <span class="s2">&quot;Creates an EPB object&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Creates an EPB object. If &#39;timestamp&#39; is not supplied, uses the current UTC time in the</span>
+<span class="sd">        default format (uint64 microseconds since unix epoch). User-supplied timestamp must also be</span>
+<span class="sd">        in this format unless IDB options uses option.IdbTsResol to specify alternate.&quot;&quot;&quot;</span>
         <span class="n">util</span><span class="o">.</span><span class="n">assert_uint32</span><span class="p">(</span> <span class="n">interface_id</span> <span class="p">)</span>  <span class="c1">#todo verify args in all fns</span>
         <span class="n">pkt_data_captured</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">pkt_data_captured</span> <span class="p">)</span>        <span class="c1">#todo is list &amp; tuple &amp; str ok?</span>
         <span class="k">if</span> <span class="n">pkt_data_orig_len</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -3223,22 +3228,21 @@ Length-Value (LV) encoding for the custom content so that any options may also b
         <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">options_lst</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_epb_option</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_timetuple</span><span class="p">()</span>
+            <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_micros</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">timestamp</span>
+            <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">timestamp</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">interface_id</span>       <span class="o">=</span> <span class="n">interface_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_captured</span>  <span class="o">=</span> <span class="n">pkt_data_captured</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_orig_len</span>  <span class="o">=</span> <span class="n">pkt_data_orig_len</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span>        <span class="o">=</span> <span class="n">options_lst</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_secs</span>          <span class="o">=</span> <span class="n">time_secs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_usecs</span>         <span class="o">=</span> <span class="n">time_usecs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_utc_micros</span>    <span class="o">=</span> <span class="n">time_utc_micros</span>
 
     <span class="k">def</span> <span class="nf">to_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot;Converts an EPB object to a map representation&quot;</span>
         <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span>
             <span class="s1">&#39;interface_id&#39;</span><span class="p">,</span> <span class="s1">&#39;pkt_data_captured&#39;</span><span class="p">,</span> <span class="s1">&#39;pkt_data_orig_len&#39;</span><span class="p">,</span> <span class="s1">&#39;options_lst&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;time_secs&#39;</span><span class="p">,</span> <span class="s1">&#39;time_usecs&#39;</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="s1">&#39;time_utc_micros&#39;</span> <span class="p">]</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="p">)</span>
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">to_map</span><span class="p">()</span>
@@ -3264,8 +3268,9 @@ Length-Value (LV) encoding for the custom content so that any options may also b
                             <span class="n">pkt_data_captured_pad_len</span> <span class="o">+</span>
                             <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span> <span class="o">+</span>
                             <span class="mi">4</span> <span class="p">)</span>      <span class="c1"># block total length</span>
+        <span class="p">(</span><span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_split32</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_utc_micros</span> <span class="p">)</span>
         <span class="n">packed_bytes</span> <span class="o">=</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPEC_CODE</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interface_id</span><span class="p">,</span>
-                                     <span class="bp">self</span><span class="o">.</span><span class="n">time_secs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_usecs</span><span class="p">,</span> <span class="n">pkt_data_captured_len</span><span class="p">,</span>
+                                     <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">,</span> <span class="n">pkt_data_captured_len</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_orig_len</span><span class="p">)</span> <span class="o">+</span>
                         <span class="n">pkt_data_pad</span> <span class="o">+</span>
                         <span class="n">options_bytes</span> <span class="o">+</span>
@@ -3276,9 +3281,10 @@ Length-Value (LV) encoding for the custom content so that any options may also b
     <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
         <span class="s2">&quot;Deserialize an EPB object from packed bytes&quot;</span>
         <span class="n">util</span><span class="o">.</span><span class="n">assert_type_bytes</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">,</span>
                 <span class="n">pkt_data_captured_len</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">28</span><span class="p">]</span> <span class="p">)</span>
         <span class="p">(</span><span class="n">block_total_len_end</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">tail_encoding</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:])</span>
+        <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_join32</span><span class="p">(</span> <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span> <span class="p">)</span>
         <span class="k">assert</span> <span class="n">block_type</span>           <span class="o">==</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">SPEC_CODE</span>      <span class="c1">#todo verify block type &amp; all fields, all fns</span>
         <span class="k">assert</span> <span class="n">block_total_len</span>      <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">pkt_data_captured_len</span> <span class="o">&lt;=</span> <span class="n">pkt_data_orig_len</span>
@@ -3289,7 +3295,7 @@ Length-Value (LV) encoding for the custom content so that any options may also b
         <span class="n">options_bytes</span>               <span class="o">=</span> <span class="n">block_bytes_stripped</span><span class="p">[</span><span class="n">pkt_data_captured_pad_len</span><span class="p">:]</span>
         <span class="n">options_lst</span>                 <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span> <span class="p">)</span>
         <span class="n">result_obj</span>                  <span class="o">=</span> <span class="n">EnhancedPacketBlock</span><span class="p">(</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">pkt_data</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="p">,</span> <span class="n">options_lst</span><span class="p">,</span>
-                                                           <span class="n">timestamp</span><span class="o">=</span><span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="p">)</span>
+                                                           <span class="n">timestamp</span><span class="o">=</span><span class="n">time_utc_micros</span>  <span class="p">)</span>
         <span class="k">return</span> <span class="n">result_obj</span>
 </pre></div>
 
@@ -3409,9 +3415,10 @@ Length-Value (LV) encoding for the custom content so that any options may also b
 <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">):</span>
     <span class="s2">&quot;Deserialize an EPB object from packed bytes&quot;</span>
     <span class="n">util</span><span class="o">.</span><span class="n">assert_type_bytes</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
-    <span class="p">(</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">block_type</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">,</span>
             <span class="n">pkt_data_captured_len</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[:</span><span class="mi">28</span><span class="p">]</span> <span class="p">)</span>
     <span class="p">(</span><span class="n">block_total_len_end</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">tail_encoding</span><span class="p">,</span> <span class="n">packed_bytes</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:])</span>
+    <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_join32</span><span class="p">(</span> <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span> <span class="p">)</span>
     <span class="k">assert</span> <span class="n">block_type</span>           <span class="o">==</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">SPEC_CODE</span>      <span class="c1">#todo verify block type &amp; all fields, all fns</span>
     <span class="k">assert</span> <span class="n">block_total_len</span>      <span class="o">==</span> <span class="n">block_total_len_end</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">pkt_data_captured_len</span> <span class="o">&lt;=</span> <span class="n">pkt_data_orig_len</span>
@@ -3421,7 +3428,7 @@ Length-Value (LV) encoding for the custom content so that any options may also b
     <span class="n">options_bytes</span>               <span class="o">=</span> <span class="n">block_bytes_stripped</span><span class="p">[</span><span class="n">pkt_data_captured_pad_len</span><span class="p">:]</span>
     <span class="n">options_lst</span>                 <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">unpack_all</span><span class="p">(</span> <span class="n">EnhancedPacketBlock</span><span class="o">.</span><span class="n">UNPACK_DISPATCH_TABLE</span><span class="p">,</span> <span class="n">options_bytes</span> <span class="p">)</span>
     <span class="n">result_obj</span>                  <span class="o">=</span> <span class="n">EnhancedPacketBlock</span><span class="p">(</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">pkt_data</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="p">,</span> <span class="n">options_lst</span><span class="p">,</span>
-                                                       <span class="n">timestamp</span><span class="o">=</span><span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="p">)</span>
+                                                       <span class="n">timestamp</span><span class="o">=</span><span class="n">time_utc_micros</span>  <span class="p">)</span>
     <span class="k">return</span> <span class="n">result_obj</span>
 </pre></div>
 
@@ -3472,17 +3479,7 @@ Length-Value (LV) encoding for the custom content so that any options may also b
 
             </div>
             <div class="item">
-            <p id="pcapng.block.EnhancedPacketBlock.time_secs" class="name">var <span class="ident">time_secs</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pcapng.block.EnhancedPacketBlock.time_usecs" class="name">var <span class="ident">time_usecs</span></p>
+            <p id="pcapng.block.EnhancedPacketBlock.time_utc_micros" class="name">var <span class="ident">time_utc_micros</span></p>
             
 
             
@@ -3501,13 +3498,17 @@ Length-Value (LV) encoding for the custom content so that any options may also b
 
     
   
-    <div class="desc"><p>Creates an EPB object</p></div>
+    <div class="desc"><p>Creates an EPB object. If 'timestamp' is not supplied, uses the current UTC time in the
+default format (uint64 microseconds since unix epoch). User-supplied timestamp must also be
+in this format unless IDB options uses option.IdbTsResol to specify alternate.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.block.EnhancedPacketBlock.__init__', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.block.EnhancedPacketBlock.__init__" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface_id</span><span class="p">,</span> <span class="n">pkt_data_captured</span><span class="p">,</span> <span class="n">pkt_data_orig_len</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">options_lst</span><span class="o">=</span><span class="p">[],</span>
                     <span class="n">timestamp</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
-    <span class="s2">&quot;Creates an EPB object&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Creates an EPB object. If &#39;timestamp&#39; is not supplied, uses the current UTC time in the</span>
+<span class="sd">    default format (uint64 microseconds since unix epoch). User-supplied timestamp must also be</span>
+<span class="sd">    in this format unless IDB options uses option.IdbTsResol to specify alternate.&quot;&quot;&quot;</span>
     <span class="n">util</span><span class="o">.</span><span class="n">assert_uint32</span><span class="p">(</span> <span class="n">interface_id</span> <span class="p">)</span>  <span class="c1">#todo verify args in all fns</span>
     <span class="n">pkt_data_captured</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">pkt_data_captured</span> <span class="p">)</span>        <span class="c1">#todo is list &amp; tuple &amp; str ok?</span>
     <span class="k">if</span> <span class="n">pkt_data_orig_len</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -3519,15 +3520,14 @@ Length-Value (LV) encoding for the custom content so that any options may also b
     <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">options_lst</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_epb_option</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_utc_timetuple</span><span class="p">()</span>
+        <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">curr_time_utc_micros</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="p">(</span><span class="n">time_secs</span><span class="p">,</span> <span class="n">time_usecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">timestamp</span>
+        <span class="n">time_utc_micros</span> <span class="o">=</span> <span class="n">timestamp</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">interface_id</span>       <span class="o">=</span> <span class="n">interface_id</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_captured</span>  <span class="o">=</span> <span class="n">pkt_data_captured</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_orig_len</span>  <span class="o">=</span> <span class="n">pkt_data_orig_len</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">options_lst</span>        <span class="o">=</span> <span class="n">options_lst</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">time_secs</span>          <span class="o">=</span> <span class="n">time_secs</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">time_usecs</span>         <span class="o">=</span> <span class="n">time_usecs</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_utc_micros</span>    <span class="o">=</span> <span class="n">time_utc_micros</span>
 </pre></div>
 
   </div>
@@ -3565,8 +3565,9 @@ Length-Value (LV) encoding for the custom content so that any options may also b
                         <span class="n">pkt_data_captured_pad_len</span> <span class="o">+</span>
                         <span class="nb">len</span><span class="p">(</span><span class="n">options_bytes</span><span class="p">)</span> <span class="o">+</span>
                         <span class="mi">4</span> <span class="p">)</span>      <span class="c1"># block total length</span>
+    <span class="p">(</span><span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">)</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">uint64_split32</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_utc_micros</span> <span class="p">)</span>
     <span class="n">packed_bytes</span> <span class="o">=</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPEC_CODE</span><span class="p">,</span> <span class="n">block_total_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interface_id</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">time_secs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_usecs</span><span class="p">,</span> <span class="n">pkt_data_captured_len</span><span class="p">,</span>
+                                 <span class="n">timestamp_high</span><span class="p">,</span> <span class="n">timestamp_low</span><span class="p">,</span> <span class="n">pkt_data_captured_len</span><span class="p">,</span>
                                  <span class="bp">self</span><span class="o">.</span><span class="n">pkt_data_orig_len</span><span class="p">)</span> <span class="o">+</span>
                     <span class="n">pkt_data_pad</span> <span class="o">+</span>
                     <span class="n">options_bytes</span> <span class="o">+</span>
@@ -3596,7 +3597,7 @@ Length-Value (LV) encoding for the custom content so that any options may also b
     <span class="s2">&quot;Converts an EPB object to a map representation&quot;</span>
     <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">select_keys</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">[</span>
         <span class="s1">&#39;interface_id&#39;</span><span class="p">,</span> <span class="s1">&#39;pkt_data_captured&#39;</span><span class="p">,</span> <span class="s1">&#39;pkt_data_orig_len&#39;</span><span class="p">,</span> <span class="s1">&#39;options_lst&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;time_secs&#39;</span><span class="p">,</span> <span class="s1">&#39;time_usecs&#39;</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="s1">&#39;time_utc_micros&#39;</span> <span class="p">]</span> <span class="p">)</span>
 </pre></div>
 
   </div>

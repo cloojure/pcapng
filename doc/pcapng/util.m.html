@@ -1062,6 +1062,7 @@ table {
     <li class="mono"><a href="#pcapng.util.assert_type_bytes">assert_type_bytes</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_charLst">assert_type_charLst</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_dict">assert_type_dict</a></li>
+    <li class="mono"><a href="#pcapng.util.assert_type_int">assert_type_int</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_list">assert_type_list</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_set">assert_type_set</a></li>
     <li class="mono"><a href="#pcapng.util.assert_type_str">assert_type_str</a></li>
@@ -1081,8 +1082,11 @@ table {
     <li class="mono"><a href="#pcapng.util.bytes_to_uint8_list">bytes_to_uint8_list</a></li>
     <li class="mono"><a href="#pcapng.util.chrList_to_str">chrList_to_str</a></li>
     <li class="mono"><a href="#pcapng.util.classname">classname</a></li>
-    <li class="mono"><a href="#pcapng.util.curr_utc_secs">curr_utc_secs</a></li>
-    <li class="mono"><a href="#pcapng.util.curr_utc_secs_hexstr">curr_utc_secs_hexstr</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_time_utc">curr_time_utc</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_time_utc_micros">curr_time_utc_micros</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_time_utc_millis">curr_time_utc_millis</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_time_utc_secs">curr_time_utc_secs</a></li>
+    <li class="mono"><a href="#pcapng.util.curr_time_utc_secs_hexstr">curr_time_utc_secs_hexstr</a></li>
     <li class="mono"><a href="#pcapng.util.curr_utc_timetuple">curr_utc_timetuple</a></li>
     <li class="mono"><a href="#pcapng.util.dict_merge">dict_merge</a></li>
     <li class="mono"><a href="#pcapng.util.dict_merge_all">dict_merge_all</a></li>
@@ -1090,20 +1094,28 @@ table {
     <li class="mono"><a href="#pcapng.util.fibonacci_range">fibonacci_range</a></li>
     <li class="mono"><a href="#pcapng.util.fibonacci_range_signed">fibonacci_range_signed</a></li>
     <li class="mono"><a href="#pcapng.util.int32_to_hexstr">int32_to_hexstr</a></li>
+    <li class="mono"><a href="#pcapng.util.is_even">is_even</a></li>
+    <li class="mono"><a href="#pcapng.util.is_int">is_int</a></li>
+    <li class="mono"><a href="#pcapng.util.is_odd">is_odd</a></li>
     <li class="mono"><a href="#pcapng.util.is_python2">is_python2</a></li>
     <li class="mono"><a href="#pcapng.util.is_python3">is_python3</a></li>
     <li class="mono"><a href="#pcapng.util.mod">mod</a></li>
     <li class="mono"><a href="#pcapng.util.pad_bytes">pad_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.quot">quot</a></li>
     <li class="mono"><a href="#pcapng.util.rand_bytes">rand_bytes</a></li>
     <li class="mono"><a href="#pcapng.util.rand_ints">rand_ints</a></li>
     <li class="mono"><a href="#pcapng.util.select_keys">select_keys</a></li>
     <li class="mono"><a href="#pcapng.util.split_float">split_float</a></li>
     <li class="mono"><a href="#pcapng.util.str_to_bytes">str_to_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.str_to_intvec">str_to_intvec</a></li>
+    <li class="mono"><a href="#pcapng.util.take">take</a></li>
     <li class="mono"><a href="#pcapng.util.test_time_utc_set">test_time_utc_set</a></li>
     <li class="mono"><a href="#pcapng.util.test_time_utc_unset">test_time_utc_unset</a></li>
     <li class="mono"><a href="#pcapng.util.timeTuple_subtract">timeTuple_subtract</a></li>
     <li class="mono"><a href="#pcapng.util.timeTuple_to_float">timeTuple_to_float</a></li>
     <li class="mono"><a href="#pcapng.util.to_bytes">to_bytes</a></li>
+    <li class="mono"><a href="#pcapng.util.uint64_join32">uint64_join32</a></li>
+    <li class="mono"><a href="#pcapng.util.uint64_split32">uint64_split32</a></li>
   </ul>
 
     </li>
@@ -1193,19 +1205,36 @@ table {
 <span class="k">def</span> <span class="nf">assert_type_bytearray</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>       <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytearray</span>
 <span class="k">def</span> <span class="nf">assert_type_bytes</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>           <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span>
 <span class="k">def</span> <span class="nf">assert_type_str</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span>
+<span class="k">def</span> <span class="nf">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span>
 <span class="k">def</span> <span class="nf">assert_type_set</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span>
 <span class="k">def</span> <span class="nf">assert_type_list</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span>
 <span class="k">def</span> <span class="nf">assert_type_dict</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span>
 
-<span class="k">def</span> <span class="nf">assert_uint8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">assert_uint16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_uint8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_uint16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">assert_int8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                 <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span>  <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">assert_int16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">assert_int32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">assert_int64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_int8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span>  <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_int16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_int32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assert_int64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">assert_type_charLst</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
     <span class="s2">&quot;Assert the arg is a list of characters (len-1 strings)&quot;</span>
@@ -1232,6 +1261,18 @@ table {
     <span class="n">assert_uint8_list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">)</span>
 
 <span class="c1">#-----------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">quot</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">):</span>
+    <span class="n">quotient</span><span class="p">,</span> <span class="n">dummy</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">quotient</span>
+
+<span class="k">def</span> <span class="nf">mod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">):</span>
+    <span class="n">dummy</span><span class="p">,</span> <span class="n">remainder</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">remainder</span>
+
+<span class="k">def</span> <span class="nf">take</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Return the first n values from a list or a generator&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">)[</span> <span class="p">:</span><span class="n">n</span> <span class="p">]</span>
 
 <span class="c1">#todo make a pow2_range(), pow2_thru() fns (0 1 2 4 8 16 32 ...)</span>
 <span class="c1">#todo make a sqr_range(), sqr_thru() fns (0 1 2 4 9 16 25 36 ...)</span>
@@ -1267,9 +1308,6 @@ table {
     <span class="n">result</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="p">(</span><span class="n">pos_vals</span> <span class="o">+</span> <span class="n">neg_vals</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
     <span class="k">return</span> <span class="n">result</span>
 
-<span class="k">def</span> <span class="nf">mod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">):</span>
-    <span class="n">dummy</span><span class="p">,</span> <span class="n">remainder</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">)</span>
-    <span class="k">return</span> <span class="n">remainder</span>
 
 <span class="c1">#-----------------------------------------------------------------------------</span>
 <span class="k">def</span> <span class="nf">assert_rel_equal</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
@@ -1323,30 +1361,44 @@ table {
     <span class="n">int_vals</span> <span class="o">=</span> <span class="n">rand_ints</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">to_bytes</span><span class="p">(</span> <span class="n">int_vals</span> <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">curr_utc_timetuple</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) tuple.&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">curr_time_utc</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in floating-point seconds since unix epoch.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">gbl_test_ctx</span>
     <span class="k">if</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
         <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span> <span class="n">utc_secs</span> <span class="p">)</span>
-    <span class="k">return</span> <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span>
+    <span class="k">return</span> <span class="n">utc_secs</span>
 
-<span class="k">def</span> <span class="nf">curr_utc_secs</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
-    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">curr_utc_timetuple</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">curr_utc_timetuple</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) integer tuple.&quot;&quot;&quot;</span>
+    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">secs</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">usecs</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">curr_time_utc_micros</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer microseconds since unix epoch.&quot;&quot;&quot;</span>
+    <span class="n">micros</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">micros</span>
+
+<span class="k">def</span> <span class="nf">curr_time_utc_millis</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer milliseconds since unix epoch.&quot;&quot;&quot;</span>
+    <span class="n">millis</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">millis</span>
+
+<span class="k">def</span> <span class="nf">curr_time_utc_secs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds since unix epoch.&quot;&quot;&quot;</span>
+    <span class="n">secs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">secs</span>
 
-<span class="k">def</span> <span class="nf">curr_utc_secs_hexstr</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">curr_time_utc_secs_hexstr</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">int32_to_hexstr</span><span class="p">(</span><span class="n">curr_utc_secs</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">int32_to_hexstr</span><span class="p">(</span><span class="n">curr_time_utc_secs</span><span class="p">())</span>
 
-<span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>    <span class="c1">#todo delete?</span>
     <span class="sd">&quot;&quot;&quot;Converts a time tuple from (secs, usecs) to float.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">usecs</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">timeTuple_subtract</span><span class="p">(</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">timeTuple_subtract</span><span class="p">(</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">):</span>    <span class="c1">#todo delete?</span>
     <span class="sd">&quot;&quot;&quot;Subtracts two time tuples in (secs, usecs) format, returning a float result.&quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">us1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts1</span>
     <span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">us2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts2</span>
@@ -1389,6 +1441,53 @@ table {
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">curr_dict</span> <span class="ow">in</span> <span class="n">dict_lst</span><span class="p">:</span>
         <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">curr_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">is_int</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns True if the arg is an integer value&quot;</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="n">arg</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns True if the arg is an even integer&quot;</span>
+    <span class="k">assert</span> <span class="n">is_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">half</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">half</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">is_odd</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns True if the arg is an even integer&quot;</span>
+    <span class="k">return</span> <span class="n">is_even</span><span class="p">(</span><span class="n">arg</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">str_to_intvec</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a string of digits into a list of integers like:</span>
+<span class="sd">            str_to_intvec(&#39;123456&#39;)     -&gt; [12, 34, 56]</span>
+<span class="sd">            str_to_intvec(&#39;123456&#39;, 3)  -&gt; [123, 456]   &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span>
+    <span class="k">assert</span> <span class="n">is_even</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">src</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">chars</span> <span class="o">=</span> <span class="n">src</span><span class="p">[:</span><span class="n">digits</span><span class="p">]</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="n">digits</span><span class="p">:]</span>
+        <span class="n">intval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">intval</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">uint64_split32</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Splits a 64-bit unsigned integer value into the high and low 32-bit integer values</span>
+<span class="sd">            (high32, low32) = uint64_split32( orig )</span>
+<span class="sd">            assert (high32 &lt;&lt; 32) | low32 == orig &quot;&quot;&quot;</span>
+    <span class="n">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">high32</span> <span class="o">=</span> <span class="n">arg</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span>
+    <span class="n">low32</span>  <span class="o">=</span> <span class="n">arg</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">high32</span><span class="p">,</span><span class="n">low32</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">uint64_join32</span><span class="p">(</span> <span class="n">high32</span><span class="p">,</span> <span class="n">low32</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a 64-bit unsigned integer value formed by joining the high and</span>
+<span class="sd">    low 32-bit integer value arguments:</span>
+<span class="sd">            assert (high32 &lt;&lt; 32) | low32 == result &quot;&quot;&quot;</span>
+    <span class="n">assert_uint32</span><span class="p">(</span><span class="n">high32</span><span class="p">)</span>
+    <span class="n">assert_uint32</span><span class="p">(</span><span class="n">low32</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">high32</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="p">)</span> <span class="o">|</span> <span class="n">low32</span>
     <span class="k">return</span> <span class="n">result</span>
 
 <span class="c1">#todo move to pcapng.bytes</span>
@@ -1509,7 +1608,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int16', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_int16" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_15</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1529,7 +1630,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int32', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_int32" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_31</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1549,7 +1652,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int64', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_int64" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_63</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1569,7 +1674,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_int8', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_int8" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                 <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span>  <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_int8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span>  <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_7</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1719,6 +1826,26 @@ table {
   
       
   <div class="item">
+    <div class="name def" id="pcapng.util.assert_type_int">
+    <p>def <span class="ident">assert_type_int</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_type_int', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.assert_type_int" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>             <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="pcapng.util.assert_type_list">
     <p>def <span class="ident">assert_type_list</span>(</p><p>arg)</p>
     </div>
@@ -1789,7 +1916,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint16', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_uint16" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint16</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_16</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1809,7 +1938,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint32', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_uint32" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint32</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_32</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1829,7 +1960,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint64', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_uint64" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>               <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_64</span><span class="p">),</span> <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -1849,7 +1982,9 @@ table {
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.assert_uint8', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.assert_uint8" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>                <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">assert_uint8</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+    <span class="n">assert_type_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">arg</span> <span class="o">&lt;</span> <span class="n">const</span><span class="o">.</span><span class="n">POW_2_8</span><span class="p">),</span>  <span class="s1">&#39;arg={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -2173,20 +2308,96 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
   
       
   <div class="item">
-    <div class="name def" id="pcapng.util.curr_utc_secs">
-    <p>def <span class="ident">curr_utc_secs</span>(</p><p>)</p>
+    <div class="name def" id="pcapng.util.curr_time_utc">
+    <p>def <span class="ident">curr_time_utc</span>(</p><p>)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Returns the current UTC time in integer seconds.</p></div>
+    <div class="desc"><p>Returns the current UTC time in floating-point seconds since unix epoch.</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_utc_secs', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.util.curr_utc_secs" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_utc_secs</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
-    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">curr_utc_timetuple</span><span class="p">()</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_time_utc', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_time_utc" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_time_utc</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in floating-point seconds since unix epoch.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
+    <span class="k">if</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">utc_secs</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.curr_time_utc_micros">
+    <p>def <span class="ident">curr_time_utc_micros</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the current UTC time in integer microseconds since unix epoch.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_time_utc_micros', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_time_utc_micros" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_time_utc_micros</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer microseconds since unix epoch.&quot;&quot;&quot;</span>
+    <span class="n">micros</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">micros</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.curr_time_utc_millis">
+    <p>def <span class="ident">curr_time_utc_millis</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the current UTC time in integer milliseconds since unix epoch.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_time_utc_millis', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_time_utc_millis" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_time_utc_millis</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer milliseconds since unix epoch.&quot;&quot;&quot;</span>
+    <span class="n">millis</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">millis</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.curr_time_utc_secs">
+    <p>def <span class="ident">curr_time_utc_secs</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns the current UTC time in integer seconds since unix epoch.</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_time_utc_secs', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_time_utc_secs" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_time_utc_secs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds since unix epoch.&quot;&quot;&quot;</span>
+    <span class="n">secs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">secs</span>
 </pre></div>
 
@@ -2197,8 +2408,8 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
   
       
   <div class="item">
-    <div class="name def" id="pcapng.util.curr_utc_secs_hexstr">
-    <p>def <span class="ident">curr_utc_secs_hexstr</span>(</p><p>)</p>
+    <div class="name def" id="pcapng.util.curr_time_utc_secs_hexstr">
+    <p>def <span class="ident">curr_time_utc_secs_hexstr</span>(</p><p>)</p>
     </div>
     
 
@@ -2206,11 +2417,11 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
   
     <div class="desc"><p>Returns the current UTC time in integer seconds.</p></div>
   <div class="source_cont">
-  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_utc_secs_hexstr', this);">Show source &equiv;</a></p>
-  <div id="source-pcapng.util.curr_utc_secs_hexstr" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_utc_secs_hexstr</span><span class="p">():</span>
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_time_utc_secs_hexstr', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.curr_time_utc_secs_hexstr" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_time_utc_secs_hexstr</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Returns the current UTC time in integer seconds.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">int32_to_hexstr</span><span class="p">(</span><span class="n">curr_utc_secs</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">int32_to_hexstr</span><span class="p">(</span><span class="n">curr_time_utc_secs</span><span class="p">())</span>
 </pre></div>
 
   </div>
@@ -2227,19 +2438,14 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
 
     
   
-    <div class="desc"><p>Returns the current UTC time as a (secs, usecs) tuple.</p></div>
+    <div class="desc"><p>Returns the current UTC time as a (secs, usecs) integer tuple.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.curr_utc_timetuple', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.curr_utc_timetuple" class="source">
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">curr_utc_timetuple</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) tuple.&quot;&quot;&quot;</span>
-    <span class="k">global</span> <span class="n">gbl_test_ctx</span>
-    <span class="k">if</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;enable&#39;</span><span class="p">]:</span>
-        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">gbl_test_ctx</span><span class="p">[</span><span class="s1">&#39;utc_time&#39;</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">utc_secs</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span> <span class="n">utc_secs</span> <span class="p">)</span>
-    <span class="k">return</span> <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span>
+    <span class="sd">&quot;&quot;&quot;Returns the current UTC time as a (secs, usecs) integer tuple.&quot;&quot;&quot;</span>
+    <span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span> <span class="o">=</span> <span class="n">split_float</span><span class="p">(</span><span class="n">curr_time_utc</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">secs</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">usecs</span><span class="p">)</span>
 </pre></div>
 
   </div>
@@ -2412,6 +2618,77 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
   
       
   <div class="item">
+    <div class="name def" id="pcapng.util.is_even">
+    <p>def <span class="ident">is_even</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns True if the arg is an even integer</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.is_even', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.is_even" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns True if the arg is an even integer&quot;</span>
+    <span class="k">assert</span> <span class="n">is_int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">half</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">half</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">half</span><span class="p">))</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.is_int">
+    <p>def <span class="ident">is_int</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns True if the arg is an integer value</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.is_int', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.is_int" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">is_int</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns True if the arg is an integer value&quot;</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="n">arg</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.is_odd">
+    <p>def <span class="ident">is_odd</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns True if the arg is an even integer</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.is_odd', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.is_odd" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">is_odd</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="s2">&quot;Returns True if the arg is an even integer&quot;</span>
+    <span class="k">return</span> <span class="n">is_even</span><span class="p">(</span><span class="n">arg</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="pcapng.util.is_python2">
     <p>def <span class="ident">is_python2</span>(</p><p>)</p>
     </div>
@@ -2495,6 +2772,28 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
     <span class="k">assert</span> <span class="p">(</span><span class="n">num_bytes_needed</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;padding length cannot be negative&quot;</span>
     <span class="n">data_bytes_pad</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">([</span><span class="n">padval</span><span class="p">])</span> <span class="o">*</span> <span class="n">num_bytes_needed</span>
     <span class="k">return</span> <span class="n">data_bytes_pad</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.quot">
+    <p>def <span class="ident">quot</span>(</p><p>numer, demon)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.quot', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.quot" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">quot</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">):</span>
+    <span class="n">quotient</span><span class="p">,</span> <span class="n">dummy</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span> <span class="n">numer</span><span class="p">,</span> <span class="n">demon</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">quotient</span>
 </pre></div>
 
   </div>
@@ -2626,6 +2925,65 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
   
       
   <div class="item">
+    <div class="name def" id="pcapng.util.str_to_intvec">
+    <p>def <span class="ident">str_to_intvec</span>(</p><p>arg, digits=2)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Parse a string of digits into a list of integers like:
+str_to_intvec('123456')     -&gt; [12, 34, 56]
+str_to_intvec('123456', 3)  -&gt; [123, 456]</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.str_to_intvec', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.str_to_intvec" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">str_to_intvec</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a string of digits into a list of integers like:</span>
+<span class="sd">            str_to_intvec(&#39;123456&#39;)     -&gt; [12, 34, 56]</span>
+<span class="sd">            str_to_intvec(&#39;123456&#39;, 3)  -&gt; [123, 456]   &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span>
+    <span class="k">assert</span> <span class="n">is_even</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">src</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">chars</span> <span class="o">=</span> <span class="n">src</span><span class="p">[:</span><span class="n">digits</span><span class="p">]</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="p">[</span><span class="n">digits</span><span class="p">:]</span>
+        <span class="n">intval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">intval</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.take">
+    <p>def <span class="ident">take</span>(</p><p>n, listy)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Return the first n values from a list or a generator</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.take', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.take" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">take</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="n">listy</span> <span class="p">):</span>
+    <span class="s2">&quot;Return the first n values from a list or a generator&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span> <span class="n">listy</span> <span class="p">)[</span> <span class="p">:</span><span class="n">n</span> <span class="p">]</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
     <div class="name def" id="pcapng.util.test_time_utc_set">
     <p>def <span class="ident">test_time_utc_set</span>(</p><p>utc_secs)</p>
     </div>
@@ -2686,7 +3044,7 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.timeTuple_subtract', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.timeTuple_subtract" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timeTuple_subtract</span><span class="p">(</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">):</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timeTuple_subtract</span><span class="p">(</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">):</span>    <span class="c1">#todo delete?</span>
     <span class="sd">&quot;&quot;&quot;Subtracts two time tuples in (secs, usecs) format, returning a float result.&quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">us1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts1</span>
     <span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">us2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ts2</span>
@@ -2714,7 +3072,7 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
   <div class="source_cont">
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.timeTuple_to_float', this);">Show source &equiv;</a></p>
   <div id="source-pcapng.util.timeTuple_to_float" class="source">
-    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timeTuple_to_float</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">usecs</span><span class="p">):</span>    <span class="c1">#todo delete?</span>
     <span class="sd">&quot;&quot;&quot;Converts a time tuple from (secs, usecs) to float.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">usecs</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000000.0</span><span class="p">)</span>
 </pre></div>
@@ -2740,6 +3098,66 @@ type &amp; content of the first block, and the remaining bytes.</p></div>
     <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts arg to a &#39;bytes&#39; object.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span> <span class="nb">bytearray</span><span class="p">(</span> <span class="n">arg</span> <span class="p">))</span>    <span class="c1"># if python2, &#39;bytes&#39; is synonym for &#39;str&#39;</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.uint64_join32">
+    <p>def <span class="ident">uint64_join32</span>(</p><p>high32, low32)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Returns a 64-bit unsigned integer value formed by joining the high and
+low 32-bit integer value arguments:
+        assert (high32 &lt;&lt; 32) | low32 == result</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.uint64_join32', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.uint64_join32" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">uint64_join32</span><span class="p">(</span> <span class="n">high32</span><span class="p">,</span> <span class="n">low32</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a 64-bit unsigned integer value formed by joining the high and</span>
+<span class="sd">    low 32-bit integer value arguments:</span>
+<span class="sd">            assert (high32 &lt;&lt; 32) | low32 == result &quot;&quot;&quot;</span>
+    <span class="n">assert_uint32</span><span class="p">(</span><span class="n">high32</span><span class="p">)</span>
+    <span class="n">assert_uint32</span><span class="p">(</span><span class="n">low32</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">high32</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="p">)</span> <span class="o">|</span> <span class="n">low32</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="pcapng.util.uint64_split32">
+    <p>def <span class="ident">uint64_split32</span>(</p><p>arg)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Splits a 64-bit unsigned integer value into the high and low 32-bit integer values
+(high32, low32) = uint64_split32( orig )
+assert (high32 &lt;&lt; 32) | low32 == orig</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-pcapng.util.uint64_split32', this);">Show source &equiv;</a></p>
+  <div id="source-pcapng.util.uint64_split32" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">uint64_split32</span><span class="p">(</span> <span class="n">arg</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Splits a 64-bit unsigned integer value into the high and low 32-bit integer values</span>
+<span class="sd">            (high32, low32) = uint64_split32( orig )</span>
+<span class="sd">            assert (high32 &lt;&lt; 32) | low32 == orig &quot;&quot;&quot;</span>
+    <span class="n">assert_uint64</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">high32</span> <span class="o">=</span> <span class="n">arg</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span>
+    <span class="n">low32</span>  <span class="o">=</span> <span class="n">arg</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">high32</span><span class="p">,</span><span class="n">low32</span><span class="p">)</span>
 </pre></div>
 
   </div>

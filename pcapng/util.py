@@ -106,13 +106,13 @@ def assert_vec16_uint8( listy ):
 
 #-----------------------------------------------------------------------------
 
-def mod( numer, demon ):  #todo need test
-    dummy, remainder = divmod( numer, demon )
-    return remainder
-
-def quot( numer, demon ):  #todo need test
+def quot( numer, demon ):
     quotient, dummy = divmod( numer, demon )
     return quotient
+
+def mod( numer, demon ):
+    dummy, remainder = divmod( numer, demon )
+    return remainder
 
 def take( n, listy):
     "Return the first n values from a list or a generator"

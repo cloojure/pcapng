@@ -212,6 +212,11 @@ def test_time():
     assert '0x0001e240' == util.curr_utc_secs_hexstr()
     util.test_time_utc_unset()
 
+def test_quot():
+    assert [0,0,0, 1,1,1, 2,2,2] == map( lambda x:util.quot(x,3), range(9) )
+
+def test_mod():
+    assert [0,1,2, 0,1,2, 0,1,2] == map( lambda x:util.mod(x,3), range(9) )
 
 def test_take():
     def generate_ints(N):

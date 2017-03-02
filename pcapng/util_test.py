@@ -84,7 +84,7 @@ def test_block32_bytes_pack():
         assert_block32_bytes_packing( range(i) )
 
 def test_block32_labelled_bytes_pack():
-    block_label = util.curr_utc_secs()
+    block_label = util.curr_time_utc_secs()
     def assert_block32_labelled_bytes_packing( data_bytes ):
         orig = to_bytes( data_bytes )
         extra_bytes = to_bytes('dummy-start') + orig + to_bytes('dummy-end')
@@ -185,7 +185,29 @@ def test_dict_merge():
     assert { "a":1, 'b':2        } == util.dict_merge(       {'a':1}, {'b':2}            )
     assert { "a":1, 'b':2, 'c':3 } == util.dict_merge_all( [ {'a':1}, {'b':2}, {'c':3} ] )
 
-#-----------------------------------------------------------------------------
+def test_even_odd():
+    assert util.is_even(2)
+    assert util.is_even(4)
+    assert util.is_even(6)
+
+    assert util.is_odd(3)
+    assert util.is_odd(5)
+    assert util.is_odd(7)
+
+def test_str_to_intvec():
+    assert util.str_to_intvec('123456')     == [12, 34, 56]
+    assert util.str_to_intvec('420001')     == [42, 0, 1]
+    assert util.str_to_intvec('123456', 3)  == [123, 456]
+
+def test_uint64_split32():
+    def assert_round_trip(orig):
+        (high32, low32) = util.uint64_split32( orig )
+        result = util.uint64_join32(high32, low32)
+        assert result == orig
+    for x in util.fibonacci_range( pow(2,50) ):
+        assert_round_trip(x)
+
+
 def test_xxx():
     xx1 = struct.pack(   '!hhl', 1, 2, 3 )  # h='short', l='long'
     xx2 = struct.unpack( '!hhl', xx1 )      # ! => network byte order (big-endian)
@@ -202,14 +224,20 @@ def test_xxx():
     assert 'abc'             == util.chrList_to_str(['a', 'b', 'c'])
 
 def test_time():
-    util.test_time_utc_set(123.456789)
+    time_tst = 123.456789
+    util.test_time_utc_set( 123.456789 )
+    util.assert_rel_equal(time_tst, util.curr_time_utc(), digits=9)
+    assert abs(123456789 - util.curr_time_utc_micros()) <= 1
+    assert abs(123456 - util.curr_time_utc_millis()) <= 1
+    assert abs(123 - util.curr_time_utc_secs()) <= 1
+
     (secs,usecs) = util.curr_utc_timetuple()
     assert 123    == secs
-    assert 456789 == round( usecs )
+    assert abs(456789 - usecs) <= 1
     util.test_time_utc_unset()
 
     util.test_time_utc_set(123456)
-    assert '0x0001e240' == util.curr_utc_secs_hexstr()
+    assert '0x0001e240' == util.curr_time_utc_secs_hexstr()
     util.test_time_utc_unset()
 
 def test_quot():

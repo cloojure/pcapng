@@ -66,19 +66,36 @@ def assert_python2():
 def assert_type_bytearray(arg):       assert type(arg) == bytearray
 def assert_type_bytes(arg):           assert type(arg) == bytes
 def assert_type_str(arg):             assert type(arg) == str
+def assert_type_int(arg):             assert type(arg) == int
 def assert_type_set(arg):             assert type(arg) == set
 def assert_type_list(arg):            assert type(arg) == list
 def assert_type_dict(arg):            assert type(arg) == dict
 
-def assert_uint8(arg):                assert (0 <= arg < const.POW_2_8),  'arg={}'.format(arg)
-def assert_uint16(arg):               assert (0 <= arg < const.POW_2_16), 'arg={}'.format(arg)
-def assert_uint32(arg):               assert (0 <= arg < const.POW_2_32), 'arg={}'.format(arg)
-def assert_uint64(arg):               assert (0 <= arg < const.POW_2_64), 'arg={}'.format(arg)
+def assert_uint8(arg):
+    assert_type_int(arg)
+    assert (0 <= arg < const.POW_2_8),  'arg={}'.format(arg)
+def assert_uint16(arg):
+    assert_type_int(arg)
+    assert (0 <= arg < const.POW_2_16), 'arg={}'.format(arg)
+def assert_uint32(arg):
+    assert_type_int(arg)
+    assert (0 <= arg < const.POW_2_32), 'arg={}'.format(arg)
+def assert_uint64(arg):
+    assert_type_int(arg)
+    assert (0 <= arg < const.POW_2_64), 'arg={}'.format(arg)
 
-def assert_int8(arg):                 assert (-const.POW_2_7  <= arg < const.POW_2_7),  'arg={}'.format(arg)
-def assert_int16(arg):                assert (-const.POW_2_15 <= arg < const.POW_2_15), 'arg={}'.format(arg)
-def assert_int32(arg):                assert (-const.POW_2_31 <= arg < const.POW_2_31), 'arg={}'.format(arg)
-def assert_int64(arg):                assert (-const.POW_2_63 <= arg < const.POW_2_63), 'arg={}'.format(arg)
+def assert_int8(arg):
+    assert_type_int(arg)
+    assert (-const.POW_2_7  <= arg < const.POW_2_7),  'arg={}'.format(arg)
+def assert_int16(arg):
+    assert_type_int(arg)
+    assert (-const.POW_2_15 <= arg < const.POW_2_15), 'arg={}'.format(arg)
+def assert_int32(arg):
+    assert_type_int(arg)
+    assert (-const.POW_2_31 <= arg < const.POW_2_31), 'arg={}'.format(arg)
+def assert_int64(arg):
+    assert_type_int(arg)
+    assert (-const.POW_2_63 <= arg < const.POW_2_63), 'arg={}'.format(arg)
 
 def assert_type_charLst( arg ):
     "Assert the arg is a list of characters (len-1 strings)"
@@ -205,30 +222,44 @@ def rand_bytes( n ):    #todo need test
     int_vals = rand_ints( n, 0, 255 )
     return to_bytes( int_vals )
 
-def curr_utc_timetuple():
-    """Returns the current UTC time as a (secs, usecs) tuple."""
+def curr_time_utc():
+    """Returns the current UTC time in floating-point seconds since unix epoch."""
     global gbl_test_ctx
     if gbl_test_ctx['enable']:
         utc_secs = gbl_test_ctx['utc_time']
     else:
         utc_secs = time.time()
-    secs, usecs = split_float( utc_secs )
-    return secs, usecs
+    return utc_secs
 
-def curr_utc_secs():
-    """Returns the current UTC time in integer seconds."""
-    secs, usecs = curr_utc_timetuple()
+def curr_utc_timetuple():
+    """Returns the current UTC time as a (secs, usecs) integer tuple."""
+    secs, usecs = split_float(curr_time_utc())
+    return secs, int(usecs)
+
+def curr_time_utc_micros():
+    """Returns the current UTC time in integer microseconds since unix epoch."""
+    micros = int(curr_time_utc() * 1000000)
+    return micros
+
+def curr_time_utc_millis():
+    """Returns the current UTC time in integer milliseconds since unix epoch."""
+    millis = int(curr_time_utc() * 1000)
+    return millis
+
+def curr_time_utc_secs():
+    """Returns the current UTC time in integer seconds since unix epoch."""
+    secs = int(curr_time_utc())
     return secs
 
-def curr_utc_secs_hexstr():
+def curr_time_utc_secs_hexstr():
     """Returns the current UTC time in integer seconds."""
-    return int32_to_hexstr(curr_utc_secs())
+    return int32_to_hexstr(curr_time_utc_secs())
 
-def timeTuple_to_float(secs, usecs):
+def timeTuple_to_float(secs, usecs):    #todo delete?
     """Converts a time tuple from (secs, usecs) to float."""
     return float(secs) + (float(usecs) / 1000000.0)
 
-def timeTuple_subtract(ts1, ts2):
+def timeTuple_subtract(ts1, ts2):    #todo delete?
     """Subtracts two time tuples in (secs, usecs) format, returning a float result."""
     (s1, us1) = ts1
     (s2, us2) = ts2
@@ -271,6 +302,53 @@ def dict_merge_all( dict_lst ):  #todo need test
     result = {}
     for curr_dict in dict_lst:
         result.update(curr_dict)
+    return result
+
+def is_int( arg ):
+    "Returns True if the arg is an integer value"
+    return ( arg == int(arg) )
+
+def is_even( arg ):
+    "Returns True if the arg is an even integer"
+    assert is_int(arg)
+    half = float(arg) / 2.0
+    return (half == int(half))
+
+def is_odd( arg ):
+    "Returns True if the arg is an even integer"
+    return is_even(arg+1)
+
+def str_to_intvec(arg, digits=2):
+    """Parse a string of digits into a list of integers like:
+            str_to_intvec('123456')     -> [12, 34, 56]
+            str_to_intvec('123456', 3)  -> [123, 456]   """
+    assert type(arg) == str
+    assert is_even(len(arg))
+    src = arg
+    result = []
+    while len(src) > 0:
+        chars = src[:digits]
+        src = src[digits:]
+        intval = int(chars)
+        result.append( intval )
+    return result
+
+def uint64_split32( arg ):
+    """Splits a 64-bit unsigned integer value into the high and low 32-bit integer values
+            (high32, low32) = uint64_split32( orig )
+            assert (high32 << 32) | low32 == orig """
+    assert_uint64(arg)
+    high32 = arg >> 32
+    low32  = arg & 0xFFFFFFFF
+    return (high32,low32)
+
+def uint64_join32( high32, low32 ):
+    """Returns a 64-bit unsigned integer value formed by joining the high and
+    low 32-bit integer value arguments:
+            assert (high32 << 32) | low32 == result """
+    assert_uint32(high32)
+    assert_uint32(low32)
+    result = (high32 << 32) | low32
     return result
 
 #todo move to pcapng.bytes

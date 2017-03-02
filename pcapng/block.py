@@ -340,22 +340,21 @@ class EnhancedPacketBlock:
         for opt in options_lst:
             assert self.is_epb_option(opt)
         if timestamp is None:
-            (time_secs, time_usecs) = util.curr_utc_timetuple()
+            time_utc_micros = util.curr_time_utc_micros()
         else:
-            (time_secs, time_usecs) = timestamp
+            time_utc_micros = timestamp
 
         self.interface_id       = interface_id
         self.pkt_data_captured  = pkt_data_captured
         self.pkt_data_orig_len  = pkt_data_orig_len
         self.options_lst        = options_lst
-        self.time_secs          = time_secs
-        self.time_usecs         = time_usecs
+        self.time_utc_micros    = time_utc_micros
 
     def to_map(self):
         "Converts an EPB object to a map representation"
         return util.select_keys( self.__dict__, [
             'interface_id', 'pkt_data_captured', 'pkt_data_orig_len', 'options_lst',
-            'time_secs', 'time_usecs' ] )
+            'time_utc_micros' ] )
 
     def __repr__(self):         return str( self.to_map() )
     def __eq__(self, other):    return self.to_map() == other.to_map()
@@ -381,8 +380,9 @@ class EnhancedPacketBlock:
                             pkt_data_captured_pad_len +
                             len(options_bytes) +
                             4 )      # block total length
+        (timestamp_high, timestamp_low) = util.uint64_split32( self.time_utc_micros )
         packed_bytes = (struct.pack( self.head_encoding, self.SPEC_CODE, block_total_len, self.interface_id,
-                                     self.time_secs, self.time_usecs, pkt_data_captured_len,
+                                     timestamp_high, timestamp_low, pkt_data_captured_len,
                                      self.pkt_data_orig_len) +
                         pkt_data_pad +
                         options_bytes +
@@ -393,9 +393,10 @@ class EnhancedPacketBlock:
     def unpack(packed_bytes):
         "Deserialize an EPB object from packed bytes"
         util.assert_type_bytes(packed_bytes)
-        (block_type, block_total_len, interface_id, time_secs, time_usecs,
+        (block_type, block_total_len, interface_id, timestamp_high, timestamp_low,
                 pkt_data_captured_len, pkt_data_orig_len) = struct.unpack( EnhancedPacketBlock.head_encoding, packed_bytes[:28] )
         (block_total_len_end,) = struct.unpack( EnhancedPacketBlock.tail_encoding, packed_bytes[-4:])
+        time_utc_micros = util.uint64_join32( timestamp_high, timestamp_low )
         assert block_type           == EnhancedPacketBlock.SPEC_CODE      #todo verify block type & all fields, all fns
         assert block_total_len      == block_total_len_end == len(packed_bytes)
         assert pkt_data_captured_len <= pkt_data_orig_len
@@ -406,7 +407,7 @@ class EnhancedPacketBlock:
         options_bytes               = block_bytes_stripped[pkt_data_captured_pad_len:]
         options_lst                 = option.unpack_all( EnhancedPacketBlock.UNPACK_DISPATCH_TABLE, options_bytes )
         result_obj                  = EnhancedPacketBlock( interface_id, pkt_data, pkt_data_orig_len, options_lst,
-                                                           timestamp=(time_secs, time_usecs) )
+                                                           timestamp=time_utc_micros  )
         return result_obj
 
 # custom format really needs a content_length field!

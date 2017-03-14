@@ -1,0 +1,23 @@
+
+If you have not already done so, make sure the VirtualBox Guest Additions are already installed (top
+menu -> Devices -> Insert Guest Additions CD, then follow the prompts)
+
+On the host, go to VirtualBox window:
+
+  top menu -> Devices -> Shared Folders -> Shared Folder Settings
+
+  Click "+" icon on right
+    - Under "Folder Path" navigate to an absolute pathname like /home/joe/myFolder
+    - Under "Folder Name" enter a unique ID like "someName"
+
+On guest vm, open a terminal and type:
+
+  > sudo mkdir -p /mystuff
+  > sudo mount -t vboxsf someName /mystuff
+
+The trick is that the ID string "someName" is just a tag to connect the host directory and the VM
+directory.  It has not other purpose. The shared folder /home/joe/myFolder is now available as the
+dir /mystuff in the VM.
+
+The VirtualBox GUI does not make a clear distinction between the directory name on the host, the directory
+name on the VM, and the ID string that connects them. 

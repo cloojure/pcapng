@@ -160,17 +160,19 @@ def main():
 
     count = 0
     while True:
-        pkt_bytes = get_next_packet( socket_fd )
-        dbg_print( pkt_bytes )
-        pcap_fp.write( pcapng.block.SimplePacketBlock( pkt_bytes ).pack() )
+        if False:
+            pkt_bytes = get_next_packet( socket_fd )
+            dbg_print( pkt_bytes )
+            pcap_fp.write( pcapng.block.SimplePacketBlock( pkt_bytes ).pack() )
 
-        pkt_bytes = get_next_packet( socket_fd )
-        dbg_print( pkt_bytes )
+        if True:
+            pkt_bytes = get_next_packet( socket_fd )
+            dbg_print( pkt_bytes )
 
-        epb_opts = [ pcapng.option.EpbFlags(       [13,14,15,16] ),
-                     pcapng.option.EpbHash(        'just about any hash spec can go here' ),
-                     pcapng.option.EpbDropCount(   13 ) ]
-        pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
+            epb_opts = [ pcapng.option.EpbFlags(       [13,14,15,16] ),
+                         pcapng.option.EpbHash(        'just about any hash spec can go here' ),
+                         pcapng.option.EpbDropCount(   13 ) ]
+            pcap_fp.write( pcapng.block.EnhancedPacketBlock( 0, pkt_bytes, len(pkt_bytes), epb_opts ).pack() )
 
 if __name__ == "__main__":
   main()

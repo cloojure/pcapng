@@ -2,15 +2,15 @@ FROM ubuntu:latest
 
 RUN apt-get update && apt-get install -y \
     apt-transport-https \
-    git \
-    lsb-release \
+    lsb-release vim git \
     net-tools \
-    python \
-    python-pip \
+    python python-pip \
     sudo \
-    tcpreplay \
-    vim \
+    tcpreplay tcpdump \
     linux-generic netperfmeter iperf arping 
+
+# HACK around https://github.com/dotcloud/docker/issues/5490
+RUN mv /usr/sbin/tcpdump /usr/bin/tcpdump
 
 RUN echo "deb [trusted=yes] https://repo.iovisor.org/apt/xenial xenial-nightly main" | \
       tee /etc/apt/sources.list.d/iovisor.list

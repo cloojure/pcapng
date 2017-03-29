@@ -91,7 +91,7 @@ def dbg_print(pkt_bytes):
         hex_list = map( lambda x: x.encode("hex"), raw_list )
         hex_str = " ".join(hex_list)
         print( hex_str )
-    else:
+    if False:
         print('.',end='')
         sys.stdout.flush()
 
@@ -161,6 +161,11 @@ def main():
 
     count = 0
     while True:
+	count += 1
+        dummy, remainder = divmod( count, 100 )
+        if (remainder == 0):
+	    print('.',end='')
+	    sys.stdout.flush()
         if False:
             pkt_bytes = get_next_packet( socket_fd )
             dbg_print( pkt_bytes )

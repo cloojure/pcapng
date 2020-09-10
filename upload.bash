@@ -7,7 +7,7 @@ rm -rf  dist  build  *.egg-info
 echo ""
 echo ">>> init for source distribution"
 echo ""
-python setup.py sdist
+python3 setup.py sdist bdist_wheel
 
 # MANUAL STEP: python setup.py register  -r https://testpypi.python.org/pypi   # *** for TESTPYPI # ***
 # MANUAL STEP: python setup.py register 

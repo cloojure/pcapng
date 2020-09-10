@@ -2,7 +2,7 @@
 
 echo ""
 echo ">>> clearing old build output"
-rm -rf dist *.egg-info      
+rm -rf  dist  build  *.egg-info      
 
 echo ""
 echo ">>> init for source distribution"
@@ -19,7 +19,7 @@ if false; then     # use 'true' or 'false' (no quotes)
   echo ""
   echo ">>> uploading data  *** USING TESTPYPI ***"
   echo ""
-  twine upload dist/* -r testpypi
+  python3 -m twine upload dist/* -r testpypi
 
   echo ""
   echo ">>> to install, perform:"
@@ -31,7 +31,7 @@ else
   echo ""
   echo ">>> uploading data to pypi.org"
   echo ""
-  twine upload dist/*
+  python3 -m twine upload dist/*
   echo ""
   echo ">>> to install, perform:"
   echo ""

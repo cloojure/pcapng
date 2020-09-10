@@ -17,7 +17,7 @@
 PCAPNG read/write package
 
 See:
-https://gitlab.com/netdev-americas/pcapng
+https://github.com/cloojure/pcapng
 """
 
 # Always prefer setuptools over distutils
@@ -38,13 +38,13 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.24',
+    version='0.1.25',
 
     description='Tool for reading/writing PCAPNG network packet capture files.',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://gitlab.com/netdev-americas/pcapng',
+    url='https://github.com/cloojure/pcapng',
 
     # Author details
     author='Alan Thompson',

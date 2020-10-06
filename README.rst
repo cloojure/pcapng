@@ -89,6 +89,39 @@ Install from the Python Package Index (PyPI)::
     sudo pip install pcapng
 
 
+
+Environment
+===========
+
+This project is designed to use `pipenv`, and is configured for Python 2.7
+
+Testing
+=======
+
+    ~/gh/pcapng > pipenv shell
+    Launching subshell in virtual environment…
+     . /home/alan/.local/share/virtualenvs/pcapng-GhZ5R3T5/bin/activate
+
+    (pcapng) ~/gh/pcapng > python --version     # verify Python version
+    Python 2.7.18rc1
+
+    (pcapng) ~/gh/pcapng > pytest               # execute unit tests
+    ========================================================================================= test session starts =========================================================================================
+    platform linux2 -- Python 2.7.18rc1, pytest-4.6.11, py-1.9.0, pluggy-0.13.1
+    rootdir: /home/alan/gh/pcapng
+    collected 69 items                                                                                                                                                                                    
+
+    pcapng/block_test.py .......                                                                                                                                                                    [ 10%]
+    pcapng/mrt_test.py ....                                                                                                                                                                         [ 15%]
+    pcapng/option_test.py ..........................                                                                                                                                                [ 53%]
+    pcapng/tlv_test.py ..........                                                                                                                                                                   [ 68%]
+    pcapng/util_test.py ......................                                                                                                                                                      [100%]
+
+    ====================================================================================== 69 passed in 0.27 seconds ======================================================================================
+
+    (pcapng) ~/gh/pcapng > exit
+
+
 API Documentation
 =================
 

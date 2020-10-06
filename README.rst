@@ -98,6 +98,8 @@ This project is designed to use `pipenv`, and is configured for Python 2.7
 Testing
 =======
 
+.. code-block:: bash
+
     ~/gh/pcapng > pipenv shell
     Launching subshell in virtual environment…
      . /home/alan/.local/share/virtualenvs/pcapng-GhZ5R3T5/bin/activate

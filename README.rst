@@ -108,18 +108,18 @@ Testing
     Python 2.7.18rc1
 
     (pcapng) ~/gh/pcapng > pytest               # execute unit tests
-    ======================================================== test session starts ========================================================
+
+    ================================== test session starts ==================================
     platform linux2 -- Python 2.7.18rc1, pytest-4.6.11, py-1.9.0, pluggy-0.13.1
     rootdir: /home/alan/gh/pcapng
-    collected 69 items                                                                                                                                                                                    
+    collected 69 items
 
-    pcapng/block_test.py .......                                                                                                                                                                    [ 10%]
-    pcapng/mrt_test.py ....                                                                                                                                                                         [ 15%]
-    pcapng/option_test.py ..........................                                                                                                                                                [ 53%]
-    pcapng/tlv_test.py ..........                                                                                                                                                                   [ 68%]
-    pcapng/util_test.py ......................                                                                                                                                                      [100%]
-
-    ===================================================== 69 passed in 0.27 seconds =====================================================
+    pcapng/block_test.py .......                                                [ 10%]
+    pcapng/mrt_test.py ....                                                     [ 15%]
+    pcapng/option_test.py ..........................                            [ 53%]
+    pcapng/tlv_test.py ..........                                               [ 68%]
+    pcapng/util_test.py ......................                                  [100%]
+    =============================== 69 passed in 0.27 seconds ===============================
 
     (pcapng) ~/gh/pcapng > exit
 
